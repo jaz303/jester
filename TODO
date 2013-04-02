@@ -1,51 +1,32 @@
-Language features
-=================
-
-[ ] while
-[ ] if
-[ ] binary expressions (inc logical operators)
-[ ] return
-[ ] function definition
-[ ] function calling
-
-[ ] symbols
-[ ] colors
-
-[ ] "garbage collection"
-
-[ ] array
-[ ] dictionary
-
-[ ] trace
-
-[ ] task spawn, yield
-[ ] yield from inside native fn
-
-[ ] parser/lexer
-
-[ ] stdlib
-
-Demonstration
-=============
-
-[ ] timeline
-[ ] allow call-stack to be accessed as objects
-[ ] ACE-editor integration
-[ ] breakpoints
-
-Optimise
-========
-
-[ ] Inline method cache
-
-Going forward
-=============
-
-[ ] Object system, new syntax
-[ ] Blocks/closures
-[ ] Iteration
-
-
-
-There should be a way of marking functions as "safe", i.e. that they have no side effects.
-Could use "fun" and "def". Means that test execution environment knows it can show invocations.
+Finish language:
+  [ ] if
+  [ ] function definition
+  [ ] function call
+  [ ] return
+  [ ] short circuiting logical operators
+  [ ] color literals
+  [ ] symbols
+  [ ] arrays + indexing
+  [ ] dictionaries + indexing
+  [ ] task spawn/yield
+  [ ] parser
+  [ ] stdlib
+  [ ] garbage collection
+  
+Make demo:
+  [ ] code window + run
+  [ ] repl
+  [ ] timeline
+  [ ] visualise callstack
+  [ ] breakpoints - suspend thread or entire VM
+  [ ] interact with stack frame
+  
+Later:
+  [ ] ACE editor integration
+  
+  [ ] Object system
+  [ ] New syntax
+  [ ] Blocks/closures
+  [ ] Iterators
+  
+  [ ] Inline method cache
