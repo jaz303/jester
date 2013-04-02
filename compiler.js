@@ -6,7 +6,11 @@
     '+'   : ops.ADD,
     '-'   : ops.SUB,
     '*'   : ops.MUL,
-    '/'   : ops.DIV
+    '/'   : ops.DIV,
+    '<'   : ops.LT,
+    '<='  : ops.LE,
+    '>'   : ops.GT,
+    '>='  : ops.GE
   };
   
   function Compiler() {}
@@ -16,10 +20,29 @@
       this._fn.code.push(opcode);
     },
     
+    compileFnDef: function(ast) {
+      
+    },
+    
     compileAssign: function(ast) {
       var slot = this._fn.slotForLocal(ast[1][1]);
       this.compileExpression(ast[2]);
-      this.emit(ops.SETL | slot);
+      this.emit(ops.SETL | (slot << 8));
+    },
+    
+    compileWhile: function(ast) {
+      
+      var loopStart = this._fn.code.length;
+      this.compileExpression(ast[1]);
+      
+      var failJump = this._fn.code.length;
+      this.emit(ops.JMPF);
+      
+      this.compileStatements(ast[2]);
+      this.emit(ops.JMPA | (loopStart << 8));
+      
+      this._fn.code[failJump] = ops.JMPF | ((this._fn.code.length - failJump - 1) << 8);
+
     },
     
     compileCall: function(ast) {
@@ -34,7 +57,7 @@
         this.compileExpression(args[i]);
       }
       
-      this.emit(ops.CALL | (args.length << 16) | this._fn.slotForFunctionCall(ast[1][1]));
+      this.emit(ops.CALL | (args.length << 8) | (this._fn.slotForFunctionCall(ast[1][1]) << 16));
       
     },
     
@@ -44,14 +67,14 @@
       } else if (ast === false) {
         this.emit(ops.PUSHF);
       } else if (typeof ast == 'number' || typeof ast == 'string') {
-        this.emit(ops.PUSHC | this._fn.slotForConstant(ast));
+        this.emit(ops.PUSHC | (this._fn.slotForConstant(ast) << 8));
       } else {
         switch (ast[0]) {
           case 'trace':
             this.emit(ops.TRACE);
             break;
           case 'ident':
-            this.emit(ops.PUSHL | this._fn.slotForLocal(ast[1]));
+            this.emit(ops.PUSHL | (this._fn.slotForLocal(ast[1]) << 8));
             break;
           case 'call':
             this.compileCall(ast);
@@ -72,8 +95,14 @@
     compileStatement: function(ast) {
       if (Array.isArray(ast)) {
         switch (ast[0]) {
+          case 'def':
+            this.compileFnDef(ast);
+            break;
           case 'assign':
             this.compileAssign(ast);
+            break;
+          case 'while':
+            this.compileWhile(ast);
             break;
           default:
             this.compileExpression(ast);
@@ -86,10 +115,14 @@
       }
     },
     
-    compileFunctionBody: function(ast) {
+    compileStatements: function(ast) {
       for (var i = 0; i < ast.length; ++i) {
         this.compileStatement(ast[i]);
       }
+    },
+    
+    compileFunctionBody: function(ast) {
+      this.compileStatements(ast);
       this.emit(ops.RET);
     },
     

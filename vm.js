@@ -1,27 +1,36 @@
 ;(function(global, simple) {
   
-  var DEFAULT_STACK_SIZE  = 2048;
+  var DEFAULT_STACK_SIZE = 2048;
   
   simple.opcodes = {};
   
   var _t = 1, t = function(name) {
-    var opcode = (_t++) << 24;
+    var opcode = (_t++);
     simple.opcodes[name] = opcode;
     return opcode;
   };
   
-  var OP_PUSHC    = t('PUSHC'),     /* Push Constant  (23:0 - constant slot) */
-      OP_PUSHL    = t('PUSHL'),     /* Push Local     (23:0 - local slot) */
+  var OP_PUSHC    = t('PUSHC'),     /* Push Constant  (31:8 - constant slot) */
+      OP_PUSHI    = t('PUSHI'),     /* Push Immediate (31:8 - integer value) */
+      OP_PUSHL    = t('PUSHL'),     /* Push Local     (31:8 - local slot) */
       OP_PUSHT    = t('PUSHT'),     /* Push true */
       OP_PUSHF    = t('PUSHF'),     /* Push false */
-      OP_SETL     = t('SETL'),      /* Set Local      (23:0 - local slot) */
-      OP_CALL     = t('CALL'),      /* Call           (23:16 - nargs, 15:0 - fn slot) */
+      OP_SETL     = t('SETL'),      /* Set Local      (31:8 - local slot) */
+      OP_CALL     = t('CALL'),      /* Call           (31:16 - fn slot, 15:8 - nargs) */
       OP_RET      = t('RET'),       /* Return */
       OP_POP      = t('POP'),       /* Pop TOS */
       OP_ADD      = t('ADD'),
       OP_SUB      = t('SUB'),
       OP_MUL      = t('MUL'),
       OP_DIV      = t('DIV'),
+      OP_LT       = t('LT'),
+      OP_LE       = t('LE'),
+      OP_GT       = t('GT'),
+      OP_GE       = t('GE'),
+      OP_JMP      = t('JMP'),       /* Jump           (31:8 - offset) */
+      OP_JMPT     = t('JMPT'),      /* Jump if True   (31:8 - offset) */
+      OP_JMPF     = t('JMPF'),      /* Jump if False  (31:8 - offset) */
+      OP_JMPA     = t('JMPA'),      /* Jump Absolute  (31:8 - target) */
       OP_TRACE    = t('TRACE'),     /* Trace */
       OP_EXIT     = t('EXIT');      /* Exit task */
       
@@ -38,6 +47,10 @@
       trace: null
     };
     
+    function truthy_p(v) {
+      return !(v === false || v === null);
+    }
+    
     function exec(task) {
       var frame = task.frames[task.fp],
           fn    = frame.fn,
@@ -46,12 +59,15 @@
       for (;;) {
         var op = code[frame.ip++];
         
-        switch (op & 0xff000000) {
+        switch (op & 0x000000FF) {
           case OP_PUSHC:
-            task.stack[frame.sp++] = fn.constants[op & 0x00ffffff];
+            task.stack[frame.sp++] = fn.constants[op >> 8];
+            break;
+          case OP_PUSHI:
+            task.stack[frame.sp++] = (op >> 8);
             break;
           case OP_PUSHL:
-            task.stack[frame.sp++] = task.stack[frame.bp + (op & 0x00ffffff)];
+            task.stack[frame.sp++] = task.stack[frame.bp + (op >> 8)];
             break;
           case OP_PUSHT:
             task.stack[frame.sp++] = true;
@@ -60,12 +76,12 @@
             task.stack[frame.sp++] = false;
             break;
           case OP_SETL:
-            task.stack[frame.bp + (op & 0x00ffffff)] = task.stack[--frame.sp];
+            task.stack[frame.bp + (op >> 8)] = task.stack[--frame.sp];
             break;
           case OP_CALL:
           
-            var fnix    = (op & 0x0000ffff),
-                nargs   = (op & 0x00ff0000) >> 16,
+            var fnix    = (op >> 16),
+                nargs   = (op >> 8) & 0xFF,
                 callfn  = env[fn.fnNames[fnix]];
                 
             if (typeof callfn == 'function') {
@@ -130,6 +146,60 @@
               throw "DIV - args non-numeric";
             }
             break;
+          case OP_LT:
+            var l = task.stack[frame.sp - 2],
+                r = task.stack[frame.sp - 1];
+            if (typeof l == 'number' && typeof r == 'number') {
+              task.stack[(frame.sp--) - 2] = (l < r);
+            } else {
+              throw "LT - args non-numeric";
+            }
+            break;
+          case OP_LE:
+            var l = task.stack[frame.sp - 2],
+                r = task.stack[frame.sp - 1];
+            if (typeof l == 'number' && typeof r == 'number') {
+              task.stack[(frame.sp--) - 2] = (l <= r);
+            } else {
+              throw "LE - args non-numeric";
+            }
+            break;
+          case OP_GT:
+            var l = task.stack[frame.sp - 2],
+                r = task.stack[frame.sp - 1];
+            if (typeof l == 'number' && typeof r == 'number') {
+              task.stack[(frame.sp--) - 2] = (l > r);
+            } else {
+              throw "GT - args non-numeric";
+            }
+            break;
+          case OP_GE:
+            var l = task.stack[frame.sp - 2],
+                r = task.stack[frame.sp - 1];
+            if (typeof l == 'number' && typeof r == 'number') {
+              task.stack[(frame.sp--) - 2] = (l >= r);
+            } else {
+              throw "GE - args non-numeric";
+            }
+            break;
+          case OP_JMP:
+            frame.ip += (op >> 8);
+            break;
+          case OP_JMPT:
+            var v = task.stack[--frame.sp];
+            if (truthy_p(v)) {
+              frame.ip += (op >> 8);
+            }
+            break;
+          case OP_JMPF:
+            var v = task.stack[--frame.sp];
+            if (!truthy_p(v)) {
+              frame.ip += (op >> 8);
+            }
+            break;
+          case OP_JMPA:
+            frame.ip = (op >> 8);
+            break;
           case OP_TRACE:
             if (vm.trace) {
               vm.trace(vm, task, frame);
@@ -139,6 +209,7 @@
             }
             break;
           case OP_EXIT:
+            console.log('task exit!');
             // TODO: remove this task from the task queue
             return;
         }

@@ -11,8 +11,22 @@
       function init() {
         
         var ast = [
+          ['def', 'add', ['l', 'r'],
+            [ ['return', ['+', ['ident', 'l'], ['ident', 'r']]]
+            ]
+          ],
+        
           ['assign', ['ident', 'b'], ['*', 20, 30]],
           ['assign', ['ident', 'c'], ['+', ['ident', 'b'], 100]],
+          
+          ['assign', ['ident', 'x'], 0],
+          ['while',
+            ['<', ['ident', 'x'], 10],
+            [ ['call', ['ident', 'print'], [['ident', 'x']]],
+              ['assign', ['ident', 'x'], ['+', ['ident', 'x'], 1]],
+            ]
+          ],
+          
           ['trace'],
           ['call', ['ident', 'print'], [['+', 50, ['ident', 'c']], 20, "foobar!"]]
         ];
@@ -26,9 +40,20 @@
           console.log("tracin'", task, frame);
         }
         
-        vm.env['print'] = function(args) { console.log("VM say: ", args[0], args[1], args[2]); };
+        vm.env['print'] = function(args) {
+          console.log("VM say: ", args[0], args[1], args[2]);
+        };
         
         vm.spawn(code);
+        
+        // var start = Date.now();
+        // for (var i = 0; i < 100000; ++i) {
+        //   
+        // }
+        // 
+        // console.log(Date.now() - start);
+        
+        
         
       }
     </script>
