@@ -1,0 +1,4 @@
+Python "jump if true/false" opcodes don't pop TOS - why is this?!
+
+There should be a way of marking functions as "safe", i.e. that they have no side effects.
+Could use "fun" and "def". Means that test execution environment knows it can show invocations.
