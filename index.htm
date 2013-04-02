@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <title>Simple</title>
+    <script src='simple.js'></script>
+    <script src='types.js'></script>
+    <script src='vm.js'></script>
+    <script src='compiler.js'></script>
+    <script>
+      function init() {
+        
+        var ast = [
+          ['assign', ['ident', 'b'], ['*', 20, 30]],
+          ['assign', ['ident', 'c'], ['+', ['ident', 'b'], 100]],
+          ['trace'],
+          ['call', ['ident', 'print'], [['+', 50, ['ident', 'c']], 20, "foobar!"]]
+        ];
+        
+        var compiler = new simple.Compiler();
+        var code = compiler.compile(ast);
+        
+        var vm = simple.createVM();
+        
+        vm.trace = function(vm, task, frame) {
+          console.log("tracin'", task, frame);
+        }
+        
+        vm.env['print'] = function(args) { console.log("VM say: ", args[0], args[1], args[2]); };
+        
+        vm.spawn(code);
+        
+      }
+    </script>
+  </head>
+  <body onload='init()'>
+  </body>
+</html>

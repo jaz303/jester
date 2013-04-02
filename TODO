@@ -1,0 +1,51 @@
+Language features
+=================
+
+[ ] while
+[ ] if
+[ ] binary expressions (inc logical operators)
+[ ] return
+[ ] function definition
+[ ] function calling
+
+[ ] symbols
+[ ] colors
+
+[ ] "garbage collection"
+
+[ ] array
+[ ] dictionary
+
+[ ] trace
+
+[ ] task spawn, yield
+[ ] yield from inside native fn
+
+[ ] parser/lexer
+
+[ ] stdlib
+
+Demonstration
+=============
+
+[ ] timeline
+[ ] allow call-stack to be accessed as objects
+[ ] ACE-editor integration
+[ ] breakpoints
+
+Optimise
+========
+
+[ ] Inline method cache
+
+Going forward
+=============
+
+[ ] Object system, new syntax
+[ ] Blocks/closures
+[ ] Iteration
+
+
+
+There should be a way of marking functions as "safe", i.e. that they have no side effects.
+Could use "fun" and "def". Means that test execution environment knows it can show invocations.
