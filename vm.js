@@ -1,5 +1,47 @@
 ;(function(global, simple) {
   
+  function Frame(fn, task) {
+    this.fn = fn;
+    this.task = task;
+    this.dirty = 0;
+    // sp, bp, ip
+  }
+  
+  Frame.prototype = {
+    localNames: function() {
+      return this.fn.locals;
+    },
+    
+    locals: function() {
+      var ls = this.fn.locals, out = {};
+      for (var i = 0; i < ls.length; ++i) {
+        out[ls[i]] = this.task.stack[this.bp + i];
+      }
+      return out;
+    },
+    
+    dirtyLocalNames: function() {
+      var ls = this.fn.locals, out = [];
+      for (var i = 0; i < ls.length; ++i) {
+        if (this.dirty & (1 << i)) {
+          out.push(ls[i]);
+        }
+      }
+      return out;
+    },
+    
+    dirtyLocals: function() {
+      var ls = this.fn.locals, out = {};
+      for (var i = 0; i < ls.length; ++i) {
+        if (this.dirty & (1 << i)) {
+          out[ls[i]] = this.task.stack[this.bp + i];
+        }
+      }
+      return out;
+    },
+  };
+  
+  
   var DEFAULT_STACK_SIZE = 2048;
   
   simple.opcodes = {};
@@ -76,7 +118,9 @@
             task.stack[frame.sp++] = false;
             break;
           case OP_SETL:
-            task.stack[frame.bp + (op >> 8)] = task.stack[--frame.sp];
+            var local = (op >> 8);
+            task.stack[frame.bp + local] = task.stack[--frame.sp];
+            frame.dirty |= (1 << local);
             break;
           case OP_CALL:
           
@@ -203,10 +247,9 @@
           case OP_TRACE:
             if (vm.trace) {
               vm.trace(vm, task, frame);
-              task.stack[frame.sp++] = true;
-            } else {
-              task.stack[frame.sp++] = false;
             }
+            frame.dirty = 0;
+            task.stack[frame.sp++] = true;
             break;
           case OP_EXIT:
             console.log('task exit!');
@@ -228,8 +271,16 @@
         fp        : 0,                      /* pointer to currently active */
       };
       
-      task.frames[0] = {fn: TaskWrapper, sp: 0, bp: 0, ip: 0};
-      task.frames[1] = {fn: fn, sp: 0, bp: 0, ip: 0};
+      task.frames[0] = new Frame(TaskWrapper, task);
+      task.frames[0].sp = 0;
+      task.frames[0].bp = 0;
+      task.frames[0].ip = 0;
+      
+      task.frames[1] = new Frame(fn, task);
+      task.frames[1].sp = 0;
+      task.frames[1].bp = 0;
+      task.frames[1].ip = 0;
+
       task.fp = 1;
       
       var frame = task.frames[1];
@@ -240,7 +291,7 @@
         ++i;
       }
       
-      while (i < fn.numLocals) {
+      while (i < fn.locals.length) {
         task.stack[frame.sp++] = null;
         ++i;
       }

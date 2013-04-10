@@ -11,8 +11,7 @@
     
     this.constants = [];
     
-    this.localNames = {};
-    this.numLocals = 0;
+    this.locals = [];
   
     this.fnNames = [];
     this.fnCache = [];
@@ -20,13 +19,14 @@
   
   Fn.prototype = {
     slotForLocal: function(name) {
-      if (this.localNames.hasOwnProperty(name)) {
-        return this.localNames[name];
-      } else {
-        var slot = this.numLocals++;
-        this.localNames[name] = slot;
-        return slot;
+      var ls = this.locals;
+      for (var i = 0; i < ls.length; ++i) {
+        if (ls[i] === name) {
+          return i;
+        }
       }
+      ls.push(name);
+      return ls.length - 1;
     },
     
     slotForConstant: function(value) {

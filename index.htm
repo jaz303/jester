@@ -16,19 +16,24 @@
             ]
           ],
         
+          ['trace'],
           ['assign', ['ident', 'b'], ['*', 20, 30]],
+          ['trace'],
           ['assign', ['ident', 'c'], ['+', ['ident', 'b'], 100]],
+          ['trace'],
           
           ['assign', ['ident', 'x'], 0],
           ['while',
             ['<', ['ident', 'x'], 10],
             [ ['call', ['ident', 'print'], [['ident', 'x']]],
               ['assign', ['ident', 'x'], ['+', ['ident', 'x'], 1]],
+              ['trace']
             ]
           ],
           
           ['trace'],
-          ['call', ['ident', 'print'], [['+', 50, ['ident', 'c']], 20, "foobar!"]]
+          ['call', ['ident', 'print'], [['+', 50, ['ident', 'c']], 20, "foobar!"]],
+          ['call', ['ident', 'print'], [['ident', 'b'], ['ident', 'c'], ['ident', 'x']]]
         ];
         
         var compiler = new simple.Compiler();
@@ -38,6 +43,7 @@
         
         vm.trace = function(vm, task, frame) {
           console.log("tracin'", task, frame);
+          console.log(frame.dirtyLocals());
         }
         
         vm.env['print'] = function(args) {
