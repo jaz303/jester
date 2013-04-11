@@ -1,6 +1,7 @@
 Finish language:
-  [ ] if
-  [ ] function definition
+  [x] trace - dirty variable tracking
+  [x] if
+  [x] function definition
   [ ] function call
   [ ] return
   [ ] short circuiting logical operators
