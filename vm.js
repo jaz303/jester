@@ -268,7 +268,7 @@
       var task = {
         stack     : new Array(stackSize),   /* stack */                                                                                                 
         frames    : [],                     /* active frames */
-        fp        : 0,                      /* pointer to currently active */
+        fp        : 1,                      /* pointer to currently active */
       };
       
       task.frames[0] = new Frame(TaskWrapper, task);
@@ -280,8 +280,6 @@
       task.frames[1].sp = 0;
       task.frames[1].bp = 0;
       task.frames[1].ip = 0;
-
-      task.fp = 1;
       
       var frame = task.frames[1];
       
