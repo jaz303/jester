@@ -53,6 +53,55 @@
       this.emit(ops.SETL | (slot << 8));
     },
     
+    compileIf: function(ast) {
+      
+      var ix        = 1,
+          firstAbs  = null,
+          lastAbs   = null;
+      
+      while (ix < ast.length) {
+        if (ast[ix]) {
+          
+          this.compileExpression(ast[ix]);
+          
+          var failJump = this._fn.code.length;
+          this.emit(ops.JMPF);
+          
+          this.compileStatements(ast[ix + 1]);
+          
+          if (firstAbs === null) {
+            firstAbs = this._fn.code.length;
+            lastAbs = this._fn.code.length;
+            this.emit(0);
+          } else {
+            var tmp = this._fn.code.length;
+            this.emit(lastAbs); // hack - stash pointer to last jump point so we can backtrack
+            lastAbs = tmp;
+          }
+          
+          this._fn.code[failJump] = ops.JMPF | ((this._fn.code.length - failJump - 1) << 8);
+        
+        } else {
+          this.compileStatements(ast[ix + 1]);
+        }
+        ix += 2;
+      }
+      
+      var jmpOp   = ops.JMPA | (this._fn.code.length << 8),
+          currAbs = lastAbs;
+      
+      do {
+        var tmp = this._fn.code[currAbs];
+        this._fn.code[currAbs] = jmpOp;
+        if (currAbs == firstAbs) {
+          break;
+        } else {
+          currAbs = tmp;
+        }
+      } while (true);
+      
+    },
+    
     compileWhile: function(ast) {
       
       var loopStart = this._fn.code.length;
@@ -132,6 +181,9 @@
             break;
           case 'assign':
             this.compileAssign(ast);
+            break;
+          case 'if':
+            this.compileIf(ast);
             break;
           case 'while':
             this.compileWhile(ast);
