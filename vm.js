@@ -138,6 +138,8 @@
                 // TODO: log error
               }
             } else if (callfn && callfn.__type__ == simple.T_FN) {
+              console.log(callfn);
+              throw "can't handle native function call!";
               // TODO: function call
               break;
             }
