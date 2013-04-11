@@ -13,7 +13,10 @@
     '>='  : ops.GE
   };
   
-  function Compiler() {}
+  function Compiler(env) {
+    this._env = env;
+    this._fn = null;
+  }
   
   Compiler.prototype = {
     emit: function(opcode) {
@@ -21,6 +24,26 @@
     },
     
     compileFnDef: function(ast) {
+      
+      var oldFn = this._fn;
+      var newFn = new simple.Fn();
+      
+      this._fn = newFn;
+      
+      var params = ast[2];
+      for (var i = 0; i < params.length; ++i) {
+        newFn.slotForLocal(params[i]);
+        newFn.minArgs++;
+        newFn.maxArgs++;
+      }
+      
+      this.compileFunctionBody(ast[3]);
+      
+      this._env[ast[1]] = newFn;
+      
+      this._fn = oldFn;
+      
+      return newFn;
       
     },
     
@@ -43,6 +66,15 @@
       
       this._fn.code[failJump] = ops.JMPF | ((this._fn.code.length - failJump - 1) << 8);
 
+    },
+    
+    compileReturn: function(ast) {
+      if (ast.length == 2) {
+        this.compileExpression(ast[1]);
+      } else {
+        this.emit(ops.PUSHF); // TODO: should probably push undefined/null or whatever
+      }
+      this.emit(ops.RET);
     },
     
     compileCall: function(ast) {
@@ -104,6 +136,9 @@
           case 'while':
             this.compileWhile(ast);
             break;
+          case 'return':
+            this.compileReturn(ast);
+            break;
           default:
             this.compileExpression(ast);
             this.emit(ops.POP);
@@ -123,6 +158,7 @@
     
     compileFunctionBody: function(ast) {
       this.compileStatements(ast);
+      this.emit(ops.PUSHF);
       this.emit(ops.RET);
     },
     

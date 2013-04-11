@@ -36,10 +36,10 @@
           ['call', ['ident', 'print'], [['ident', 'b'], ['ident', 'c'], ['ident', 'x']]]
         ];
         
-        var compiler = new simple.Compiler();
-        var code = compiler.compile(ast);
-        
         var vm = simple.createVM();
+        
+        var compiler = new simple.Compiler(vm.env);
+        var code = compiler.compile(ast);
         
         vm.trace = function(vm, task, frame) {
           console.log("tracin'", task, frame);
