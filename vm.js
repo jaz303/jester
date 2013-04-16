@@ -22,11 +22,10 @@
     if (task.next === task) {
       list.curr = null;
     } else {
-      var c = list.curr;
-      c.prev.next = c.next;
-      c.next.prev = c.prev;
+      task.prev.next = task.next;
+      task.next.prev = task.prev;
       if (list.curr === task) {
-        list.curr = c.next;
+        list.curr = task.next;
       }
     }
     task.prev = null;
@@ -35,6 +34,10 @@
   
   function tasklist_next(list) {
     list.curr = list.curr.next;
+  }
+  
+  function tasklist_curr(list) {
+    return list.curr;
   }
   
   function Frame(fn, task) {
@@ -398,7 +401,7 @@
       
       function tick() {
         
-        var task = vm.runnable.curr;
+        var task = tasklist_curr(vm.runnable);
         
         if (!task) {
           vm.state = VM_PAUSED;
