@@ -126,6 +126,10 @@
       this.emit(ops.RET);
     },
     
+    compileYield: function(ast) {
+      this.emit(ops.YIELD);
+    },
+    
     compileCall: function(ast) {
       
       var args = ast[2];
@@ -190,6 +194,9 @@
             break;
           case 'return':
             this.compileReturn(ast);
+            break;
+          case 'yield':
+            this.compileYield(ast);
             break;
           default:
             this.compileExpression(ast);

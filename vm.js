@@ -1,5 +1,42 @@
 ;(function(global, simple) {
   
+  function TaskList() {
+    this.curr = null;
+  }
+  
+  function tasklist_add(list, task) {
+    if (list.curr === null) {
+      task.next = task;
+      task.prev = task;
+      list.curr = task;
+    } else {
+      var c = list.curr;
+      c.prev.next = task;
+      task.next = c;
+      task.prev = c.prev;
+      c.prev = task;
+    }
+  }
+  
+  function tasklist_remove(list, task) {
+    if (task.next === task) {
+      list.curr = null;
+    } else {
+      var c = list.curr;
+      c.prev.next = c.next;
+      c.next.prev = c.prev;
+      if (list.curr === task) {
+        list.curr = c.next;
+      }
+    }
+    task.prev = null;
+    task.next = null;
+  }
+  
+  function tasklist_next(list) {
+    list.curr = list.curr.next;
+  }
+  
   function Frame(fn, task) {
     this.fn = fn;
     this.task = task;
@@ -41,7 +78,6 @@
     },
   };
   
-  
   var DEFAULT_STACK_SIZE = 2048;
   
   simple.opcodes = {};
@@ -74,7 +110,17 @@
       OP_JMPF     = t('JMPF'),      /* Jump if False  (31:8 - offset) */
       OP_JMPA     = t('JMPA'),      /* Jump Absolute  (31:8 - target) */
       OP_TRACE    = t('TRACE'),     /* Trace */
+      OP_YIELD    = t('YIELD'),     /* Yield */
       OP_EXIT     = t('EXIT');      /* Exit task */
+      
+  var TASK_RUNNABLE   = simple.TASK_RUNNABLE  = 1,  /* default state; task is runnable */
+      TASK_DEAD       = simple.TASK_DEAD      = 2,  /* task is dead. done. gone. */
+      TASK_BLOCKED    = simple.TASK_BLOCKED   = 3,  /* task blocked waiting on something e.g. IO, delay */
+      TASK_RESUMED    = simple.TASK_RESUMED   = 4;  /* task has just resumed. for use in native functions */
+      
+  var VM_STOPPED      = 1,
+      VM_RUNNING      = 2,
+      VM_PAUSED       = 3;
       
   // TaskWrapper is a shim placed around every task that is spawned
   // Ensures task exits after main task function returns
@@ -83,11 +129,15 @@
   
   function createVM() {
     
-    var env = {};
-    
     var vm = {
-      trace: null
+      trace: null,
+      state: VM_STOPPED,
+      runnable: new TaskList(),
+      blocked: new TaskList(),
+      env: {}
     };
+    
+    var env = vm.env;
     
     function truthy_p(v) {
       return !(v === false || v === null);
@@ -130,9 +180,20 @@
                 
             if (typeof callfn == 'function') {
               try {
-                var res = callfn(task.stack.slice(frame.sp - nargs, frame.sp), task, env);
-                frame.sp -= nargs;
-                task.stack[frame.sp++] = res;
+                var res = callfn(task.stack.slice(frame.sp - nargs, frame.sp), task, env, vm);
+                if (task.state == TASK_BLOCKED) {
+                  // task has blocked for whatever reason.
+                  // backtrack one instruction so native function will be called again when
+                  // task is resumed. native function must detect state == TASK_RESUMED, set
+                  // task state to TASK_RUNNABLE, and return a value as normal
+                  --frame.ip;
+                  return;
+                } else if (task.state == TASK_DEAD) {
+                  return;
+                } else {
+                  frame.sp -= nargs;
+                  task.stack[frame.sp++] = res;
+                }
                 break;
               } catch (e) {
                 // TODO: log error
@@ -144,8 +205,11 @@
               break;
             }
             
-            // not a function!
-            // TODO: kill task
+            // TODO: what do we do here?
+            //  - raise exception? (we don't have those yet...)
+            //  - kill the task?
+            //  - kill the VM (throw)
+            throw "not callable!";
             
             break;
           case OP_RET:
@@ -253,9 +317,11 @@
             frame.dirty = 0;
             task.stack[frame.sp++] = true;
             break;
+          case OP_YIELD:
+            return;
           case OP_EXIT:
+            task.state = TASK_DEAD;
             console.log('task exit!');
-            // TODO: remove this task from the task queue
             return;
         }
       }
@@ -271,6 +337,9 @@
         stack     : new Array(stackSize),   /* stack */                                                                                                 
         frames    : [],                     /* active frames */
         fp        : 1,                      /* pointer to currently active */
+        state     : TASK_RUNNABLE,          /* task state */
+        prev      : null,                   /* prev task in queue */
+        next      : null                    /* next task in queue */
       };
       
       task.frames[0] = new Frame(TaskWrapper, task);
@@ -296,23 +365,102 @@
         ++i;
       }
       
-      exec(task);
+      tasklist_add(vm.runnable, task);
+      if (vm.state == VM_PAUSED)
+        setTimeout(resume, 0);
+      
+      return task;
     }
     
-    function tick() {
+    function isRunning() {
+      return vm.state != VM_STOPPED;
+    }
+    
+    function resumeTask(task) {
+      if (task.state != TASK_BLOCKED)
+        throw "StateError: task to resume must be blocked";
       
+      task.state = TASK_RESUMED;
+      
+      tasklist_remove(vm.blocked, task);
+      tasklist_add(vm.runnable, task);
+      
+      if (vm.state == VM_PAUSED)
+        resume();
+    }
+    
+    function resume() {
+      
+      if (vm.state == VM_RUNNING)
+        return;
+      
+      vm.state = VM_RUNNING;
+      
+      function tick() {
+        
+        var task = vm.runnable.curr;
+        
+        if (!task) {
+          vm.state = VM_PAUSED;
+          return;
+        }
+        
+        exec(task);
+        
+        if (task.state == TASK_RUNNABLE) {
+          tasklist_next(vm.runnable);
+        } else if (task.state == TASK_DEAD) {
+          tasklist_remove(vm.runnable, task);
+        } else if (task.state == TASK_BLOCKED) {
+          tasklist_remove(vm.runnable, task);
+          tasklist_add(vm.blocked, task);
+        } else {
+          console.log(task);
+          throw 'illegal task state after execution!';
+        }
+        
+        setTimeout(tick, 0);
+        
+      }
+      
+      tick();
+    
+    }
+    
+    function start() {
+      if (isRunning()) return;
+      vm.state = VM_PAUSED;
+      resume();
+    }
+    
+    function gcTask(task) {
+      var frames = task.frames;
+      
+      for (var i = task.fp + 1, len = frames.length; i < len; ++i) {
+        frames[i] = null;
+      }
+      
+      var stack = task.stack, sp = frames[task.fp].sp;
+      while (sp < stack.length) {
+        stack[sp++] = undefined;
+      }
     }
     
     function gc() {
-      // TODO: iterate over each task
-      // TODO: nullify frames
-      // TODO: nullify stack above sp
+      var task;
+      
+      task = vm.runnable;
+      while (task) gcTask(task), task = task.next;
+      
+      task = vm.blocked;
+      while (task) gcTask(task), task = task.next;
     }
     
-    vm.env    = env;
-    vm.spawn  = spawn;
-    vm.tick   = tick;
-    vm.gc     = gc;
+    vm.env        = env;
+    vm.spawn      = spawn;
+    vm.start      = start;
+    vm.gc         = gc;
+    vm.resumeTask = resumeTask;
     
     return vm;
   }

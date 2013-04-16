@@ -43,18 +43,20 @@
           ['while',
             ['<', ['ident', 'x'], 10],
             [ ['call', ['ident', 'print'], [['ident', 'x']]],
-              ['assign', ['ident', 'x'], ['+', ['ident', 'x'], 1]]
+              ['assign', ['ident', 'x'], ['+', ['ident', 'x'], 1]],
+              ['call', ['ident', 'delay'], [['call', ['ident', 'random'], []]]]
+              // ['call', ['ident', 'delay'], [100]]
             ]
           ],
           
           ['assign', ['ident', 'a'], 200],
           ['trace'],
           
-          ['call',
-            ['ident', 'print'],
-            [ ['call', ['ident', 'add'], [5, 6]]
-            ]
-          ],
+          // ['call',
+          //   ['ident', 'print'],
+          //   [ ['call', ['ident', 'add'], [5, 6]]
+          //   ]
+          // ],
           
           ['trace'],
           ['call', ['ident', 'print'], [['+', 50, ['ident', 'c']], 20, "foobar!"]],
@@ -71,11 +73,31 @@
           console.log(frame.dirtyLocals());
         }
         
+        vm.env['random'] = function() {
+          return Math.floor(Math.random() * 1000);
+        }
+        
+        vm.env['delay'] = function(args, task, env, vm) {
+          
+          if (task.state == simple.TASK_RESUMED) {
+            task.state = simple.TASK_RUNNABLE;
+            return null;
+          }
+          
+          task.state = simple.TASK_BLOCKED;
+          setTimeout(function() { vm.resumeTask(task); }, args[0]);
+          
+        };
+        
         vm.env['print'] = function(args) {
           console.log("VM say: ", args[0], args[1], args[2]);
         };
         
-        vm.spawn(code);
+        for (var i = 0; i < 20; ++i) {
+          vm.spawn(code);
+        }
+        
+        vm.start();
         
         // var start = Date.now();
         // for (var i = 0; i < 100000; ++i) {
