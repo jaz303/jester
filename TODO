@@ -1,33 +1,39 @@
-Finish language:
-  [x] trace - dirty variable tracking
-  [x] if
-  [x] function definition
-  [ ] function call
-  [ ] return
-  [ ] short circuiting logical operators
-  [ ] color literals
-  [ ] symbols
-  [ ] arrays + indexing
-  [ ] dictionaries + indexing
-  [ ] task spawn/yield
-  [ ] parser
-  [ ] stdlib
-  [ ] garbage collection
+Finish language
+===============
+[x] trace - dirty variable tracking
+[x] if
+[x] function definition
+[ ] function call
+[ ] return
+[ ] short circuiting logical operators
+[ ] color literals
+[ ] symbols
+[ ] arrays + indexing
+[ ] dictionaries + indexing
+[x] tasks
+[x] yield
+[x] delay
+[ ] spawn
+[ ] parser
+[ ] stdlib
+[ ] garbage collection
   
-Make demo:
-  [ ] code window + run
-  [ ] repl
-  [ ] timeline
-  [ ] visualise callstack
-  [ ] breakpoints - suspend thread or entire VM
-  [ ] interact with stack frame
+Make demo
+=========
+[ ] code window + run
+[ ] repl
+[ ] timeline
+[ ] visualise callstack
+[ ] breakpoints - suspend thread or entire VM
+[ ] interact with stack frame
   
-Later:
-  [ ] ACE editor integration
-  
-  [ ] Object system
-  [ ] New syntax
-  [ ] Blocks/closures
-  [ ] Iterators
-  
-  [ ] Inline method cache
+Later
+=====
+[ ] ACE editor integration
+
+[ ] Object system
+[ ] New syntax
+[ ] Blocks/closures
+[ ] Iterators
+
+[ ] Inline method cache
