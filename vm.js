@@ -189,6 +189,10 @@
                   // backtrack one instruction so native function will be called again when
                   // task is resumed. native function must detect state == TASK_RESUMED, set
                   // task state to TASK_RUNNABLE, and return a value as normal
+                  // BUG: if the function is redefined before the function resumes, the new
+                  // version of the function will be called the second time around. probably
+                  // better to have a flag in the VM saying we're blocked in a native call
+                  // and stash a direct pointer to that function...
                   --frame.ip;
                   return;
                 } else if (task.state == TASK_DEAD) {
