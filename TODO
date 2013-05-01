@@ -3,8 +3,8 @@ Finish language
 [x] trace - dirty variable tracking
 [x] if
 [x] function definition
-[ ] function call
-[ ] return
+[x] function call
+[x] return
 [ ] short circuiting logical operators
 [ ] color literals
 [ ] symbols

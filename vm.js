@@ -202,21 +202,36 @@
                 // TODO: log error
               }
             } else if (callfn && callfn.__type__ == simple.T_FN) {
-              console.log(callfn);
-              throw "can't handle native function call!";
-              // TODO: function call
+              if (nargs != callfn.minArgs) {
+                throw "invalid number of args";
+              }
+              
+              frame.sp -= nargs;
+              
+              var newFrame = new Frame(callfn, task);
+              newFrame.bp = frame.sp;
+              newFrame.sp = frame.sp + newFrame.fn.locals.length;
+              newFrame.ip = 0;
+              
+              task.frames[++task.fp] = newFrame;
+              
+              frame = newFrame;
+              fn = frame.fn;
+              code = fn.code;
+              
               break;
+            } else {
+              // TODO: what do we do here?
+              //  - raise exception? (we don't have those yet...)
+              //  - kill the task?
+              //  - kill the VM (throw)
+              throw "not callable!";
             }
-            
-            // TODO: what do we do here?
-            //  - raise exception? (we don't have those yet...)
-            //  - kill the task?
-            //  - kill the VM (throw)
-            throw "not callable!";
-            
             break;
           case OP_RET:
-            frame = task.frames[--task.fp];
+            var retVal = task.stack[frame.sp-1];
+            task.stack[task.frames[--task.fp].sp++] = retVal;
+            frame = task.frames[task.fp];
             fn = frame.fn;
             code = fn.code;
             break;

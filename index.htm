@@ -12,9 +12,14 @@
         
         var ast = [
           ['def', 'add', ['l', 'r'],
-            [ ['return', ['+', ['ident', 'l'], ['ident', 'r']]]
+            [ 
+              ['call', ['ident', 'print'], ["i'm in a function!"]],
+              ['return', ['+', ['ident', 'l'], ['ident', 'r']]]
             ]
           ],
+          
+          ['assign', ['ident', 'z'], ['call', ['ident', 'add'], [10, 125]]],
+          ['call', ['ident', 'print'], [['ident', 'z']]],
           
           ['assign', ['ident', 'a'], 10],
           
@@ -93,11 +98,18 @@
           console.log("VM say: ", args[0], args[1], args[2]);
         };
         
-        for (var i = 0; i < 20; ++i) {
-          vm.spawn(code);
-        }
-        
         vm.start();
+        vm.spawn(code);
+        
+        // for (var i = 0; i < 20; ++i) {
+        //   vm.spawn(code);
+        // }
+        // 
+        // setTimeout(function() {
+        //   for (var i = 0; i < 20; ++i) {
+        //     vm.spawn(code);
+        //   }
+        // }, 10000);
         
         // var start = Date.now();
         // for (var i = 0; i < 100000; ++i) {
