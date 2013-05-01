@@ -140,6 +140,8 @@
       env: {}
     };
     
+    var nextTaskId = 1;
+    
     var env = vm.env;
     
     function truthy_p(v) {
@@ -356,6 +358,7 @@
       var stackSize = opts.stackSize || DEFAULT_STACK_SIZE;
       
       var task = {
+        id        : (nextTaskId++),         /* task ID */
         stack     : new Array(stackSize),   /* stack */                                                                                                 
         frames    : [],                     /* active frames */
         fp        : 1,                      /* pointer to currently active */
