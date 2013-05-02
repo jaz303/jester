@@ -11,6 +11,28 @@
       function init() {
         
         var ast = [
+        
+          ['def', 'fib', ['n'],
+            [ 
+              ['if',
+                ['<=', ['ident', 'n'], 0],
+                [ ['return', 0]
+                ],
+                ['<=', ['ident', 'n'], 1],
+                [ ['return', 1]
+                ],
+                null,
+                [ [ 'return',
+                    [ '+',
+                      ['call', ['ident', 'fib'], [['-', ['ident', 'n'], 2]]],
+                      ['call', ['ident', 'fib'], [['-', ['ident', 'n'], 1]]]
+                    ]
+                  ]
+                ]
+              ]
+            ]
+          ],
+        
           ['def', 'add', ['l', 'r'],
             [ 
               ['call', ['ident', 'print'], ["i'm in a function!"]],
@@ -18,7 +40,7 @@
             ]
           ],
           
-          ['assign', ['ident', 'z'], ['call', ['ident', 'add'], [10, 125]]],
+          ['assign', ['ident', 'z'], ['call', ['ident', 'fib'], [20]]],
           ['call', ['ident', 'print'], [['ident', 'z']]],
           
           ['assign', ['ident', 'a'], 10],
