@@ -26,7 +26,7 @@
     compileFnDef: function(ast) {
       
       var oldFn = this._fn;
-      var newFn = new simple.Fn();
+      var newFn = simple.makeFunction();
       
       this._fn = newFn;
       
@@ -222,7 +222,7 @@
     },
     
     compile: function(ast) {
-      this._fn = new simple.Fn();
+      this._fn = simple.makeFunction();
       this.compileFunctionBody(ast);
       return this._fn;
     }

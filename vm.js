@@ -127,7 +127,7 @@
       
   // TaskWrapper is a shim placed around every task that is spawned
   // Ensures task exits after main task function returns
-  var TaskWrapper = new simple.Fn();
+  var TaskWrapper = simple.makeFunction();
   TaskWrapper.code = [OP_EXIT];
   
   function createVM() {
@@ -216,7 +216,7 @@
               
               var newFrame = new Frame(callfn, task);
               newFrame.bp = frame.sp;
-              newFrame.sp = frame.sp + newFrame.fn.locals.length;
+              newFrame.sp = frame.sp + callfn.locals.length;
               newFrame.ip = 0;
               
               task.frames[++task.fp] = newFrame;

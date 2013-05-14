@@ -1,6 +1,7 @@
 ;(function(global, simple) {
   
-  var T_FN                = 1;
+  var T_FN      = 1;
+  var T_ARRAY   = 2;
   
   function Fn() {
     this.__type__ = simple.T_FN;
@@ -54,8 +55,17 @@
   //
   // Expose
   
-  simple.Fn = Fn;
+  simple.makeFunction = function() {
+    return new Fn();
+  }
   
-  simple.T_FN         = T_FN;
+  simple.makeArray = function() {
+    var array = [];
+    array.__type__ = T_ARRAY;
+    return array;
+  }
+  
+  simple.T_FN     = T_FN;
+  simple.T_ARRAY  = T_ARRAY;
   
 })(this, simple)
