@@ -25,7 +25,7 @@
     ']'         : T.R_BRACKET,
     '('         : T.L_PAREN,
     ')'         : T.R_PAREN,
-    ','         : T.SEMICOLON,
+    ';'         : T.SEMICOLON,
     ','         : T.COMMA,
     '\n'        : T.NEWLINE
   };
@@ -71,20 +71,23 @@
       
       if (p === len)
         return T.EOF;
-        
+      
+      // skip whitespace
       while (space_p(src[p])) {
         if (++p === len)
           return T.EOF;
       }
       
       // skip comments
-      // TODO: this is broken
       if (src[p] === '-' && more() && src[p+1] === '-') {
         p += 2;
-        while (more() && src[p] !== '\r' && src[p] !== '\n')
+        while (true) {
+          if (p === len)
+            return T.EOF;
+          if (src[p] === '\r' || src[p] === '\n')
+            break;
           ++p;
-        if (p === len)
-          return T.EOF;
+        }
       }
       
       if ((tok = SINGLES[src[p]])) {
@@ -185,6 +188,8 @@
             var skip = false;
             
             start = p;
+            
+            error = "unterminated string literal";
             tok = T.ERROR;
             
             while (more()) {
@@ -195,12 +200,14 @@
                 skip = true;
               } else if (src[p] === '"') {
                 text = src.substring(start + 1, p); // TODO: parse string
+                error = null;
                 tok = T.STRING;
                 break;
               }
             }
             
           } else {
+            error = "unexpected character: '" + ch + "'";
             tok = T.ERROR;
           }
           

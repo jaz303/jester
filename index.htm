@@ -96,12 +96,15 @@
         var code = document.getElementById('source').innerText;
         
         var lexer = simple.createLexer(code);
+        var parser = simple.createParser(lexer);
         
-        do {
-          var token = lexer.nextToken();
-          var text = lexer.text();
-          console.log(simple.TOKEN_NAMES[token], text);
-        } while (token !== simple.TOKENS.EOF);
+        console.log(parser.parseTopLevel());
+        
+        // do {
+        //   var token = lexer.nextToken();
+        //   var text = lexer.text();
+        //   console.log(simple.TOKEN_NAMES[token], text, lexer.error());
+        // } while (token !== simple.TOKENS.EOF);
         
         // var vm = simple.createVM();
         //         
@@ -160,10 +163,11 @@
   </head>
   <body onload='init()'>
     <script type='text/simple' id='source'>
-      def fib(n) {
-        if (n <= 0) {
+      def fib(n)
+      {
+        if n <= 0 {
           return 0
-        } else if (n <= 1) {
+        } else if n <= 1 {
           return 1
         } else {
           return fib(n-2) + fib(n-1)
@@ -180,26 +184,27 @@
 
       a = 10
 
-      -- here's a comment to skip
       if a < 30 {
-        print "a is less than 30! - 1"
+        print "a is less than 30! - 1";
         print "a is less than 30! - 2"
         print "a is less than 30! - 3"
-      } else if a < 40 {
+      }
+      else if a < 40
+      {
         print "a is less than 40! - 1"
         print "a is less than 40! - 2"
         print "a is less than 40! - 3"
-      } else {
+      }
+      else
+      {
         print "a is >= 40"
       }
 
-      trace
-
-      b = 20 * 30
-      c = b + 100
-
+      trace; b = 20 * 30; c = b + 100
+      
       x = 10
-      while x < 10 {
+      while x < 10
+      {
         print x
         x = x + 1
         delay random()
@@ -209,7 +214,7 @@
       trace
       trace
 
-      print 0x42 + c, 20, "foobar!"
+      print(0x42 + c, 20, "foobar!")
       print b, c, x
     </script>
   </body>

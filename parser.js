@@ -35,37 +35,30 @@
   
   simple.createParser = function(lexer) {
     
+    var curr = null;
+    
     function next() {
-      // get next token from lexer and assign to curr
+      curr = lexer.nextToken();
     }
     
     function text() {
-      // return current token text
+      return lexer.text();
     }
     
     function accept(token, msg) {
       if (curr !== token) {
-        throw msg || "unexpted token :(";
+        throw msg || ("unexpted token, expected: " + simple.TOKEN_NAMES[token] + ", got: " + simple.TOKEN_NAMES[curr]);
       } else {
         next();
       }
     }
     
-    function at(token) {
-      return curr === token;
-    }
-    
-    function atBlockTerminator() {
-      return curr === T.R_BRACE;
-    }
-
-    function atStatementTerminator() {
-      return curr === T.SEMICOLON || curr === T.NEWLINE;
-    }
-    
-    function atExpStart() {
-      return !!EXP_START_TOKENS[curr];
-    }
+    function at(token)                  { return curr === token; }
+    function atBlockTerminator()        { return curr === T.R_BRACE; }
+    function atStatementTerminator()    { return curr === T.SEMICOLON || curr === T.NEWLINE; }
+    function skipNewlines()             { while (curr === T.NEWLINE) next(); }
+    function skipStatementTerminators() { while (atStatementTerminator()) next(); }
+    function atExpStart()               { return !!EXP_START_TOKENS[curr]; }
     
     function parseFormalParameterList() {
       var params = [];
@@ -100,10 +93,13 @@
       }
       
       node.name = text();
+      next();
       
-      accept(L_PAREN);
+      accept(T.L_PAREN);
       node.parameters = parseFormalParameterList();
-      accept(R_PAREN);
+      accept(T.R_PAREN);
+      
+      skipNewlines();
       
       node.body = parseStatementBlock();
       
@@ -114,23 +110,23 @@
       accept(T.IF);
       var node = { type: 'if', clauses: [] };
       
-      node.clauses.push({
-        condition   : parseExpression(),
-        body        : parseStatementBlock()
-      });
+      var cond = parseExpression();
+      skipNewlines();
+      node.clauses.push({ condition: cond, body: parseStatementBlock() });
+      skipNewlines();
       
       while (at(T.ELSE)) {
         next();
         if (at(T.IF)) {
-          node.clauses.push({
-            condition   : parseExpression(),
-            body        : parseStatementBlock()
-          });
+          next();
+          cond = parseExpression();
+          skipNewlines();
+          node.clauses.push({ condition: cond, body: parseStatementBlock() });
+          skipNewlines();
         } else {
-          node.clauses.push({
-            condition   : null,
-            body        : parseStatementBlock()
-          });
+          skipNewlines();
+          node.clauses.push({ condition: null, body: parseStatementBlock() });
+          skipNewlines();
           break;
         }
       }
@@ -149,6 +145,7 @@
       accept(T.WHILE);
       var node = { type: 'while' };
       node.condition = parseExpression();
+      skipNewlines();
       node.body = parseStatementBlock();
       return node;
     }
@@ -182,6 +179,8 @@
     function parseStatements() {
       var node = { type: 'statements', statements: [] };
       
+      skipStatementTerminators();
+      
       while (curr !== T.EOF && curr !== T.R_BRACE) {
         switch (curr) {
           case T.DEF:
@@ -202,6 +201,7 @@
             node.statements.push(parseExpressionStatement());
             break;
         }
+        skipStatementTerminators();
       }
       
       return node;
@@ -331,6 +331,9 @@
       } else if (at(T.INTEGER)) {
         exp = parseInt(text(), 10);
         next();
+      } else if (at(T.HEX)) {
+        exp = parseInt(text(), 16);
+        next();
       } else if (at(T.FLOAT)) {
         exp = parseFloat(text(), 10);
         next();
@@ -357,6 +360,8 @@
       accept(T.EOF);
       return statements;
     }
+    
+    next();
     
     return {
       parseTopLevel        : parseTopLevel
