@@ -2,37 +2,36 @@
   
   var T = simple.TOKENS;
   
-  var TOKEN_OP = {
-    T.SUB     : '-',
-    T.ADD     : '+',
-    T.MUL     : '*',
-    T.DIV     : '/',
-    T.BANG    : '!',
-    T.TILDE   : '~',
-    T.LT      : '<',
-    T.GT      : '>',
-    T.LE      : '<=',
-    T.GE      : '>=',
-    T.EQ      : '==',
-    T.NEQ     : '!='
-  };
+  var TOKEN_OP = {};
+  TOKEN_OP[T.SUB]   = '-';
+  TOKEN_OP[T.ADD]   = '+';
+  TOKEN_OP[T.MUL]   = '*';
+  TOKEN_OP[T.DIV]   = '/';
+  TOKEN_OP[T.BANG]  = '!';
+  TOKEN_OP[T.TILDE] = '~';
+  TOKEN_OP[T.LT]    = '<';
+  TOKEN_OP[T.GT]    = '>';
+  TOKEN_OP[T.LE]    = '<=';
+  TOKEN_OP[T.GE]    = '>=';
+  TOKEN_OP[T.EQ]    = '==';
+  TOKEN_OP[T.NEQ]   = '!=';
   
   // these are the tokens that can follow an identifier to allow
   // a function call without parens e.g.
   // foo 1, 2, 3
-  var EXP_START_TOKENS = {
-    T.SUB       : true,
-    T.ADD       : true,
-    T.BANG      : true,
-    T.TILDE     : true,
-    T.TRUE      : true,
-    T.FALSE     : true,
-    T.INTEGER   : true,
-    T.FLOAT     : true,
-    T.STRING    : true,
-    T.TRACE     : true,
-    T.IDENT     : true
-  };
+  var EXP_START_TOKENS = {};
+  EXP_START_TOKENS[T.SUB]     = true;
+  EXP_START_TOKENS[T.ADD]     = true;
+  EXP_START_TOKENS[T.BANG]    = true;
+  EXP_START_TOKENS[T.TILDE]   = true;
+  EXP_START_TOKENS[T.TRUE]    = true;
+  EXP_START_TOKENS[T.FALSE]   = true;
+  EXP_START_TOKENS[T.INTEGER] = true;
+  EXP_START_TOKENS[T.HEX]     = true;
+  EXP_START_TOKENS[T.FLOAT]   = true;
+  EXP_START_TOKENS[T.STRING]  = true;
+  EXP_START_TOKENS[T.TRACE]   = true;
+  EXP_START_TOKENS[T.IDENT]   = true;
   
   simple.createParser = function(lexer) {
     

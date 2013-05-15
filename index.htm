@@ -8,59 +8,7 @@
     <script src='vm.js'></script>
     <script src='compiler.js'></script>
     <script src='parser.js'></script>
-    
-    <script type='text/simple'>
-      def fib(n) {
-        if (n <= 0) {
-          return 0
-        } else if (n <= 1) {
-          return 1
-        } else {
-          return fib(n-2) + fib(n-1)
-        }
-      }
-
-      def add(l, r) {
-        print "i'm in a function"
-        return l + r
-      }
-
-      z = add 10, 125
-      print z
-
-      a = 10
-
-      if a < 30 {
-        print "a is less than 30! - 1"
-        print "a is less than 30! - 2"
-        print "a is less than 30! - 3"
-      } else if a < 40 {
-        print "a is less than 40! - 1"
-        print "a is less than 40! - 2"
-        print "a is less than 40! - 3"
-      } else {
-        print "a is >= 40"
-      }
-
-      trace
-
-      b = 20 * 30
-      c = b + 100
-
-      x = 10
-      while x < 10 {
-        print x
-        x = x + 1
-        delay random()
-      }
-
-      a = 200
-      trace
-      trace
-
-      print 50 + c, 20, "foobar!"
-      print b, c, x
-    </script>
+    <script src='lexer.js'></script>
     
     <script>
       function init() {
@@ -145,61 +93,124 @@
           ['call', ['ident', 'print'], [['ident', 'b'], ['ident', 'c'], ['ident', 'x']]]
         ];
         
-        var vm = simple.createVM();
+        var code = document.getElementById('source').innerText;
         
-        var compiler = new simple.Compiler(vm.env);
-        var code = compiler.compile(ast);
+        var lexer = simple.createLexer(code);
         
-        vm.trace = function(vm, task, frame) {
-          console.log("tracin'", task, frame);
-          console.log(frame.dirtyLocals());
-        }
+        do {
+          var token = lexer.nextToken();
+          var text = lexer.text();
+          console.log(simple.TOKEN_NAMES[token], text);
+        } while (token !== simple.TOKENS.EOF);
         
-        vm.env['random'] = function() {
-          return Math.floor(Math.random() * 1000);
-        }
-        
-        vm.env['delay'] = function(args, task, env, vm) {
-          
-          if (task.state == simple.TASK_RESUMED) {
-            task.state = simple.TASK_RUNNABLE;
-            return null;
-          }
-          
-          task.state = simple.TASK_BLOCKED;
-          setTimeout(function() { vm.resumeTask(task); }, args[0]);
-          
-        };
-        
-        vm.env['print'] = function(args) {
-          console.log("VM say: ", args[0], args[1], args[2]);
-        };
-        
-        vm.start();
-        vm.spawn(code);
-        
-        // for (var i = 0; i < 20; ++i) {
-        //   vm.spawn(code);
-        // }
-        // 
-        // setTimeout(function() {
-        //   for (var i = 0; i < 20; ++i) {
-        //     vm.spawn(code);
-        //   }
-        // }, 10000);
-        
-        // var start = Date.now();
-        // for (var i = 0; i < 100000; ++i) {
-        //   
-        // }
-        // 
-        // console.log(Date.now() - start);
-        
+        // var vm = simple.createVM();
+        //         
+        //         var compiler = new simple.Compiler(vm.env);
+        //         var code = compiler.compile(ast);
+        //         
+        //         vm.trace = function(vm, task, frame) {
+        //           console.log("tracin'", task, frame);
+        //           console.log(frame.dirtyLocals());
+        //         }
+        //         
+        //         vm.env['random'] = function() {
+        //           return Math.floor(Math.random() * 1000);
+        //         }
+        //         
+        //         vm.env['delay'] = function(args, task, env, vm) {
+        //           
+        //           if (task.state == simple.TASK_RESUMED) {
+        //             task.state = simple.TASK_RUNNABLE;
+        //             return null;
+        //           }
+        //           
+        //           task.state = simple.TASK_BLOCKED;
+        //           setTimeout(function() { vm.resumeTask(task); }, args[0]);
+        //           
+        //         };
+        //         
+        //         vm.env['print'] = function(args) {
+        //           console.log("VM say: ", args[0], args[1], args[2]);
+        //         };
+        //         
+        //         vm.start();
+        //         vm.spawn(code);
+        //         
+        //         // for (var i = 0; i < 20; ++i) {
+        //         //   vm.spawn(code);
+        //         // }
+        //         // 
+        //         // setTimeout(function() {
+        //         //   for (var i = 0; i < 20; ++i) {
+        //         //     vm.spawn(code);
+        //         //   }
+        //         // }, 10000);
+        //         
+        //         // var start = Date.now();
+        //         // for (var i = 0; i < 100000; ++i) {
+        //         //   
+        //         // }
+        //         // 
+        //         // console.log(Date.now() - start);
+        //         
         
         
       }
     </script>
   </head>
   <body onload='init()'>
+    <script type='text/simple' id='source'>
+      def fib(n) {
+        if (n <= 0) {
+          return 0
+        } else if (n <= 1) {
+          return 1
+        } else {
+          return fib(n-2) + fib(n-1)
+        }
+      }
+
+      def add(l, r) {
+        print "i'm in a function"
+        return l + r
+      }
+
+      z = add 10, 125
+      print z
+
+      a = 10
+
+      -- here's a comment to skip
+      if a < 30 {
+        print "a is less than 30! - 1"
+        print "a is less than 30! - 2"
+        print "a is less than 30! - 3"
+      } else if a < 40 {
+        print "a is less than 40! - 1"
+        print "a is less than 40! - 2"
+        print "a is less than 40! - 3"
+      } else {
+        print "a is >= 40"
+      }
+
+      trace
+
+      b = 20 * 30
+      c = b + 100
+
+      x = 10
+      while x < 10 {
+        print x
+        x = x + 1
+        delay random()
+      }
+
+      a = 200
+      trace
+      trace
+
+      print 0x42 + c, 20, "foobar!"
+      print b, c, x
+    </script>
   </body>
 </html>

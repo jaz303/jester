@@ -5,6 +5,7 @@ simple = {};
   var nextToken = 1;
   
   simple.TOKENS = {};
+  simple.TOKEN_NAMES = {};
   
   [ 'SUB',
     'ADD',
@@ -21,6 +22,7 @@ simple = {};
     'TRUE',
     'FALSE',
     'INTEGER',
+    'HEX',
     'FLOAT',
     'STRING',
     'TRACE',
@@ -41,9 +43,12 @@ simple = {};
     'COMMA',
     'RETURN',
     'ASSIGN',
-    'EOF'
+    'EOF',
+    'ERROR'
   ].forEach(function(tok) {
-    simple.TOKENS[tok] = nextToken++;
+    var tokenId = nextToken++;
+    simple.TOKENS[tok] = tokenId;
+    simple.TOKEN_NAMES[tokenId] = tok;
   });
   
 })(simple);
