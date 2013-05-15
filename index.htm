@@ -174,12 +174,14 @@
         }
       }
 
+      while a < 100 { a = a + 1 }
+
       def add(l, r) {
         print "i'm in a function"
         return l + r
       }
 
-      z = add 10, 125
+      z = add 10, (add 20, 30), 40
       print z
 
       a = 10

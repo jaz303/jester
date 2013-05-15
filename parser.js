@@ -20,8 +20,6 @@
   // a function call without parens e.g.
   // foo 1, 2, 3
   var EXP_START_TOKENS = {};
-  EXP_START_TOKENS[T.SUB]     = true;
-  EXP_START_TOKENS[T.ADD]     = true;
   EXP_START_TOKENS[T.BANG]    = true;
   EXP_START_TOKENS[T.TILDE]   = true;
   EXP_START_TOKENS[T.TRUE]    = true;
