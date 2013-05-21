@@ -244,7 +244,7 @@
       text          : function() { return text; },    /* text of current token */
       error         : function() { return error; },   /* error message */
       line          : function() { return tokLine; }, /* start line of current token */
-      column        : function() { return tolCol; }   /* start column of current token */
+      column        : function() { return tokCol; }   /* start column of current token */
     };
     
   };
