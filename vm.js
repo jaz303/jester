@@ -173,8 +173,12 @@
             task.stack[frame.sp++] = false;
             break;
           case OP_SETL:
+            // Note: this opcode does NOT pop the stack
+            // That's because it's currently only used when compiling the assignment
+            // operator - which evaluates to its rval-  so the easiest thing to do is
+            // just preserve the stack as-is.
             var local = (op >> 8);
-            task.stack[frame.bp + local] = task.stack[--frame.sp];
+            task.stack[frame.bp + local] = task.stack[frame.sp-1];
             frame.dirty |= (1 << local);
             break;
           case OP_CALL:
