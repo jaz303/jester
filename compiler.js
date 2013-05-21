@@ -1,5 +1,9 @@
 ;(function(global, simple) {
   
+  function assert(condition, message) {
+    if (!condition) throw (message || "assertion failed");
+  }
+  
   var ops = simple.opcodes;
   
   var BIN_OPS = {
@@ -25,21 +29,25 @@
     
     compileFnDef: function(ast) {
       
+      assert(ast.type === 'def');
+      assert(Array.isArray(ast.parameters));
+      assert(Array.isArray(ast.body));
+      
       var oldFn = this._fn;
       var newFn = simple.makeFunction();
       
       this._fn = newFn;
       
-      var params = ast[2];
+      var params = ast.parameters;
       for (var i = 0; i < params.length; ++i) {
         newFn.slotForLocal(params[i]);
         newFn.minArgs++;
         newFn.maxArgs++;
       }
       
-      this.compileFunctionBody(ast[3]);
+      this.compileFunctionBody(ast.body);
       
-      this._env[ast[1]] = newFn;
+      this._env[ast.name] = newFn;
       
       this._fn = oldFn;
       
@@ -48,26 +56,33 @@
     },
     
     compileAssign: function(ast) {
-      var slot = this._fn.slotForLocal(ast[1][1]);
-      this.compileExpression(ast[2]);
+      
+      assert(ast.type === 'assign');
+      assert(ast.left.type === 'ident');
+      
+      var slot = this._fn.slotForLocal(ast.left.name);
+      this.compileExpression(ast.right);
       this.emit(ops.SETL | (slot << 8));
+      
     },
     
     compileIf: function(ast) {
       
-      var ix        = 1,
+      var ix        = 0,
           firstAbs  = null,
-          lastAbs   = null;
+          lastAbs   = null,
+          clauses   = ast.clauses;
       
-      while (ix < ast.length) {
-        if (ast[ix]) {
-          
-          this.compileExpression(ast[ix]);
+      while (ix < clauses.length) {
+        var clause = clauses[ix];
+        
+        if (typeof clause.condition !== 'undefined') {
+          this.compileExpression(clause.condition);
           
           var failJump = this._fn.code.length;
           this.emit(ops.JMPF);
           
-          this.compileStatements(ast[ix + 1]);
+          this.compileStatements(clause.body);
           
           if (firstAbs === null) {
             firstAbs = this._fn.code.length;
@@ -80,11 +95,11 @@
           }
           
           this._fn.code[failJump] = ops.JMPF | ((this._fn.code.length - failJump - 1) << 8);
-        
         } else {
-          this.compileStatements(ast[ix + 1]);
+          this.compileStatements(clause.body);
         }
-        ix += 2;
+        
+        ix++;
       }
       
       var jmpOp   = ops.JMPA | (this._fn.code.length << 8),
@@ -104,13 +119,17 @@
     
     compileWhile: function(ast) {
       
+      assert(ast.type === 'while');
+      assert(typeof ast.condition === 'object');
+      assert(Array.isArray(ast.body));
+      
       var loopStart = this._fn.code.length;
-      this.compileExpression(ast[1]);
+      this.compileExpression(ast.condition);
       
       var failJump = this._fn.code.length;
       this.emit(ops.JMPF);
       
-      this.compileStatements(ast[2]);
+      this.compileStatements(ast.body);
       this.emit(ops.JMPA | (loopStart << 8));
       
       this._fn.code[failJump] = ops.JMPF | ((this._fn.code.length - failJump - 1) << 8);
@@ -118,12 +137,17 @@
     },
     
     compileReturn: function(ast) {
-      if (ast.length == 2) {
-        this.compileExpression(ast[1]);
+      
+      assert(ast.type === 'return');
+      
+      if (typeof ast.returnValue !== 'undefined') {
+        this.compileExpression(ast.returnValue);
       } else {
         this.emit(ops.PUSHF); // TODO: should probably push undefined/null or whatever
       }
+      
       this.emit(ops.RET);
+    
     },
     
     compileYield: function(ast) {
@@ -132,8 +156,12 @@
     
     compileCall: function(ast) {
       
-      var args = ast[2];
+      assert(ast.type === 'call');
+      assert(typeof ast.fn === 'object');
+      assert(ast.fn.type === 'ident');
+      assert(Array.isArray(ast.args));
       
+      var args = ast.args;
       if (args.length > 255) {
         throw "compile error - max args per function call (255) exceeded";
       }
@@ -142,7 +170,7 @@
         this.compileExpression(args[i]);
       }
       
-      this.emit(ops.CALL | (args.length << 8) | (this._fn.slotForFunctionCall(ast[1][1]) << 16));
+      this.emit(ops.CALL | (args.length << 8) | (this._fn.slotForFunctionCall(ast.fn.name) << 16));
       
     },
     
@@ -154,21 +182,24 @@
       } else if (typeof ast == 'number' || typeof ast == 'string') {
         this.emit(ops.PUSHC | (this._fn.slotForConstant(ast) << 8));
       } else {
-        switch (ast[0]) {
+        switch (ast.type) {
+          case 'assign':
+            this.compileAssign(ast);
+            break;
           case 'trace':
             this.emit(ops.TRACE);
             break;
           case 'ident':
-            this.emit(ops.PUSHL | (this._fn.slotForLocal(ast[1]) << 8));
+            this.emit(ops.PUSHL | (this._fn.slotForLocal(ast.name) << 8));
             break;
           case 'call':
             this.compileCall(ast);
             break;
           default:
-            if (ast[0] in BIN_OPS) {
-              this.compileExpression(ast[1]);
-              this.compileExpression(ast[2]);
-              this.emit(BIN_OPS[ast[0]]);
+            if (ast.type in BIN_OPS) {
+              this.compileExpression(ast.left);
+              this.compileExpression(ast.right);
+              this.emit(BIN_OPS[ast.type]);
             } else {
               throw "unknown expression - " + ast;
             }
@@ -178,13 +209,10 @@
     },
     
     compileStatement: function(ast) {
-      if (Array.isArray(ast)) {
-        switch (ast[0]) {
+      if (ast.type) {
+        switch (ast.type) {
           case 'def':
             this.compileFnDef(ast);
-            break;
-          case 'assign':
-            this.compileAssign(ast);
             break;
           case 'if':
             this.compileIf(ast);
@@ -202,21 +230,21 @@
             this.compileExpression(ast);
             this.emit(ops.POP);
             break;
-        }
+          }
       } else {
         this.compileExpression(ast);
         this.emit(ops.POP);
       }
     },
     
-    compileStatements: function(ast) {
-      for (var i = 0; i < ast.length; ++i) {
-        this.compileStatement(ast[i]);
+    compileStatements: function(statements) {
+      for (var i = 0; i < statements.length; ++i) {
+        this.compileStatement(statements[i]);
       }
     },
     
-    compileFunctionBody: function(ast) {
-      this.compileStatements(ast);
+    compileFunctionBody: function(statements) {
+      this.compileStatements(statements);
       this.emit(ops.PUSHF);
       this.emit(ops.RET);
     },

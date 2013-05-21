@@ -31,6 +31,20 @@
   EXP_START_TOKENS[T.TRACE]   = true;
   EXP_START_TOKENS[T.IDENT]   = true;
   
+  function ParseError(message, line, column, expectedToken, actualToken) {
+    this.name = "ParseError";
+    this.message = message;
+    this.sourceLine = line;
+    this.sourceColumn = column;
+    this.expectedToken = expectedToken;
+    this.actualToken = actualToken;
+  }
+  
+  ParseError.prototype = new Error();
+  ParseError.prototype.constructor = ParseError;
+  
+  simple.ParseError = ParseError;
+  
   simple.createParser = function(lexer) {
     
     var curr = null;
@@ -45,10 +59,31 @@
     
     function accept(token, msg) {
       if (curr !== token) {
-        throw msg || ("unexpted token, expected: " + simple.TOKEN_NAMES[token] + ", got: " + simple.TOKEN_NAMES[curr]);
+        error(msg || "parse error", token);
       } else {
         next();
       }
+    }
+    
+    function error(msg, expectedToken) {
+      if (curr === T.ERROR) {
+        msg = lexer.error();
+      }
+      throw new ParseError(
+        msg,
+        lexer.line(),
+        lexer.column(),
+        expectedToken ? simple.TOKEN_NAMES[expectedToken] : null,
+        simple.TOKEN_NAMES[curr]
+      )
+    }
+    
+    function mktoken(type) {
+      return {
+        type    : type,
+        line    : lexer.line(),
+        column  : lexer.column()
+      };
     }
     
     function at(token)                  { return curr === token; }
@@ -70,12 +105,10 @@
       
       while (at(T.COMMA)) {
         next();
-        if (!at(T.IDENT)) {
-          throw("expected: parameter name (identifier)");
-        } else {
+        if (at(T.IDENT)) {
           params.push(text());
-          next();
         }
+        accept(T.IDENT, "expected: parameter name (identifier)");
       }
       
       return params;
@@ -86,12 +119,11 @@
       
       var node = { type: 'def' };
       
-      if (!at(T.IDENT)) {
-        error("expected: function name (identifier)");
+      if (at(T.IDENT)) {
+        node.name = text();
       }
       
-      node.name = text();
-      next();
+      accept(T.IDENT, "expected: function name (identifier)");
       
       accept(T.L_PAREN);
       node.parameters = parseFormalParameterList();
@@ -123,7 +155,7 @@
           skipNewlines();
         } else {
           skipNewlines();
-          node.clauses.push({ condition: null, body: parseStatementBlock() });
+          node.clauses.push({ condition: undefined, body: parseStatementBlock() });
           skipNewlines();
           break;
         }
@@ -161,7 +193,7 @@
     function parseReturnStatement() {
       accept(T.RETURN);
       
-      var node = { type: 'return', returnValue: null };
+      var node = { type: 'return', returnValue: undefined };
       
       if (atBlockTerminator()) {
         /* do nothing */
@@ -175,34 +207,34 @@
     }
     
     function parseStatements() {
-      var node = { type: 'statements', statements: [] };
+      var statements = [];
       
       skipStatementTerminators();
       
       while (curr !== T.EOF && curr !== T.R_BRACE) {
         switch (curr) {
           case T.DEF:
-            node.statements.push(parseFunctionDefinition());
+            statements.push(parseFunctionDefinition());
             break;
           case T.IF:
-            node.statements.push(parseIfStatement());
+            statements.push(parseIfStatement());
             break;
           case T.WHILE:
-            node.statements.push(parseWhileStatement());
+            statements.push(parseWhileStatement());
             break;
           case T.RETURN:
-            node.statements.push(parseReturnStatement());
+            statements.push(parseReturnStatement());
             break;
           default:
             // TODO: if parsed expression is a sole identifier, turn it
             // into a call
-            node.statements.push(parseExpressionStatement());
+            statements.push(parseExpressionStatement());
             break;
         }
         skipStatementTerminators();
       }
       
-      return node;
+      return statements;
     }
     
     // non-empty lists only
@@ -348,6 +380,8 @@
         next();
         exp = parseExpression();
         accept(T.R_PAREN);
+      } else {
+        error("expected: expression");
       }
       
       return exp;
