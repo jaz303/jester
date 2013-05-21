@@ -26,8 +26,7 @@
     '('         : T.L_PAREN,
     ')'         : T.R_PAREN,
     ';'         : T.SEMICOLON,
-    ','         : T.COMMA,
-    '\n'        : T.NEWLINE
+    ','         : T.COMMA
   };
   
   function space_p(ch) {
@@ -100,6 +99,14 @@
       // stash its position in the source.
       tokLine = curLine;
       tokCol = curCol;
+      
+      // newline
+      if (src[p] === '\n') {
+        p++;
+        curLine++;
+        curCol = 1;
+        return T.NEWLINE;
+      }
       
       if ((tok = SINGLES[src[p]])) {
         adv();
