@@ -55,15 +55,20 @@
   
   simple.createLexer = function(src) {
     
-    var p     = 0,
-        tok   = null,
-        len   = src.length,
-        text  = null,
-        start = null,
-        error = null;
+    var p         = 0,            /* current position in src */
+        len       = src.length,   /* length of src */
+        tok       = null,         /* result of last call to nextToken() */
+        text      = null,         /* parsed text of last token */
+        start     = null,         /* temporary marker for start of token being lexed */
+        error     = null,         /* error */
+        curLine   = 1,
+        curCol    = 1,
+        tokLine   = null,
+        tokCol    = null;
     
     function more() { return p < len - 1; }
     function two_more() { return p < len - 2; }
+    function adv(n) { n = n || 1; p += n; curCol += n; }
     
     function nextToken() {
       
@@ -74,24 +79,30 @@
       
       // skip whitespace
       while (space_p(src[p])) {
-        if (++p === len)
+        adv();
+        if (p === len)
           return T.EOF;
       }
       
       // skip comments
       if (src[p] === '-' && more() && src[p+1] === '-') {
-        p += 2;
+        adv(2);
         while (true) {
           if (p === len)
             return T.EOF;
           if (src[p] === '\r' || src[p] === '\n')
             break;
-          ++p;
+          adv();
         }
       }
       
+      // if we get to this point we known we're at a token
+      // stash its position in the source.
+      tokLine = curLine;
+      tokCol = curCol;
+      
       if ((tok = SINGLES[src[p]])) {
-        ++p;
+        adv();
         return tok;
       }
       
@@ -99,7 +110,7 @@
       switch (ch) {
         case '!':
           if (more() && src[p+1] === '=') {
-            ++p;
+            adv();
             tok = T.NEQ;
           } else {
             tok = T.BANG;
@@ -107,7 +118,7 @@
           break;
         case '<':
           if (more() && src[p+1] === '=') {
-            ++p;
+            adv();
             tok = T.LE;
           } else {
             tok = T.LT;
@@ -115,7 +126,7 @@
           break;
         case '>':
           if (more() && src[p+1] === '=') {
-            ++p;
+            adv();
             tok = T.GE;
           } else {
             tok = T.GT;
@@ -123,7 +134,7 @@
           break;
         case '=':
           if (more() && src[p+1] === '=') {
-            ++p;
+            adv();
             tok = T.EQ;
           } else {
             tok = T.ASSIGN;
@@ -131,8 +142,10 @@
           break;
         case '\r':
           if (more() && src[p+1] === '\n') {
-            ++p;
+            p++;
           }
+          curLine++;
+          curCol = 0; // column will be advanced to 1 at function end
           tok = T.NEWLINE;
           break;
         default:
@@ -140,7 +153,7 @@
             
             start = p;
             while (more() && ident_rest_p(src[p+1]))
-              ++p;
+              adv();
             
             text = src.substring(start, p + 1);
             tok = KEYWORDS[text] || T.IDENT;
@@ -150,10 +163,10 @@
             if (ch === '0' && two_more() && src[p+1] === 'x' && hex_digit_p(src[p+2])) {
               
               start = p;
-              p += 2;
+              adv(2);
               
               while (more() && hex_digit_p(src[p+1]))
-                ++p;
+                adv();
               
               text = src.substring(start, p + 1);
               tok = T.HEX;
@@ -163,16 +176,16 @@
               start = p;
               
               while (more() && digit_p(src[p+1]))
-                ++p;
+                adv();
                 
               if (more() && src[p+1] === '.') {
-                ++p;
+                adv();
                 if (!more() || !digit_p(src[p+1])) {
                   error = "invalid float literal";
                   tok = T.ERROR;
                 } else {
                   while (more() && digit_p(src[p+1]))
-                    ++p;
+                    adv();
                   text = src.substring(start, p + 1);
                   tok = T.FLOAT;
                 }
@@ -193,7 +206,7 @@
             tok = T.ERROR;
             
             while (more()) {
-              ++p;
+              adv();
               if (skip) {
                 skip = false;
               } else if (src[p] === '\\') {
@@ -207,22 +220,24 @@
             }
             
           } else {
-            error = "unexpected character: '" + ch + "'";
+            error = "unexpected character in input: '" + ch + "'";
             tok = T.ERROR;
           }
           
           break;
       }
       
-      ++p;
+      adv();
       return tok;
  
     }
     
     return {
-      nextToken     : nextToken,
-      text          : function() { return text; },
-      error         : function() { return error; }
+      nextToken     : nextToken,                      /* advance to next token and return */
+      text          : function() { return text; },    /* text of current token */
+      error         : function() { return error; },   /* error message */
+      line          : function() { return tokLine; }, /* start line of current token */
+      column        : function() { return tolCol; }   /* start column of current token */
     };
     
   };
