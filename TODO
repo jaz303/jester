@@ -6,6 +6,7 @@ Finish language
 [x] function call
 [x] return
 [ ] short circuiting logical operators
+[ ] implicit return
 [ ] color literals
 [ ] symbols
 [ ] arrays + indexing
@@ -14,10 +15,21 @@ Finish language
 [x] yield
 [x] delay
 [ ] spawn
-[ ] parser
+[x] parser
 [ ] stdlib
 [ ] garbage collection
-  
+
+Debugging tools
+===============
+[ ] Need to streamline compile process
+    - create a VM
+    - from VM, compile a "file" directly
+    - VM exposes methods to register functions - no direct access to environment object
+    - Compiler shouldn't assign exported functions to environment until compilation has been successful
+[ ] Source map per function - should map opcode to line#
+[x] Sane error messages from compiler
+[ ] Inspector program for browsing functions; bytecode explorer/decoder
+
 Make demo
 =========
 [ ] code window + run
@@ -37,3 +49,8 @@ Later
 [ ] Iterators
 
 [ ] Inline method cache
+
+Known Bugs
+==========
+[ ] Newlines in multi-line string tokens are not processed by lexer
+[ ] If definition of blocking native function change while it is paused, new version will be invoked upon resume
