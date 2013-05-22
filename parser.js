@@ -127,9 +127,13 @@
       
       accept(T.IDENT, "expected: function name (identifier)");
       
-      accept(T.L_PAREN);
-      node.parameters = parseFormalParameterList();
-      accept(T.R_PAREN);
+      if (at(T.L_PAREN)) {
+        accept(T.L_PAREN);
+        node.parameters = parseFormalParameterList();
+        accept(T.R_PAREN);
+      } else {
+        node.parameters = [];
+      }
       
       skipNewlines();
       
