@@ -17,8 +17,7 @@
     '>='  : ops.GE
   };
   
-  function Compiler(env) {
-    this._env = env;
+  function Compiler() {
     this._fn = null;
   }
   
@@ -260,9 +259,15 @@
     },
     
     compile: function(ast) {
+      this._env = {};
       this._fn = simple.makeFunction();
+      
       this.compileFunctionBody(ast);
-      return this._fn;
+      
+      return {
+        topLevelFn  : this._fn,
+        symbols     : this._env
+      };
     }
   };
   

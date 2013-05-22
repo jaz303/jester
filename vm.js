@@ -485,11 +485,17 @@
       while (task) gcTask(task), task = task.next;
     }
     
-    vm.env        = env;
+    function merge(symbols) {
+      for (var k in symbols) {
+        env[k] = symbols[k];
+      }
+    }
+    
     vm.spawn      = spawn;
     vm.start      = start;
     vm.gc         = gc;
     vm.resumeTask = resumeTask;
+    vm.merge      = merge;
     
     return vm;
   }

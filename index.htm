@@ -26,8 +26,11 @@
           var parser = simple.createParser(lexer);
           var ast = parser.parseTopLevel();
           var vm = simple.createVM();
-          var compiler = new simple.Compiler(vm.env);
+          var compiler = new simple.Compiler();
           var code = compiler.compile(ast);
+          
+          vm.merge(code.symbols);
+          
         } catch (e) {
           if (e instanceof simple.ParseError) {
             console.log(e);
@@ -62,7 +65,7 @@
         };
         
         vm.start();
-        vm.spawn(code);
+        vm.spawn(code.topLevelFn);
         
         // for (var i = 0; i < 20; ++i) {
         //   vm.spawn(code);
