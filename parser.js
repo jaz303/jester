@@ -180,6 +180,14 @@
       return node;
     }
     
+    function parseLoopStatement() {
+      accept(T.LOOP);
+      var node = { type: 'loop' };
+      skipNewlines();
+      node.body = parseStatementBlock();
+      return node;
+    }
+    
     function parseExpressionStatement() {
       var node = parseExpression();
       if (atBlockTerminator()) {
@@ -221,6 +229,9 @@
             break;
           case T.WHILE:
             statements.push(parseWhileStatement());
+            break;
+          case T.LOOP:
+            statements.push(parseLoopStatement());
             break;
           case T.RETURN:
             statements.push(parseReturnStatement());

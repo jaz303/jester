@@ -136,6 +136,13 @@
 
     },
     
+    compileLoop: function(ast) {
+      var loopStart = this._fn.code.length;
+      this.compileStatements(ast.body);
+      this.emit(ops.YIELD);
+      this.emit(ops.JMPA | (loopStart << 8));
+    },
+    
     compileReturn: function(ast) {
       
       assert(ast.type === 'return');
@@ -219,6 +226,9 @@
             break;
           case 'while':
             this.compileWhile(ast);
+            break;
+          case 'loop':
+            this.compileLoop(ast);
             break;
           case 'return':
             this.compileReturn(ast);

@@ -6,6 +6,7 @@
     'if'        : T.IF,
     'else'      : T.ELSE,
     'while'     : T.WHILE,
+    'loop'      : T.LOOP,
     'def'       : T.DEF,
     'trace'     : T.TRACE,
     'return'    : T.RETURN,

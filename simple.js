@@ -30,6 +30,7 @@ simple = {};
     'IF',
     'ELSE',
     'WHILE',
+    'LOOP',
     'DEF',
     'L_BRACE',
     'R_BRACE',
