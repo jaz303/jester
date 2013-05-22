@@ -109,8 +109,8 @@
       OP_GT       = t('GT'),            
       OP_GE       = t('GE'),            
       OP_JMP      = t('JMP'),           /* Jump                   (31:8 - offset) */
-      OP_JMPT     = t('JMPT'),          /* Jump if True           (31:8 - offset) */
-      OP_JMPF     = t('JMPF'),          /* Jump if False          (31:8 - offset) */
+      OP_JMPT     = t('JMPT'),          /* Jump if True (pops)    (31:8 - offset) */
+      OP_JMPF     = t('JMPF'),          /* Jump if False (pops)   (31:8 - offset) */
       OP_JMPT_OP  = t('JMPT_OP'),       /* Jump if False or Pop   (31:8 offset) */
       OP_JMPF_OP  = t('JMPF_OP'),       /* Jump if True of Pop    (31:8 offset) */
       OP_JMPA     = t('JMPA'),          /* Jump Absolute          (31:8 - target) */
