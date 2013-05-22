@@ -7,20 +7,22 @@ simple = {};
   simple.TOKENS = {};
   simple.TOKEN_NAMES = {};
   
-  [ 'SUB',
-    'ADD',
-    'MUL',
-    'DIV',
-    'BANG',
-    'LT',
-    'GT',
-    'LE',
-    'GE',
-    'EQ',
-    'NEQ',
-    'TILDE',
-    'TRUE',
-    'FALSE',
+  [ 'SUB',        // -
+    'ADD',        // +
+    'MUL',        // *
+    'DIV',        // /
+    'BANG',       // !
+    'LT',         // <
+    'GT',         // >
+    'LE',         // <=
+    'GE',         // >=
+    'EQ',         // ==
+    'NEQ',        // !=
+    'LAND',       // &&
+    'LOR',        // ||
+    'TILDE',      // ~
+    'TRUE',       // true
+    'FALSE',      // false
     'INTEGER',
     'HEX',
     'FLOAT',

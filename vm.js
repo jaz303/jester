@@ -91,30 +91,32 @@
     return opcode;
   };
   
-  var OP_PUSHC    = t('PUSHC'),     /* Push Constant  (31:8 - constant slot) */
-      OP_PUSHI    = t('PUSHI'),     /* Push Immediate (31:8 - integer value) */
-      OP_PUSHL    = t('PUSHL'),     /* Push Local     (31:8 - local slot) */
-      OP_PUSHT    = t('PUSHT'),     /* Push true */
-      OP_PUSHF    = t('PUSHF'),     /* Push false */
-      OP_SETL     = t('SETL'),      /* Set Local      (31:8 - local slot) */
-      OP_CALL     = t('CALL'),      /* Call           (31:16 - fn slot, 15:8 - nargs) */
-      OP_RET      = t('RET'),       /* Return */
-      OP_POP      = t('POP'),       /* Pop TOS */
-      OP_ADD      = t('ADD'),
-      OP_SUB      = t('SUB'),
-      OP_MUL      = t('MUL'),
-      OP_DIV      = t('DIV'),
-      OP_LT       = t('LT'),
-      OP_LE       = t('LE'),
-      OP_GT       = t('GT'),
-      OP_GE       = t('GE'),
-      OP_JMP      = t('JMP'),       /* Jump           (31:8 - offset) */
-      OP_JMPT     = t('JMPT'),      /* Jump if True   (31:8 - offset) */
-      OP_JMPF     = t('JMPF'),      /* Jump if False  (31:8 - offset) */
-      OP_JMPA     = t('JMPA'),      /* Jump Absolute  (31:8 - target) */
-      OP_TRACE    = t('TRACE'),     /* Trace */
-      OP_YIELD    = t('YIELD'),     /* Yield */
-      OP_EXIT     = t('EXIT');      /* Exit task */
+  var OP_PUSHC    = t('PUSHC'),         /* Push Constant          (31:8 - constant slot) */
+      OP_PUSHI    = t('PUSHI'),         /* Push Immediate         (31:8 - integer value) */
+      OP_PUSHL    = t('PUSHL'),         /* Push Local             (31:8 - local slot) */
+      OP_PUSHT    = t('PUSHT'),         /* Push true */           
+      OP_PUSHF    = t('PUSHF'),         /* Push false */          
+      OP_SETL     = t('SETL'),          /* Set Local              (31:8 - local slot) */
+      OP_CALL     = t('CALL'),          /* Call                   (31:16 - fn slot, 15:8 - nargs) */
+      OP_RET      = t('RET'),           /* Return */              
+      OP_POP      = t('POP'),           /* Pop TOS */
+      OP_ADD      = t('ADD'),           
+      OP_SUB      = t('SUB'),           
+      OP_MUL      = t('MUL'),           
+      OP_DIV      = t('DIV'),           
+      OP_LT       = t('LT'),            
+      OP_LE       = t('LE'),            
+      OP_GT       = t('GT'),            
+      OP_GE       = t('GE'),            
+      OP_JMP      = t('JMP'),           /* Jump                   (31:8 - offset) */
+      OP_JMPT     = t('JMPT'),          /* Jump if True           (31:8 - offset) */
+      OP_JMPF     = t('JMPF'),          /* Jump if False          (31:8 - offset) */
+      OP_JMPT_OP  = t('JMPT_OP'),       /* Jump if False or Pop   (31:8 offset) */
+      OP_JMPF_OP  = t('JMPF_OP'),       /* Jump if True of Pop    (31:8 offset) */
+      OP_JMPA     = t('JMPA'),          /* Jump Absolute          (31:8 - target) */
+      OP_TRACE    = t('TRACE'),         /* Trace */
+      OP_YIELD    = t('YIELD'),         /* Yield */
+      OP_EXIT     = t('EXIT');          /* Exit task */
       
   var TASK_RUNNABLE   = simple.TASK_RUNNABLE  = 1,  /* default state; task is runnable */
       TASK_DEAD       = simple.TASK_DEAD      = 2,  /* task is dead. done. gone. */
@@ -332,6 +334,20 @@
           case OP_JMPF:
             var v = task.stack[--frame.sp];
             if (!truthy_p(v)) {
+              frame.ip += (op >> 8);
+            }
+            break;
+          case OP_JMPT_OP:
+            if (truthy_p(task.stack[frame.sp - 1])) {
+              frame.ip += (op >> 8);
+            } else {
+              --frame.sp;
+            }
+            break;
+          case OP_JMPF_OP:
+            if (truthy_p(task.stack[frame.sp - 1])) {
+              --frame.sp;
+            } else {
               frame.ip += (op >> 8);
             }
             break;

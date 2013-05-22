@@ -15,6 +15,8 @@
   TOKEN_OP[T.GE]    = '>=';
   TOKEN_OP[T.EQ]    = '==';
   TOKEN_OP[T.NEQ]   = '!=';
+  TOKEN_OP[T.LAND]  = 'logical-and';
+  TOKEN_OP[T.LOR]   = 'logical-or';
   
   // these are the tokens that can follow an identifier to allow
   // a function call without parens e.g.
@@ -265,19 +267,37 @@
     
     // foo = "bar"
     function parseAssignExpression() {
-      var exp = parseEqualityExpression();
+      var exp = parseLogicalOrExpression();
       if (at(T.ASSIGN)) {
         next();
-        var root = { type: 'assign', left: exp, right: parseEqualityExpression() }, curr = root;
+        var root = { type: 'assign', left: exp, right: parseLogicalOrExpression() }, curr = root;
         while (at(T.ASSIGN)) {
           next();
-          curr.right = { type: 'assign', left: curr.right, right: parseEqualityExpression() };
+          curr.right = { type: 'assign', left: curr.right, right: parseLogicalOrExpression() };
           curr = curr.right;
         }
         return root;
       } else {
         return exp;
       }
+    }
+    
+    function parseLogicalOrExpression() {
+      var exp = parseLogicalAndExpression();
+      while (at(T.LOR)) {
+        next();
+        exp = { type: TOKEN_OP[T.LOR], left: exp, right: parseLogicalAndExpression() };
+      }
+      return exp;
+    }
+    
+    function parseLogicalAndExpression() {
+      var exp = parseEqualityExpression();
+      while (at(T.LAND)) {
+        next();
+        exp = { type: TOKEN_OP[T.LAND], left: exp, right: parseEqualityExpression() };
+      }
+      return exp;
     }
     
     function parseEqualityExpression() {

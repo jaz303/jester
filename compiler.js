@@ -180,6 +180,32 @@
       
     },
     
+    compileLogicalAnd: function(ast) {
+      
+      this.compileExpression(ast.left);
+      
+      var bailJump = this._fn.code.length;
+      this.emit(0);
+      
+      this.compileExpression(ast.right);
+      
+      this._fn.code[bailJump] = ops.JMPF_OP | ((this._fn.code.length - bailJump - 1) << 8);
+
+    },
+    
+    compileLogicalOr: function(ast) {
+      
+      this.compileExpression(ast.left);
+      
+      var bailJump = this._fn.code.length;
+      this.emit(0);
+      
+      this.compileExpression(ast.right);
+      
+      this._fn.code[bailJump] = ops.JMPT_OP | ((this._fn.code.length - bailJump - 1) << 8);
+      
+    },
+    
     compileExpression: function(ast) {
       if (ast === true) {
         this.emit(ops.PUSHT);
@@ -202,7 +228,11 @@
             this.compileCall(ast);
             break;
           default:
-            if (ast.type in BIN_OPS) {
+            if (ast.type === 'logical-and') {
+              this.compileLogicalAnd(ast);
+            } else if (ast.type === 'logical-or') {
+              this.compileLogicalOr(ast);
+            } else if (ast.type in BIN_OPS) {
               this.compileExpression(ast.left);
               this.compileExpression(ast.right);
               this.emit(BIN_OPS[ast.type]);

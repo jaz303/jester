@@ -140,6 +140,24 @@
             tok = T.GT;
           }
           break;
+        case '&':
+          if (more() && src[p+1] === '&') {
+            adv();
+            tok = T.LAND;
+          } else {
+            error = "invalid token '&'";
+            tok = T.ERROR;
+          }
+          break;
+        case '|':
+          if (more() && src[p+1] === '|') {
+            adv();
+            tok = T.LOR;
+          } else {
+            error = "invalid token '|'";
+            tok = T.ERROR;
+          }
+          break;
         case '=':
           if (more() && src[p+1] === '=') {
             adv();
