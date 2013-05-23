@@ -146,6 +146,10 @@
     
     var env = vm.env;
     
+    function runtimeError(frame, message) {
+      throw "line " + frame.fn.sourceMap[frame.ip-1] + ": " + message;
+    }
+    
     function truthy_p(v) {
       return !(v === false || v === null);
     }
@@ -237,7 +241,7 @@
               //  - raise exception? (we don't have those yet...)
               //  - kill the task?
               //  - kill the VM (throw)
-              throw "not callable!";
+              runtimeError(frame, "function call error");
             }
             break;
           case OP_RET:
@@ -256,7 +260,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l + r);
             } else {
-              throw "ADD - args non-numeric";
+              runtimeError(frame, "ADD - args non-numeric");
             }
             break;
           case OP_SUB:

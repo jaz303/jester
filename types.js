@@ -6,6 +6,7 @@
   function Fn() {
     this.__type__ = simple.T_FN;
     this.code = [];
+    this.sourceMap = [];
     
     this.minArgs = 0;
     this.maxArgs = 0;
@@ -13,7 +14,7 @@
     this.constants = [];
     
     this.locals = [];
-  
+    
     this.fnNames = [];
     this.fnCache = [];
   };

@@ -22,8 +22,9 @@
   }
   
   Compiler.prototype = {
-    emit: function(opcode) {
+    emit: function(opcode, line) {
       this._fn.code.push(opcode);
+      this._fn.sourceMap.push(line || 0);
     },
     
     compileFnDef: function(ast) {
@@ -61,7 +62,7 @@
       
       var slot = this._fn.slotForLocal(ast.left.name);
       this.compileExpression(ast.right);
-      this.emit(ops.SETL | (slot << 8));
+      this.emit(ops.SETL | (slot << 8), ast.line);
       
     },
     
@@ -138,7 +139,7 @@
     compileLoop: function(ast) {
       var loopStart = this._fn.code.length;
       this.compileStatements(ast.body);
-      this.emit(ops.YIELD);
+      this.emit(ops.YIELD, ast.line);
       this.emit(ops.JMPA | (loopStart << 8));
     },
     
@@ -152,12 +153,12 @@
         this.emit(ops.PUSHF); // TODO: should probably push undefined/null or whatever
       }
       
-      this.emit(ops.RET);
+      this.emit(ops.RET, ast.line);
     
     },
     
     compileYield: function(ast) {
-      this.emit(ops.YIELD);
+      this.emit(ops.YIELD, ast.line);
     },
     
     compileCall: function(ast) {
@@ -176,7 +177,7 @@
         this.compileExpression(args[i]);
       }
       
-      this.emit(ops.CALL | (args.length << 8) | (this._fn.slotForFunctionCall(ast.fn.name) << 16));
+      this.emit(ops.CALL | (args.length << 8) | (this._fn.slotForFunctionCall(ast.fn.name) << 16), ast.line);
       
     },
     
@@ -208,21 +209,21 @@
     
     compileExpression: function(ast) {
       if (ast === true) {
-        this.emit(ops.PUSHT);
+        this.emit(ops.PUSHT, ast.line);
       } else if (ast === false) {
-        this.emit(ops.PUSHF);
+        this.emit(ops.PUSHF, ast.line);
       } else if (typeof ast == 'number' || typeof ast == 'string') {
-        this.emit(ops.PUSHC | (this._fn.slotForConstant(ast) << 8));
+        this.emit(ops.PUSHC | (this._fn.slotForConstant(ast) << 8), ast.line);
       } else {
         switch (ast.type) {
           case 'assign':
             this.compileAssign(ast);
             break;
           case 'trace':
-            this.emit(ops.TRACE);
+            this.emit(ops.TRACE, ast.line);
             break;
           case 'ident':
-            this.emit(ops.PUSHL | (this._fn.slotForLocal(ast.name) << 8));
+            this.emit(ops.PUSHL | (this._fn.slotForLocal(ast.name) << 8), ast.line);
             break;
           case 'call':
             this.compileCall(ast);
@@ -235,7 +236,7 @@
             } else if (ast.type in BIN_OPS) {
               this.compileExpression(ast.left);
               this.compileExpression(ast.right);
-              this.emit(BIN_OPS[ast.type]);
+              this.emit(BIN_OPS[ast.type], ast.line);
             } else {
               throw "unknown expression - " + ast;
             }
