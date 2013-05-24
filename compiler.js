@@ -14,7 +14,9 @@
     '<'   : ops.LT,
     '<='  : ops.LE,
     '>'   : ops.GT,
-    '>='  : ops.GE
+    '>='  : ops.GE,
+    '=='  : ops.EQ,
+    '!='  : ops.NEQ
   };
   
   function Compiler() {

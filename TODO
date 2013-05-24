@@ -7,6 +7,7 @@ Finish language
 [ ] spawn
 [ ] stdlib
 [ ] garbage collection
+[x] equality operators
 [x] trace - dirty variable tracking
 [x] if
 [x] function definition

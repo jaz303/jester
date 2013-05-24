@@ -106,7 +106,9 @@
       OP_ADD      = t('ADD'),           
       OP_SUB      = t('SUB'),           
       OP_MUL      = t('MUL'),           
-      OP_DIV      = t('DIV'),           
+      OP_DIV      = t('DIV'),  
+      OP_EQ       = t('EQ'),
+      OP_NEQ      = t('NEQ'),
       OP_LT       = t('LT'),            
       OP_LE       = t('LE'),            
       OP_GT       = t('GT'),            
@@ -260,6 +262,16 @@
             break;
           case OP_POP:
             --frame.sp;
+            break;
+          case OP_EQ:
+            var l = task.stack[frame.sp - 2],
+                r = task.stack[frame.sp - 1];
+            task.stack[(frame.sp--) - 2] = (l === r);
+            break;
+          case OP_NEQ:
+            var l = task.stack[frame.sp - 2],
+                r = task.stack[frame.sp - 1];
+            task.stack[(frame.sp--) - 2] = (l !== r);
             break;
           case OP_ADD:
             var l = task.stack[frame.sp - 2],
