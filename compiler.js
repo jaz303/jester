@@ -268,12 +268,12 @@
             break;
           default:
             this.compileExpression(ast);
-            this.emit(ops.POP);
+            this.emit(ops.SETZ);
             break;
           }
       } else {
         this.compileExpression(ast);
-        this.emit(ops.POP);
+        this.emit(ops.SETZ);
       }
     },
     
@@ -285,7 +285,7 @@
     
     compileFunctionBody: function(statements) {
       this.compileStatements(statements);
-      this.emit(ops.PUSHF);
+      this.emit(ops.PUSHZ);
       this.emit(ops.RET);
     },
     

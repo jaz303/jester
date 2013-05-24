@@ -44,6 +44,7 @@
     this.fn = fn;
     this.task = task;
     this.dirty = 0;
+    this.z = false;
     // sp, bp, ip
   }
   
@@ -95,7 +96,9 @@
       OP_PUSHI    = t('PUSHI'),         /* Push Immediate         (31:8 - integer value) */
       OP_PUSHL    = t('PUSHL'),         /* Push Local             (31:8 - local slot) */
       OP_PUSHT    = t('PUSHT'),         /* Push true */           
-      OP_PUSHF    = t('PUSHF'),         /* Push false */          
+      OP_PUSHF    = t('PUSHF'),         /* Push false */
+      OP_PUSHZ    = t('PUSHZ'),         /* Push last evaluated value */
+      OP_SETZ     = t('SETZ'),          /* Store TOS in Z and pop */
       OP_SETL     = t('SETL'),          /* Set Local              (31:8 - local slot) */
       OP_CALL     = t('CALL'),          /* Call                   (31:16 - fn slot, 15:8 - nargs) */
       OP_RET      = t('RET'),           /* Return */              
@@ -177,6 +180,12 @@
             break;
           case OP_PUSHF:
             task.stack[frame.sp++] = false;
+            break;
+          case OP_PUSHZ:
+            task.stack[frame.sp++] = frame.z;
+            break;
+          case OP_SETZ:
+            frame.z = task.stack[--frame.sp];
             break;
           case OP_SETL:
             // Note: this opcode does NOT pop the stack
