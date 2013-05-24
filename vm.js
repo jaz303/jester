@@ -149,8 +149,10 @@
     
     var env = vm.env;
     
-    function runtimeError(frame, message) {
-      throw "line " + frame.fn.sourceMap[frame.ip-1] + ": " + message;
+    function runtimeError(task, message) {
+      task.state = TASK_DEAD;
+      var frame = task.frames[task.fp];
+      console.log("Runtime error in task " + task.id + " at line " + frame.fn.sourceMap[frame.ip-1] + ": " + message);
     }
     
     function truthy_p(v) {
@@ -246,11 +248,7 @@
               
               break;
             } else {
-              // TODO: what do we do here?
-              //  - raise exception? (we don't have those yet...)
-              //  - kill the task?
-              //  - kill the VM (throw)
-              runtimeError(frame, "function call error");
+              return runtimeError(task, "'" + callfn + "' is not a function");
             }
             break;
           case OP_RET:
@@ -269,7 +267,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l + r);
             } else {
-              runtimeError(frame, "ADD - args non-numeric");
+              return runtimeError(task, "ADD - args non-numeric");
             }
             break;
           case OP_SUB:
@@ -278,7 +276,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l - r);
             } else {
-              throw "SUB - args non-numeric";
+              return runtimeError(task, "SUB - args non-numeric");
             }
             break;
           case OP_MUL:
@@ -287,7 +285,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l * r);
             } else {
-              throw "MUL - args non-numeric";
+              return runtimeError(task, "MUL - args non-numeric");
             }
             break;
           case OP_DIV:
@@ -296,7 +294,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l / r);
             } else {
-              throw "DIV - args non-numeric";
+              return runtimeError(task, "DIV - args non-numeric");
             }
             break;
           case OP_LT:
@@ -305,7 +303,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l < r);
             } else {
-              throw "LT - args non-numeric";
+              return runtimeError(task, "LT - args non-numeric");
             }
             break;
           case OP_LE:
@@ -314,7 +312,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l <= r);
             } else {
-              throw "LE - args non-numeric";
+              return runtimeError(task, "LE - args non-numeric");
             }
             break;
           case OP_GT:
@@ -323,7 +321,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l > r);
             } else {
-              throw "GT - args non-numeric";
+              return runtimeError(task, "GT - args non-numeric");
             }
             break;
           case OP_GE:
@@ -332,7 +330,7 @@
             if (typeof l == 'number' && typeof r == 'number') {
               task.stack[(frame.sp--) - 2] = (l >= r);
             } else {
-              throw "GE - args non-numeric";
+              return runtimeError(task, "GE - args non-numeric");
             }
             break;
           case OP_JMP:
