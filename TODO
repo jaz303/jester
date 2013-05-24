@@ -1,32 +1,50 @@
 Finish language
 ===============
+[ ] color literals
+[ ] name mangling (optional feature)
+[ ] arrays + indexing
+[ ] dictionaries + indexing
+[ ] spawn
+[ ] stdlib
+[ ] garbage collection
 [x] trace - dirty variable tracking
 [x] if
 [x] function definition
 [x] function call
 [x] return
-[ ] short circuiting logical operators
-[ ] implicit return
-[ ] color literals
-[ ] symbols
-[ ] arrays + indexing
-[ ] dictionaries + indexing
+[x] short circuiting logical operators
+[x] implicit return
 [x] tasks
 [x] yield
 [x] delay
-[ ] spawn
 [x] parser
-[ ] stdlib
-[ ] garbage collection
+
+var context = simple.createContext();
+context.compile(script, filename);
+
+context.getEnv(k);
+context.setEnv(k, v);
+
+// need some notion of the "main" task/entry point
+
+var vm = context.getVM();
+vm.start();
+
+task = spawn foo, 1, 2
+yield
+
+Need to work out the final scoping rules and implement them in the parser/compiler.
+ - will need a dual-pass thing
+ - this will probably require a tree walker
 
 Debugging tools
 ===============
-[ ] Need to streamline compile process
+[x] Need to streamline compile process
     - create a VM
     - from VM, compile a "file" directly
     - VM exposes methods to register functions - no direct access to environment object
     - Compiler shouldn't assign exported functions to environment until compilation has been successful
-[ ] Source map per function - should map opcode to line#
+[x] Source map per function - should map opcode to line#
 [x] Sane error messages from compiler
 [ ] Inspector program for browsing functions; bytecode explorer/decoder
 
@@ -39,16 +57,37 @@ Make demo
 [ ] breakpoints - suspend thread or entire VM
 [ ] interact with stack frame
   
-Later
-=====
-[ ] ACE editor integration
+Future Work
+===========
 
+Language Features
+-----------------
 [ ] Object system
 [ ] New syntax
 [ ] Blocks/closures
 [ ] Iterators
+[ ] Comprehensions
 
+Internals
+---------
+[ ] Compiler flags
+    - when to automatically insert "yield"
+      - loop { }
+      - while (/* any constant */) { }
+      - any loop
+    - toggle name-mangling
 [ ] Inline method cache
+
+Tooling
+-------
+[ ] Editor integration
+
+Possible optimisations
+======================
+Implicit return is possible through syntax tree analysis and planting returns
+in the correct places. This would remove the need for 2 opcodes and save one
+memory write per statement. Probably best leave this until we've got some
+machinery in place for walking/transforming the AST.
 
 Known Bugs
 ==========
