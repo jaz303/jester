@@ -41,10 +41,10 @@
   }
   
   function Frame(fn, task) {
-    this.fn = fn;
-    this.task = task;
-    this.dirty = 0;
-    this.z = false;
+    this.fn     = fn;     /* function this frame is executing */
+    this.task   = task;   /* task this frame belongs to */
+    this.dirty  = 0;      /* bitmask of locals modified since last `trace` */
+    this.z      = false;  /* last evaluated value */
     // sp, bp, ip
   }
   
