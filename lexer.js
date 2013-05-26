@@ -36,7 +36,9 @@
   
   function hex_digit_p(ch) {
     var c = ch.charCodeAt(0);
-    return (c >= 48 && c <= 57) || (c >= 65 && c <= 70) || (c >= 97 && c <= 102);
+    return (c >= 48 && c <= 57)
+            || (c >= 65 && c <= 70)
+            || (c >= 97 && c <= 102);
   }
   
   function digit_p(ch) {
@@ -46,11 +48,21 @@
   
   function ident_start_p(ch) {
     var c = ch.charCodeAt(0);
-    return (c >= 65 && c <= 90) || (c >= 97 && c <= 122) || (c == 95);
+    return (c === 95)
+            || (c >= 65 && c <= 90)
+            || (c >= 97 && c <= 122);
   }
   
   function ident_rest_p(ch) {
     return ident_start_p(ch) || digit_p(ch);
+  }
+  
+  function color_rest_p(ch) {
+    var c = ch.charCodeAt(0);
+    return (c === 95)
+            || (c >= 65 && c <= 90)
+            || (c >= 97 && c <= 122)
+            || (c >= 48 && c <= 57);
   }
   
   simple.createLexer = function(src) {
@@ -175,7 +187,22 @@
           tok = T.NEWLINE;
           break;
         default:
-          if (ident_start_p(ch)) {
+          if (ch === '#') {
+            
+            start = p;
+            
+            if (more() && color_rest_p(src[p+1])) {
+              while (more() && color_rest_p(src[p+1]))
+                adv();
+                
+              text = src.substring(start, p + 1);
+              tok = T.COLOR;
+            } else {
+              error = "invalid colour literal";
+              tok = T.ERROR;
+            }
+            
+          } else if (ident_start_p(ch)) {
             
             start = p;
             while (more() && ident_rest_p(src[p+1]))

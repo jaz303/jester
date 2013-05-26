@@ -80,12 +80,15 @@
       )
     }
     
-    function mktoken(type) {
-      return {
-        type    : type,
-        line    : lexer.line(),
-        column  : lexer.column()
-      };
+    function decodeColor(text) {
+      var resolved  = simple.COLOR_NAMES[text.substring(1).replace(/_/g, '').toLowerCase()],
+          hex       = resolved || text;
+      
+      if (hex.match(/^#[0-9a-z]+$/i) && (hex.length === 7 || hex.length === 9)) {
+        return { type: 'color', hex: hex };
+      } else {
+        error("Invalid color literal '" + text + "'. Color literals should be 6/8 character hex strings, or valid color names.");
+      }
     }
     
     function at(token)                  { return curr === token; }
@@ -424,6 +427,9 @@
         next();
       } else if (at(T.STRING)) {
         exp = text();
+        next();
+      } else if (at(T.COLOR)) {
+        exp = decodeColor(text());
         next();
       } else if (at(T.TRACE)) {
         exp = { type: 'trace', line: line };

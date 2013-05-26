@@ -27,6 +27,7 @@ simple = {};
     'HEX',
     'FLOAT',
     'STRING',
+    'COLOR',
     'TRACE',
     'IDENT',
     'IF',

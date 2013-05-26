@@ -218,6 +218,9 @@
         this.emit(ops.PUSHC | (this._fn.slotForConstant(ast) << 8), ast.line);
       } else {
         switch (ast.type) {
+          case 'color':
+            throw "not yet able to compile colors, hex=" + ast.hex;
+            break;
           case 'assign':
             this.compileAssign(ast);
             break;

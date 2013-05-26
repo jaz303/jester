@@ -2,6 +2,7 @@
   
   var T_FN      = 1;
   var T_ARRAY   = 2;
+  var T_COLOR   = 3;
   
   function Fn() {
     this.__type__ = simple.T_FN;
@@ -66,7 +67,18 @@
     return array;
   }
   
+  simple.makeColor = function(r, g, b, a) {
+    return {
+      __type__  : T_COLOR,
+      r         : r,
+      g         : g,
+      b         : b,
+      a         : a
+    };
+  }
+  
   simple.T_FN     = T_FN;
   simple.T_ARRAY  = T_ARRAY;
+  simple.T_COLOR  = T_COLOR;
   
 })(this, simple)
