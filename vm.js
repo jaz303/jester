@@ -161,6 +161,18 @@
       return !(v === false || v === null);
     }
     
+    function eq_p(l, r) {
+      if (l === r) {
+        return true;
+      }
+      
+      if (l.__type__ === simple.T_COLOR && r.__type__ === simple.T_COLOR) {
+        return l.color === r.color;
+      }
+      
+      return false;
+    }
+    
     function exec(task) {
       var frame = task.frames[task.fp],
           fn    = frame.fn,
@@ -266,12 +278,12 @@
           case OP_EQ:
             var l = task.stack[frame.sp - 2],
                 r = task.stack[frame.sp - 1];
-            task.stack[(frame.sp--) - 2] = (l === r);
+            task.stack[(frame.sp--) - 2] = eq_p(l, r);
             break;
           case OP_NEQ:
             var l = task.stack[frame.sp - 2],
                 r = task.stack[frame.sp - 1];
-            task.stack[(frame.sp--) - 2] = (l !== r);
+            task.stack[(frame.sp--) - 2] = !eq_p(l, r);
             break;
           case OP_ADD:
             var l = task.stack[frame.sp - 2],
