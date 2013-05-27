@@ -32,6 +32,7 @@
   EXP_START_TOKENS[T.STRING]  = true;
   EXP_START_TOKENS[T.TRACE]   = true;
   EXP_START_TOKENS[T.IDENT]   = true;
+  EXP_START_TOKENS[T.COLOR]   = true;
   
   function ParseError(message, line, column, expectedToken, actualToken) {
     this.name = "ParseError";
@@ -82,10 +83,25 @@
     
     function decodeColor(text) {
       var resolved  = simple.COLOR_NAMES[text.substring(1).replace(/_/g, '').toLowerCase()],
-          hex       = resolved || text;
+          hex       = resolved || text,
+          matches   = null;
       
-      if (hex.match(/^#[0-9a-z]+$/i) && (hex.length === 7 || hex.length === 9)) {
-        return { type: 'color', hex: hex };
+      if (matches = hex.match(/^#([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})$/i)) {
+        return {
+          type  : 'color',
+          r     : parseInt(matches[1], 16),
+          g     : parseInt(matches[2], 16),
+          b     : parseInt(matches[3], 16),
+          a     : 255
+        };
+      } else if (matches = hex.match(/^#([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})$/i)) {
+        return {
+          type  : 'color',
+          r     : parseInt(matches[1], 16),
+          g     : parseInt(matches[2], 16),
+          b     : parseInt(matches[3], 16),
+          a     : parseInt(matches[4], 16)
+        };
       } else {
         error("Invalid color literal '" + text + "'. Color literals should be 6/8 character hex strings, or valid color names.");
       }

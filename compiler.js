@@ -219,7 +219,8 @@
       } else {
         switch (ast.type) {
           case 'color':
-            throw "not yet able to compile colors, hex=" + ast.hex;
+            var color = simple.makeColor(ast.r, ast.g, ast.b, ast.a);
+            this.emit(ops.PUSHC | (this._fn.slotForConstant(color) << 8), ast.line);
             break;
           case 'assign':
             this.compileAssign(ast);
