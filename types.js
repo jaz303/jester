@@ -70,10 +70,7 @@
   simple.makeColor = function(r, g, b, a) {
     return {
       __type__  : T_COLOR,
-      r         : r,
-      g         : g,
-      b         : b,
-      a         : a
+      color     : (a << 24) | (r << 16) | (g << 8) | b
     };
   }
   
