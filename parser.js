@@ -438,6 +438,9 @@
       } else if (at(T.HEX)) {
         exp = parseInt(text(), 16);
         next();
+      } else if (at(T.BINARY)) {
+        exp = parseInt(text().substring(2), 2);
+        next();
       } else if (at(T.FLOAT)) {
         exp = parseFloat(text(), 10);
         next();

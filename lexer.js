@@ -41,6 +41,11 @@
             || (c >= 97 && c <= 102);
   }
   
+  function binary_digit_p(ch) {
+    var c = ch.charCodeAt(0);
+    return c === 48 || c === 49;
+  }
+  
   function digit_p(ch) {
     var c = ch.charCodeAt(0);
     return c >= 48 && c <= 57;
@@ -223,6 +228,17 @@
               
               text = src.substring(start, p + 1);
               tok = T.HEX;
+              
+            } else if (ch === '0' && two_more() && src[p+1] === 'b' && binary_digit_p(src[p+2])) {
+              
+              start = p;
+              adv(2);
+              
+              while (more() && binary_digit_p(src[p+1]))
+                adv();
+                
+              text = src.substring(start, p + 1);
+              tok = T.BINARY;
               
             } else {
               

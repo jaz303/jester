@@ -25,6 +25,7 @@ simple = {};
     'FALSE',      // false
     'INTEGER',
     'HEX',
+    'BINARY',
     'FLOAT',
     'STRING',
     'COLOR',
