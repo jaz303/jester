@@ -1,12 +1,16 @@
 Finish language
 ===============
-[ ] color literals
 [ ] name mangling (optional feature)
 [ ] arrays + indexing
 [ ] dictionaries + indexing
 [ ] spawn
 [ ] stdlib
 [ ] garbage collection
+[ ] scoping rules
+[ ] REPL
+[ ] loop control flow - break/continue
+[ ] binary literals
+[x] color literals
 [x] equality operators
 [x] trace - dirty variable tracking
 [x] if
@@ -69,6 +73,11 @@ Language Features
 [ ] Iterators
 [ ] Comprehensions
 
+Optimisations
+-------------
+[ ] Constant folding - http://bugs.python.org/issue1346238
+[ ] Dead code removal
+
 Internals
 ---------
 [ ] Compiler flags
@@ -94,3 +103,4 @@ Known Bugs
 ==========
 [ ] Newlines in multi-line string tokens are not processed by lexer
 [ ] If definition of blocking native function change while it is paused, new version will be invoked upon resume
+[ ] Function constant pools use === for equality - results in duplicates of any values whose internal representations are objects e.g. colors
