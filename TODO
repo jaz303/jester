@@ -9,7 +9,7 @@ Finish language
 [ ] scoping rules
 [ ] REPL
 [ ] loop control flow - break/continue
-[ ] binary literals
+[x] binary literals
 [x] color literals
 [x] equality operators
 [x] trace - dirty variable tracking
