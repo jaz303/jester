@@ -85,43 +85,45 @@
   var DEFAULT_STACK_SIZE = 2048;
   
   simple.opcodes = {};
+  simple.opcodeMeta = {};
   
-  var _t = 1, t = function(name) {
+  var _t = 1, t = function(name, desc, operands) {
     var opcode = (_t++);
     simple.opcodes[name] = opcode;
+    simple.opcodeMeta[opcode] = {name: name, desc: desc, operands: operands};
     return opcode;
   };
   
-  var OP_PUSHC    = t('PUSHC'),         /* Push Constant          (31:8 - constant slot) */
-      OP_PUSHI    = t('PUSHI'),         /* Push Immediate         (31:8 - integer value) */
-      OP_PUSHL    = t('PUSHL'),         /* Push Local             (31:8 - local slot) */
-      OP_PUSHT    = t('PUSHT'),         /* Push true */           
-      OP_PUSHF    = t('PUSHF'),         /* Push false */
-      OP_PUSHZ    = t('PUSHZ'),         /* Push last evaluated value */
-      OP_SETZ     = t('SETZ'),          /* Store TOS in Z and pop */
-      OP_SETL     = t('SETL'),          /* Set Local              (31:8 - local slot) */
-      OP_CALL     = t('CALL'),          /* Call                   (31:16 - fn slot, 15:8 - nargs) */
-      OP_RET      = t('RET'),           /* Return */              
-      OP_POP      = t('POP'),           /* Pop TOS */
-      OP_ADD      = t('ADD'),           
-      OP_SUB      = t('SUB'),           
-      OP_MUL      = t('MUL'),           
-      OP_DIV      = t('DIV'),  
-      OP_EQ       = t('EQ'),
-      OP_NEQ      = t('NEQ'),
-      OP_LT       = t('LT'),            
-      OP_LE       = t('LE'),            
-      OP_GT       = t('GT'),            
-      OP_GE       = t('GE'),            
-      OP_JMP      = t('JMP'),           /* Jump                   (31:8 - offset) */
-      OP_JMPT     = t('JMPT'),          /* Jump if True (pops)    (31:8 - offset) */
-      OP_JMPF     = t('JMPF'),          /* Jump if False (pops)   (31:8 - offset) */
-      OP_JMPT_OP  = t('JMPT_OP'),       /* Jump if False or Pop   (31:8 offset) */
-      OP_JMPF_OP  = t('JMPF_OP'),       /* Jump if True of Pop    (31:8 offset) */
-      OP_JMPA     = t('JMPA'),          /* Jump Absolute          (31:8 - target) */
-      OP_TRACE    = t('TRACE'),         /* Trace */
-      OP_YIELD    = t('YIELD'),         /* Yield */
-      OP_EXIT     = t('EXIT');          /* Exit task */
+  var OP_PUSHC    = t('PUSHC',    'Push constant',          [31, 8, 'constant']),
+      OP_PUSHI    = t('PUSHI',    'Push immediate',         [31, 8, 'integer']),
+      OP_PUSHL    = t('PUSHL',    'Push local',             [31, 8, 'local']),
+      OP_PUSHT    = t('PUSHT',    'Push true'),
+      OP_PUSHF    = t('PUSHF',    'Push false'),
+      OP_PUSHZ    = t('PUSHZ',    'Push last evaluated value'),
+      OP_SETZ     = t('SETZ',     'Set last evaluated value'),
+      OP_SETL     = t('SETL',     'Set local',              [31, 8, 'local']),
+      OP_CALL     = t('CALL',     'Call function',          [31, 16, 'fn', 15, 8, 'integer']),
+      OP_RET      = t('RET',      'Return'),
+      OP_POP      = t('POP',      'Pop TOS'),
+      OP_ADD      = t('ADD',      'Add'),
+      OP_SUB      = t('SUB',      'Sub'),
+      OP_MUL      = t('MUL',      'Multiply'),
+      OP_DIV      = t('DIV',      'Divide'),
+      OP_EQ       = t('EQ',       'Equals check'),
+      OP_NEQ      = t('NEQ',      'Not-equals check'),
+      OP_LT       = t('LT',       'Less-than check'),
+      OP_LE       = t('LE',       'Less-than-or-equal check'),
+      OP_GT       = t('GT',       'Greater-than check'),
+      OP_GE       = t('GE',       'Greater-than-or-equal check'),
+      OP_JMP      = t('JMP',      'Jump',                   [31, 8, 'roffset']),
+      OP_JMPT     = t('JMPT',     'Jump if true',           [31, 8, 'roffset']),
+      OP_JMPF     = t('JMPF',     'Jump if false',          [31, 8, 'roffset']),
+      OP_JMPT_OP  = t('JMPT_OP',  'Jump if true or pop',    [31, 8, 'roffset']),
+      OP_JMPF_OP  = t('JMPF_OP',  'Jump if false or pop',   [31, 8, 'roffset']),
+      OP_JMPA     = t('JMPA',     'Jump absolute',          [38, 8, 'aoffset']),
+      OP_TRACE    = t('TRACE',    'Trace'),
+      OP_YIELD    = t('YIELD',    'Yield'),
+      OP_EXIT     = t('EXIT',     'Exit task');
       
   var TASK_RUNNABLE   = simple.TASK_RUNNABLE  = 1,  /* default state; task is runnable */
       TASK_DEAD       = simple.TASK_DEAD      = 2,  /* task is dead. done. gone. */
