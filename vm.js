@@ -90,7 +90,7 @@
   var _t = 1, t = function(name, desc, operands) {
     var opcode = (_t++);
     simple.opcodes[name] = opcode;
-    simple.opcodeMeta[opcode] = {name: name, desc: desc, operands: operands};
+    simple.opcodeMeta[opcode] = {name: name, desc: desc, operands: operands || []};
     return opcode;
   };
   
@@ -102,7 +102,7 @@
       OP_PUSHZ    = t('PUSHZ',    'Push last evaluated value'),
       OP_SETZ     = t('SETZ',     'Set last evaluated value'),
       OP_SETL     = t('SETL',     'Set local',              [31, 8, 'local']),
-      OP_CALL     = t('CALL',     'Call function',          [31, 16, 'fn', 15, 8, 'integer']),
+      OP_CALL     = t('CALL',     'Call function',          [31, 16, 'fn', 15, 8, 'nargs']),
       OP_RET      = t('RET',      'Return'),
       OP_POP      = t('POP',      'Pop TOS'),
       OP_ADD      = t('ADD',      'Add'),
@@ -120,7 +120,7 @@
       OP_JMPF     = t('JMPF',     'Jump if false',          [31, 8, 'roffset']),
       OP_JMPT_OP  = t('JMPT_OP',  'Jump if true or pop',    [31, 8, 'roffset']),
       OP_JMPF_OP  = t('JMPF_OP',  'Jump if false or pop',   [31, 8, 'roffset']),
-      OP_JMPA     = t('JMPA',     'Jump absolute',          [38, 8, 'aoffset']),
+      OP_JMPA     = t('JMPA',     'Jump absolute',          [31, 8, 'aoffset']),
       OP_TRACE    = t('TRACE',    'Trace'),
       OP_YIELD    = t('YIELD',    'Yield'),
       OP_EXIT     = t('EXIT',     'Exit task');

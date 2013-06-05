@@ -1,0 +1,74 @@
+.function-inspector {
+  width: 400px;
+}
+
+.function-inspector > .r-title {
+  background: #ccffcc;
+}
+
+.function-inspector .r-code {
+  margin: 0;
+  padding: 0;
+  display: block;
+  list-style: none;
+  font: 12px monospace;
+}
+
+.function-inspector li {
+  margin: 0 0 1px 0;
+  padding: 0;
+  display: block;
+  list-style: none;
+}
+
+.function-inspector span {
+  display: inline-block;
+  box-sizing: border-box;
+  padding: 3px;
+}
+
+.function-inspector .r-offset {
+  text-align: right;
+  background: #F1ECFF;
+}
+
+.function-inspector .r-opcode {
+  background: #ccccff;
+}
+
+.function-inspector .r-operand {
+  background: #cccccc;
+}
+
+.function-inspector .r-operand-constant {
+  background: #ffcccc;
+}
+
+.function-inspector .r-operand-nargs {
+  background: #DDFED1;
+}
+
+.function-inspector .r-operand-constant {
+  background: #FFDFFF;
+}
+
+.function-inspector .r-operand-fn {
+  background: #BAFEA3;
+}
+
+.function-inspector .r-operand-integer {
+  background: #ffcccc;
+}
+
+.function-inspector .r-operand-local {
+  background: #FFE1C6;
+}
+
+.function-inspector .r-operand-aoffset,
+.function-inspector .r-operand-roffset {
+  background: #ffffcc;
+}
+
+.function-inspector .r-unused {
+  background: #cccccc;
+}

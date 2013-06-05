@@ -6,6 +6,7 @@
   
   function Fn() {
     this.__type__ = simple.T_FN;
+    this.name = null;
     this.code = [];
     this.sourceMap = [];
     

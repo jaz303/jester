@@ -38,6 +38,8 @@
       var oldFn = this._fn;
       var newFn = simple.makeFunction();
       
+      newFn.name = ast.name;
+      
       this._fn = newFn;
       
       var params = ast.parameters;
