@@ -86,21 +86,13 @@
           hex       = resolved || text,
           matches   = null;
       
-      if (matches = hex.match(/^#([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})$/i)) {
+      if (matches = hex.match(/^#([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})?$/i)) {
         return {
           type  : 'color',
           r     : parseInt(matches[1], 16),
           g     : parseInt(matches[2], 16),
           b     : parseInt(matches[3], 16),
-          a     : 255
-        };
-      } else if (matches = hex.match(/^#([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})$/i)) {
-        return {
-          type  : 'color',
-          r     : parseInt(matches[1], 16),
-          g     : parseInt(matches[2], 16),
-          b     : parseInt(matches[3], 16),
-          a     : parseInt(matches[4], 16)
+          a     : (typeof matches[4] === 'string') ? parseInt(matches[4], 16) : 255
         };
       } else {
         error("Invalid color literal '" + text + "'. Color literals should be 6/8 character hex strings, or valid color names.");
