@@ -4,20 +4,22 @@
     if (!condition) throw (message || "assertion failed");
   }
   
+  var T   = simple.TOKENS,
+      A   = simple.AST_NODES;
+  
   var ops = simple.opcodes;
   
-  var BIN_OPS = {
-    '+'   : ops.ADD,
-    '-'   : ops.SUB,
-    '*'   : ops.MUL,
-    '/'   : ops.DIV,
-    '<'   : ops.LT,
-    '<='  : ops.LE,
-    '>'   : ops.GT,
-    '>='  : ops.GE,
-    '=='  : ops.EQ,
-    '!='  : ops.NEQ
-  };
+  var BIN_OPS = {};
+  BIN_OPS[T.ADD]  = ops.ADD;
+  BIN_OPS[T.SUB]  = ops.SUB;
+  BIN_OPS[T.MUL]  = ops.MUL;
+  BIN_OPS[T.DIV]  = ops.DIV;
+  BIN_OPS[T.LT]   = ops.LT;
+  BIN_OPS[T.LE]   = ops.LE;
+  BIN_OPS[T.GT]   = ops.GT;
+  BIN_OPS[T.GE]   = ops.GE;
+  BIN_OPS[T.EQ]   = ops.EQ;
+  BIN_OPS[T.NEQ]  = ops.NEQ;
   
   function Compiler() {
     this._fn = null;
@@ -30,10 +32,6 @@
     },
     
     compileFnDef: function(ast) {
-      
-      assert(ast.type === 'def');
-      assert(Array.isArray(ast.parameters));
-      assert(Array.isArray(ast.body));
       
       var oldFn = this._fn;
       var newFn = simple.makeFunction();
@@ -53,6 +51,8 @@
       
       this._env[ast.name] = newFn;
       
+      document.getElementById('dis').appendChild(disassemble(newFn));
+      
       this._fn = oldFn;
       
       return newFn;
@@ -60,9 +60,6 @@
     },
     
     compileAssign: function(ast) {
-      
-      assert(ast.type === 'assign');
-      assert(ast.left.type === 'ident');
       
       var slot = this._fn.slotForLocal(ast.left.name);
       this.compileExpression(ast.right);
@@ -123,10 +120,6 @@
     
     compileWhile: function(ast) {
       
-      assert(ast.type === 'while');
-      assert(typeof ast.condition === 'object');
-      assert(Array.isArray(ast.body));
-      
       var loopStart = this._fn.code.length;
       this.compileExpression(ast.condition);
       
@@ -149,8 +142,6 @@
     
     compileReturn: function(ast) {
       
-      assert(ast.type === 'return');
-      
       if (typeof ast.returnValue !== 'undefined') {
         this.compileExpression(ast.returnValue);
       } else {
@@ -166,11 +157,6 @@
     },
     
     compileCall: function(ast) {
-      
-      assert(ast.type === 'call');
-      assert(typeof ast.fn === 'object');
-      assert(ast.fn.type === 'ident');
-      assert(Array.isArray(ast.args));
       
       var args = ast.args;
       if (args.length > 255) {
@@ -220,35 +206,37 @@
         this.emit(ops.PUSHC | (this._fn.slotForConstant(ast) << 8), ast.line);
       } else {
         switch (ast.type) {
-          case 'color':
+          case A.COLOR:
             var color = simple.makeColor(ast.r, ast.g, ast.b, ast.a);
             this.emit(ops.PUSHC | (this._fn.slotForConstant(color) << 8), ast.line);
             break;
-          case 'assign':
+          case A.ASSIGN:
             this.compileAssign(ast);
             break;
-          case 'trace':
+          case A.TRACE:
             this.emit(ops.TRACE, ast.line);
             break;
-          case 'ident':
+          case A.IDENT:
             this.emit(ops.PUSHL | (this._fn.slotForLocal(ast.name) << 8), ast.line);
             break;
-          case 'call':
+          case A.CALL:
             this.compileCall(ast);
             break;
-          default:
-            if (ast.type === 'logical-and') {
+          case A.BIN_OP:
+            if (ast.op === T.LAND) {
               this.compileLogicalAnd(ast);
-            } else if (ast.type === 'logical-or') {
+            } else if (ast.op === T.LOR) {
               this.compileLogicalOr(ast);
-            } else if (ast.type in BIN_OPS) {
+            } else if (ast.op in BIN_OPS) {
               this.compileExpression(ast.left);
               this.compileExpression(ast.right);
-              this.emit(BIN_OPS[ast.type], ast.line);
+              this.emit(BIN_OPS[ast.op], ast.line);
             } else {
-              throw "unknown expression - " + ast;
+              throw "unknown binary operator!";
             }
             break;
+          default:
+            throw "unknown/unimplemented AST node type: " + ast.type;
         }
       }
     },
@@ -256,22 +244,22 @@
     compileStatement: function(ast) {
       if (ast.type) {
         switch (ast.type) {
-          case 'def':
+          case A.DEF:
             this.compileFnDef(ast);
             break;
-          case 'if':
+          case A.IF:
             this.compileIf(ast);
             break;
-          case 'while':
+          case A.WHILE:
             this.compileWhile(ast);
             break;
-          case 'loop':
+          case A.LOOP:
             this.compileLoop(ast);
             break;
-          case 'return':
+          case A.RETURN:
             this.compileReturn(ast);
             break;
-          case 'yield':
+          case A.YIELD:
             this.compileYield(ast);
             break;
           default:

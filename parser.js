@@ -1,22 +1,7 @@
 ;(function(global, simple) {
   
-  var T = simple.TOKENS;
-  
-  var TOKEN_OP = {};
-  TOKEN_OP[T.SUB]   = '-';
-  TOKEN_OP[T.ADD]   = '+';
-  TOKEN_OP[T.MUL]   = '*';
-  TOKEN_OP[T.DIV]   = '/';
-  TOKEN_OP[T.BANG]  = '!';
-  TOKEN_OP[T.TILDE] = '~';
-  TOKEN_OP[T.LT]    = '<';
-  TOKEN_OP[T.GT]    = '>';
-  TOKEN_OP[T.LE]    = '<=';
-  TOKEN_OP[T.GE]    = '>=';
-  TOKEN_OP[T.EQ]    = '==';
-  TOKEN_OP[T.NEQ]   = '!=';
-  TOKEN_OP[T.LAND]  = 'logical-and';
-  TOKEN_OP[T.LOR]   = 'logical-or';
+  var T = simple.TOKENS,
+      A = simple.AST_NODES;
   
   // these are the tokens that can follow an identifier to allow
   // a function call without parens e.g.
@@ -88,7 +73,7 @@
       
       if (matches = hex.match(/^#([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})?$/i)) {
         return {
-          type  : 'color',
+          type  : A.COLOR,
           r     : parseInt(matches[1], 16),
           g     : parseInt(matches[2], 16),
           b     : parseInt(matches[3], 16),
@@ -132,7 +117,7 @@
       
       accept(T.DEF);
       
-      var node = { type: 'def', line: line };
+      var node = { type: A.DEF, line: line };
       
       if (at(T.IDENT)) {
         node.name = text();
@@ -159,7 +144,7 @@
       var line = lexer.line();
       
       accept(T.IF);
-      var node = { type: 'if', line: line, clauses: [] };
+      var node = { type: A.IF, line: line, clauses: [] };
       
       var cond = parseExpression();
       skipNewlines();
@@ -195,7 +180,7 @@
     function parseWhileStatement() {
       var line = lexer.line();
       accept(T.WHILE);
-      var node = { type: 'while', line: line };
+      var node = { type: A.WHILE, line: line };
       node.condition = parseExpression();
       skipNewlines();
       node.body = parseStatementBlock();
@@ -205,7 +190,7 @@
     function parseLoopStatement() {
       var line = lexer.line();
       accept(T.LOOP);
-      var node = { type: 'loop', line: line };
+      var node = { type: A.LOOP, line: line };
       skipNewlines();
       node.body = parseStatementBlock();
       return node;
@@ -225,7 +210,7 @@
       var line = lexer.line();
       accept(T.RETURN);
       
-      var node = { type: 'return', line: line, returnValue: undefined };
+      var node = { type: A.RETURN, line: line, returnValue: undefined };
       
       if (atBlockTerminator()) {
         /* do nothing */
@@ -293,11 +278,11 @@
       if (at(T.ASSIGN)) {
         var line = lexer.line();
         next();
-        var root = { type: 'assign', line: line, left: exp, right: parseLogicalOrExpression() }, curr = root;
+        var root = { type: A.ASSIGN, line: line, left: exp, right: parseLogicalOrExpression() }, curr = root;
         while (at(T.ASSIGN)) {
           line = lexer.line();
           next();
-          curr.right = { type: 'assign', line: line, left: curr.right, right: parseLogicalOrExpression() };
+          curr.right = { type: A.ASSIGN, line: line, left: curr.right, right: parseLogicalOrExpression() };
           curr = curr.right;
         }
         return root;
@@ -311,7 +296,7 @@
       while (at(T.LOR)) {
         var line = lexer.line();
         next();
-        exp = { type: TOKEN_OP[T.LOR], line: line, left: exp, right: parseLogicalAndExpression() };
+        exp = { type: A.BIN_OP, op: T.LOR, line: line, left: exp, right: parseLogicalAndExpression() };
       }
       return exp;
     }
@@ -321,7 +306,7 @@
       while (at(T.LAND)) {
         var line = lexer.line();
         next();
-        exp = { type: TOKEN_OP[T.LAND], line: line, left: exp, right: parseEqualityExpression() };
+        exp = { type: A.BIN_OP, op: T.LAND, line: line, left: exp, right: parseEqualityExpression() };
       }
       return exp;
     }
@@ -329,10 +314,9 @@
     function parseEqualityExpression() {
       var exp = parseCmpExpression();
       while (at(T.EQ) || at(T.NEQ)) {
-        var line = lexer.line();
-        var op = TOKEN_OP[curr];
+        var line = lexer.line(), op = curr;
         next();
-        exp = { type: op, line: line, left: exp, right: parseCmpExpression() };
+        exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseCmpExpression() };
       }
       return exp;
     }
@@ -340,10 +324,9 @@
     function parseCmpExpression() {
       var exp = parseAddSubExpression();
       while (at(T.LT) || at(T.GT) || at(T.LE) || at(T.GE)) {
-        var line = lexer.line();
-        var op = TOKEN_OP[curr];
+        var line = lexer.line(), op = curr;
         next();
-        exp = { type: op, line: line, left: exp, right: parseAddSubExpression() };
+        exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseAddSubExpression() };
       }
       return exp;
     }
@@ -352,10 +335,9 @@
     function parseAddSubExpression() {
       var exp = parseMulDivExpression();
       while (at(T.ADD) || at(T.SUB)) {
-        var line = lexer.line();
-        var op = TOKEN_OP[curr];
+        var line = lexer.line(), op = curr;
         next();
-        exp = { type: op, line: line, left: exp, right: parseMulDivExpression() };
+        exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseMulDivExpression() };
       }
       return exp;
     }
@@ -364,10 +346,9 @@
     function parseMulDivExpression() {
       var exp = parseUnary();
       while (at(T.MUL) || at(T.DIV)) {
-        var line = lexer.line();
-        var op = TOKEN_OP[curr];
+        var line = lexer.line(), op = curr;
         next();
-        exp = { type: op, line: line, left: exp, right: parseUnary() };
+        exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseUnary() };
       }
       return exp;
     }
@@ -376,11 +357,11 @@
     function parseUnary() {
       if (at(T.BANG) || at(T.TILDE) || at(T.SUB) || at(T.ADD)) {
         var line = lexer.line();
-        var root = { type: TOKEN_OP[curr], line: line, exp: null }, curr = root;
+        var root = { type: A.UN_OP, op: curr, line: line, exp: null }, curr = root;
         next();
         while (at(T.BANG) || at(T.TILDE) || at(T.SUB) || at(T.ADD)) {
           line = lexer.line();
-          curr.exp = { type: TOKEN_OP[curr], line: line, exp: null };
+          curr.exp = { type: A.UN_OP, op: curr, line: line, exp: null };
           curr = curr.exp;
           next();
         }
@@ -405,11 +386,11 @@
           args = parseExpressionList();
         }
         accept(T.R_PAREN);
-        return { type: 'call', line: line, fn: atom, args: args };
+        return { type: A.CALL, line: line, fn: atom, args: args };
       } else if (atExpStart()) {
         line = lexer.line();
         var args = parseExpressionList();
-        return { type: 'call', line: line, fn: atom, args: args };
+        return { type: A.CALL, line: line, fn: atom, args: args };
       } else {
         return atom;
       }
@@ -443,10 +424,10 @@
         exp = decodeColor(text());
         next();
       } else if (at(T.TRACE)) {
-        exp = { type: 'trace', line: line };
+        exp = { type: A.TRACE, line: line };
         next();
       } else if (at(T.IDENT)) {
-        exp = { type: 'ident', line: line, name: text() };
+        exp = { type: A.IDENT, line: line, name: text() };
         next();
       } else if (at(T.L_PAREN)) {
         next();
