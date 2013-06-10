@@ -2,10 +2,11 @@ simple = {};
 
 ;(function(simple) {
   
-  var nextToken = 1;
+  simple.TOKENS       = {};
+  simple.TOKEN_NAMES  = {};
+  simple.AST_NODES    = {};
   
-  simple.TOKENS = {};
-  simple.TOKEN_NAMES = {};
+  var nextToken = 1;
   
   [ 'SUB',        // -
     'ADD',        // +
@@ -54,6 +55,26 @@ simple = {};
     var tokenId = nextToken++;
     simple.TOKENS[tok] = tokenId;
     simple.TOKEN_NAMES[tokenId] = tok;
+  });
+  
+  var nextAstNode = 1;
+  
+  [ 'DEF',
+    'IF',
+    'WHILE',
+    'LOOP',
+    'RETURN',
+    'YIELD',
+    'COLOR',
+    'ASSIGN',
+    'TRACE',
+    'IDENT',
+    'CALL',
+    'BIN_OP',
+    'UN_OP'
+  ].forEach(function(ast) {
+    var astNodeId = nextAstNode++;
+    simple.AST_NODES[ast] = astNodeId;
   });
   
 })(simple);
