@@ -20,5 +20,8 @@
   "license": "MIT",
   "bin": {
     "jester": "./cli.js"
+  },
+  "dependencies": {
+    "docopt": "~0.4.0"
   }
 }
