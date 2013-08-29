@@ -1,6 +1,6 @@
 {
   "name": "jester",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Simple language designed for teaching",
   "main": "index.js",
   "scripts": {
