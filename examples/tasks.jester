@@ -1,0 +1,10 @@
+def test(id, delay_time) {
+    loop {
+        print id
+        delay delay_time
+    }
+}
+
+spawn test(1, 500)
+spawn test 2, 1000
+spawn test 3, 100

@@ -14,7 +14,7 @@
   * Name mangling
   * Arrays
   * Dictionaries
-  * Spawn
+  * <del>Spawn</del>
   * "Garbage collection"
   * stdlib
 
