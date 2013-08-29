@@ -1,0 +1,21 @@
+{
+  "name": "jester",
+  "version": "0.0.0",
+  "description": "Simple language designed for teaching",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jaz303/jester.git"
+  },
+  "keywords": [
+    "programming",
+    "language",
+    "teaching",
+    "simple"
+  ],
+  "author": "Jason Frame <jason@onehackoranother.com> (http://jasonframe.co.uk)",
+  "license": "MIT",
+}
