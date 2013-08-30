@@ -5,6 +5,10 @@ def test(id, delay_time) {
     }
 }
 
-spawn test(1, 500)
-spawn test 2, 1000
-spawn test 3, 100
+a = spawn test(1, 500)
+b = spawn test(2, 1000)
+c = spawn test(3, 2000)
+
+print a
+print b
+print c
