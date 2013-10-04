@@ -1,0 +1,9 @@
+loop {
+    prompt "> "
+    code = input()
+    if code == null {
+        return
+    }
+    eval code
+}
+
