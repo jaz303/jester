@@ -1,0 +1,11 @@
+loop {
+    prompt ">> "
+    code = input()
+    if code == null {
+        return
+    }
+    result = eval code
+    prompt "=> "
+    print result
+}
+
