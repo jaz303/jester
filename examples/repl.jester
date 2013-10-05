@@ -1,9 +1,11 @@
 loop {
-    prompt "> "
+    prompt ">> "
     code = input()
     if code == null {
         return
     }
-    eval code
+    result = eval code
+    prompt "=> "
+    print result
 }
 
