@@ -1,0 +1,13 @@
+print "globals test..."
+
+$foo = 10
+
+def add_to_foo(x) {
+    $foo = $foo + x
+}
+
+add_to_foo 20
+
+$bar = 40
+
+print $foo + $bar
