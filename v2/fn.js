@@ -10,8 +10,14 @@ function Fn() {
 
 }
 
+// indicate that `name` is definitely known to be local to the current scope
 Fn.prototype.addLocalReference = function(name) {
     console.log("local: " + name);
+}
+
+// 
+Fn.prototype.addPossibleLocalReference = function(name) {
+
 }
 
 Fn.prototype.addVariableReference = function(name) {

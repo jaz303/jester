@@ -1,6 +1,9 @@
 var A = require('../lib/ast_nodes');
 var Fn = require('./fn');
 
+// first compiler pass
+// 1. creates stub function prototypes for all defined functions
+// 2. walks module AST and identifies free/local variables
 function pass1(ast) {
 
     if (ast.type !== A.MODULE) {
