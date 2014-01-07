@@ -1,5 +1,6 @@
 var TOKENS          = {},
     TOKEN_NAMES     = {},
+    SYMBOLS         = {},
     KEYWORDS        = {},
     nextToken       = 1;
 
@@ -8,6 +9,12 @@ function addToken(name) {
     TOKENS[name] = tokenId;
     TOKEN_NAMES[tokenId] = name;
     return tokenId;
+}
+
+function addSymbols(syms) {
+    for (var s in syms) {
+        SYMBOLS[syms[s]] = addToken(s);
+    }
 }
 
 function addTokens(list) {
@@ -20,30 +27,40 @@ function addKeywords(kws) {
     }
 }
 
+addSymbols({
+    'SUB'           : '-',
+    'ADD'           : '+',
+    'MUL'           : '*',
+    'DIV'           : '/',
+    'POW'           : '**',
+    'MOD'           : '%',
+    'BANG'          : '!',
+    'LT'            : '<',
+    'GT'            : '>',
+    'LE'            : '<=',
+    'GE'            : '>=',
+    'EQ'            : '==',
+    'NEQ'           : '!=',
+    'L_AND'         : '&&',
+    'L_OR'          : '||',
+    'L_SHIFT'       : '<<',
+    'R_SHIFT'       : '>>',
+    'B_AND'         : '&',
+    'B_OR'          : '|',
+    'B_XOR'         : '^',
+    'ASSIGN'        : '=',
+    'SEMICOLON'     : ';',
+    'COMMA'         : ',',
+    'DOT'           : '.',
+    'L_BRACE'       : '{',
+    'R_BRACE'       : '}',
+    'L_BRACKET'     : '[',
+    'R_BRACKET'     : ']',
+    'L_PAREN'       : '(',
+    'R_PAREN'       : ')'
+});
+
 addTokens([
-    'SUB',              // -
-    'ADD',              // +
-    'MUL',              // *
-    'DIV',              // /
-    'BANG',             // !
-    'LT',               // <
-    'GT',               // >
-    'LE',               // <=
-    'GE',               // >=
-    'EQ',               // ==
-    'NEQ',              // !=
-    'LAND',             // &&
-    'LOR',              // ||
-    'TILDE',            // ~
-    'L_BRACE',          // {
-    'R_BRACE',          // }
-    'L_BRACKET',        // [
-    'R_BRACKET',        // ]
-    'L_PAREN',          // (
-    'R_PAREN',          // )
-    'COMMA',            // ,
-    'SEMICOLON',        // ;
-    'ASSIGN',           // =
     'NEWLINE',          // \n
 
     'IDENT',
@@ -81,6 +98,7 @@ addKeywords({
     'EXPORT_BANG!'  : 'export!'
 });
 
-exports.tokens = TOKENS;
-exports.names = TOKEN_NAMES;
-exports.keywords = KEYWORDS;
+exports.tokens      = TOKENS;
+exports.names       = TOKEN_NAMES;
+exports.symbols     = SYMBOLS;
+exports.keywords    = KEYWORDS;

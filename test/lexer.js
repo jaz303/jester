@@ -33,13 +33,8 @@ testTokens({
     '+'                 : T.ADD,
     '*'                 : T.MUL,
     '/'                 : T.DIV,
-    // '**'                : T.POW,
-    //'%'                 : T.MOD,
-
-    // '>>'                : T.RSHIFT,
-    // '<<'                : T.LSHIFT,
-
-
+    '**'                : T.POW,
+    '%'                 : T.MOD,
     '!'                 : T.BANG,
     '<'                 : T.LT,
     '>'                 : T.GT,
@@ -47,21 +42,24 @@ testTokens({
     '>='                : T.GE,
     '=='                : T.EQ,
     '!='                : T.NEQ,
-    // '&&'                : T.ANDAND,
-    // '||'                : T.OROR,
-    // '~'                 : T.TILDE,
-    
+    '&&'                : T.L_AND,
+    '||'                : T.L_OR,
+    '>>'                : T.R_SHIFT,
+    '<<'                : T.L_SHIFT,
+    '~'                 : T.TILDE,
+    '&'                 : T.B_AND,
+    '|'                 : T.B_OR,
+    '^'                 : T.B_XOR,
+    '='                 : T.ASSIGN,
+    ';'                 : T.SEMICOLON,
+    ','                 : T.COMMA,
+    '.'                 : T.DOT,
     '{'                 : T.L_BRACE,
     '}'                 : T.R_BRACE,
     '['                 : T.L_BRACKET,
     ']'                 : T.R_BRACKET,
     '('                 : T.L_PAREN,
     ')'                 : T.R_PAREN,
-
-    ','                 : T.COMMA,
-    // '.'                 : T.DOT,
-    ';'                 : T.SEMICOLON,
-    '='                 : T.ASSIGN,
     
     'true'              : T.TRUE,
     'false'             : T.FALSE,
@@ -92,5 +90,20 @@ testTokens({
 
     // '$'                 : T.DOLLAR,
     // '$foo'              : [T.GLOBAL, 'foo']
+
+    'foo'               : [T.IDENT, 'foo'],
+    'foo_bar'           : [T.IDENT, 'foo_bar'],
+    'a123'              : [T.IDENT, 'a123'],
+    '_abc'              : [T.IDENT, '_abc'],
+
+    '123'               : [T.INTEGER, '123'],
+
+    // hex literals
+    '0xff'              : [T.HEX, '0xff'],
+    '0xDEADBEEF'        : [T.HEX, '0xDEADBEEF'],
+
+    // binary literals
+    '0b1'               : [T.BINARY, '0b1'],
+    '0b1100'            : [T.BINARY, '0b1100'],
 
 });

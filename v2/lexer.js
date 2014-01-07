@@ -1,24 +1,8 @@
 "use strict";
 
-var T = require('./tokens').tokens;
-
-var KEYWORDS = require('./tokens').keywords;
-
-var SINGLES = {
-    '-'         : T.SUB,
-    '+'         : T.ADD,
-    '*'         : T.MUL,
-    '/'         : T.DIV,
-    '~'         : T.TILDE,
-    '{'         : T.L_BRACE,
-    '}'         : T.R_BRACE,
-    '['         : T.L_BRACKET,
-    ']'         : T.R_BRACKET,
-    '('         : T.L_PAREN,
-    ')'         : T.R_PAREN,
-    ';'         : T.SEMICOLON,
-    ','         : T.COMMA
-};
+var T           = require('./tokens').tokens,
+    SYMBOLS     = require('./tokens').symbols,
+    KEYWORDS    = require('./tokens').keywords;
 
 function space_p(ch) {
     return ch === ' ' || ch === '\t';
@@ -61,6 +45,8 @@ function color_rest_p(ch) {
 }
 
 module.exports = function(src) {
+
+    var OP_RE     = /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/;
     
     var p         = 0,            /* current position in src */
         len       = src.length,   /* length of src */
@@ -115,64 +101,15 @@ module.exports = function(src) {
             curCol = 1;
             return T.NEWLINE;
         }
-        
-        if ((tok = SINGLES[src[p]])) {
-            adv();
-            return tok;
+
+        var matchResult = OP_RE.exec(src.substring(p));
+        if (matchResult) {
+            adv(matchResult[0].length);
+            return SYMBOLS[matchResult[0]];
         }
         
         var ch = src[p];
         switch (ch) {
-            case '!':
-                if (more() && src[p+1] === '=') {
-                    adv();
-                    tok = T.NEQ;
-                } else {
-                    tok = T.BANG;
-                }
-                break;
-            case '<':
-                if (more() && src[p+1] === '=') {
-                    adv();
-                    tok = T.LE;
-                } else {
-                    tok = T.LT;
-                }
-                break;
-            case '>':
-                if (more() && src[p+1] === '=') {
-                    adv();
-                    tok = T.GE;
-                } else {
-                    tok = T.GT;
-                }
-                break;
-            case '&':
-                if (more() && src[p+1] === '&') {
-                    adv();
-                    tok = T.LAND;
-                } else {
-                    error = "invalid token '&'";
-                    tok = T.ERROR;
-                }
-                break;
-            case '|':
-                if (more() && src[p+1] === '|') {
-                    adv();
-                    tok = T.LOR;
-                } else {
-                    error = "invalid token '|'";
-                    tok = T.ERROR;
-                }
-                break;
-            case '=':
-                if (more() && src[p+1] === '=') {
-                    adv();
-                    tok = T.EQ;
-                } else {
-                    tok = T.ASSIGN;
-                }
-                break;
             case '$':
                 if (more() && ident_start_p(src[p+1])) {
                     start = ++p;
