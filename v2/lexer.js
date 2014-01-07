@@ -2,20 +2,7 @@
 
 var T = require('./tokens').tokens;
 
-var KEYWORDS = {
-    'if'        : T.IF,
-    'else'      : T.ELSE,
-    'while'     : T.WHILE,
-    'loop'      : T.LOOP,
-    'def'       : T.DEF,
-    'trace'     : T.TRACE,
-    'return'    : T.RETURN,
-    'true'      : T.TRUE,
-    'false'     : T.FALSE,
-    'null'      : T.NULL,
-    'spawn'     : T.SPAWN,
-    'eval'      : T.EVAL
-};
+var KEYWORDS = require('./tokens').keywords;
 
 var SINGLES = {
     '-'         : T.SUB,
