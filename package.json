@@ -23,5 +23,8 @@
   },
   "dependencies": {
     "docopt": "~0.4.0"
+  },
+  "devDependencies": {
+    "tape": "~2.3.2"
   }
 }
