@@ -79,6 +79,7 @@ testTokens({
     'trace'             : T.TRACE,
     'spawn'             : T.SPAWN,
     'eval'              : T.EVAL,
+    'as'                : T.AS,
 
     '\n'                : T.NEWLINE,
     '\r'                : T.NEWLINE,

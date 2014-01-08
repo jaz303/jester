@@ -98,7 +98,8 @@ addKeywords({
     'IMPORT'        : 'import',
     'IMPORT_BANG'   : 'import!',
     'EXPORT'        : 'export',
-    'EXPORT_BANG'   : 'export!'
+    'EXPORT_BANG'   : 'export!',
+    'AS'            : 'as'
 });
 
 exports.tokens      = TOKENS;
