@@ -54,6 +54,7 @@ testTokens({
     ';'                 : T.SEMICOLON,
     ','                 : T.COMMA,
     '.'                 : T.DOT,
+    '.{'                : T.LAMBDA_BRACE,
     '{'                 : T.L_BRACE,
     '}'                 : T.R_BRACE,
     '['                 : T.L_BRACKET,

@@ -12,7 +12,7 @@ module.exports = function(src) {
 
     var TOKENS = [
         // symbols
-        {   pattern: /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
+        {   pattern: /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|\.\{|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
             cb: function(match) {
                 return SYMBOLS[match[0]];
             }
