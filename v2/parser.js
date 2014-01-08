@@ -1,8 +1,10 @@
+var A = require('./ast_nodes');
+
 module.exports = function(lexer) {
 
     function parseTopLevel() {
 
-        var program = { type: A.PROGRAM, body: [] };
+        var program = { type: A.MODULE, body: [] };
 
         program.body.push(parseAtom());
 
@@ -10,6 +12,10 @@ module.exports = function(lexer) {
 
         return program;
 
+    }
+
+    function parseAtom() {
+        
     }
 
 }
