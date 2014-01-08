@@ -8,42 +8,6 @@ function space_p(ch) {
     return ch === ' ' || ch === '\t';
 }
 
-function hex_digit_p(ch) {
-    var c = ch.charCodeAt(0);
-    return (c >= 48 && c <= 57)
-                    || (c >= 65 && c <= 70)
-                    || (c >= 97 && c <= 102);
-}
-
-function binary_digit_p(ch) {
-    var c = ch.charCodeAt(0);
-    return c === 48 || c === 49;
-}
-
-function digit_p(ch) {
-    var c = ch.charCodeAt(0);
-    return c >= 48 && c <= 57;
-}
-
-function ident_start_p(ch) {
-    var c = ch.charCodeAt(0);
-    return (c === 95)
-                    || (c >= 65 && c <= 90)
-                    || (c >= 97 && c <= 122);
-}
-
-function ident_rest_p(ch) {
-    return ident_start_p(ch) || digit_p(ch);
-}
-
-function color_rest_p(ch) {
-    var c = ch.charCodeAt(0);
-    return (c === 95)
-                    || (c >= 65 && c <= 90)
-                    || (c >= 97 && c <= 122)
-                    || (c >= 48 && c <= 57);
-}
-
 module.exports = function(src) {
 
     var TOKENS = [
@@ -65,10 +29,30 @@ module.exports = function(src) {
                 return (match[0].charAt(1) === 'x') ? T.HEX : T.BINARY;
             }
         },
+        // numbers
+        {
+            pattern: /^[0-9]+(\.[0-9]+)?/,
+            cb: function(match) {
+                return match[1] ? T.FLOAT : T.INTEGER
+            }
+        },
         // $, $foo
         {   pattern: /^\$([a-zA-Z_][a-zA-Z0-9_]*)?/,
             cb: function(match) {
                 return (match[0].length === 1) ? T.DOLLAR : T.GLOBAL_IDENT;
+            }
+        },
+        // #, #red, #ff0000
+        {   pattern: /^#([0-9a-fA-F]{6}|[a-zA-Z]+)?/,
+            cb: function(match) {
+                return (match[0].length === 1) ? T.POUND : T.COLOR;
+            }
+        },
+        // strings
+        // TODO: fix curLine/curCol
+        {   pattern: /^"(\\[\\trn"]|[^\\"])*"/,
+            cb: function(match) {
+                return T.STRING;
             }
         }
     ];
@@ -127,6 +111,14 @@ module.exports = function(src) {
             curLine++;
             curCol = 1;
             return T.NEWLINE;
+        } else if (src[p] === '\r') {
+            if (more() && src[p+1] === '\n') {
+                p++;
+            }
+            p++;
+            curLine++;
+            curCol = 1;
+            return T.NEWLINE;
         }
 
         var remainder = src.substring(p);
@@ -139,89 +131,9 @@ module.exports = function(src) {
                 return TOKENS[i].cb(matchResult);
             }
         }
-        
-        var ch = src[p];
-        switch (ch) {
-            case '\r':
-                if (more() && src[p+1] === '\n') {
-                    p++;
-                }
-                curLine++;
-                curCol = 0; // column will be advanced to 1 at function end
-                tok = T.NEWLINE;
-                break;
-            default:
-                if (ch === '#') {
-                    
-                    start = p;
-                    
-                    if (more() && color_rest_p(src[p+1])) {
-                        while (more() && color_rest_p(src[p+1]))
-                            adv();
-                            
-                        text = src.substring(start, p + 1);
-                        tok = T.COLOR;
-                    } else {
-                        error = "invalid colour literal";
-                        tok = T.ERROR;
-                    }
-                    
-                } else if (digit_p(ch)) {
 
-                    start = p;
-                    
-                    while (more() && digit_p(src[p+1]))
-                        adv();
-                        
-                    if (more() && src[p+1] === '.') {
-                        adv();
-                        if (!more() || !digit_p(src[p+1])) {
-                            error = "invalid float literal";
-                            tok = T.ERROR;
-                        } else {
-                            while (more() && digit_p(src[p+1]))
-                                adv();
-                            text = src.substring(start, p + 1);
-                            tok = T.FLOAT;
-                        }
-                    } else {
-                        text = src.substring(start, p + 1);
-                        tok = T.INTEGER;
-                    }
-                    
-                } else if (ch === '"') {
-                    
-                    var skip = false;
-                    
-                    start = p;
-                    
-                    error = "unterminated string literal";
-                    tok = T.ERROR;
-                    
-                    while (more()) {
-                        adv();
-                        if (skip) {
-                            skip = false;
-                        } else if (src[p] === '\\') {
-                            skip = true;
-                        } else if (src[p] === '"') {
-                            text = src.substring(start + 1, p); // TODO: parse string
-                            error = null;
-                            tok = T.STRING;
-                            break;
-                        }
-                    }
-                    
-                } else {
-                    error = "unexpected character in input: '" + ch + "'";
-                    tok = T.ERROR;
-                }
-                
-                break;
-        }
-        
-        adv();
-        return tok;
+        error = "unexpected character in input: '" + ch + "'";
+        return T.ERROR;
 
     }
     

@@ -80,14 +80,17 @@ testTokens({
     'eval'              : T.EVAL,
 
     '\n'                : T.NEWLINE,
+    '\r'                : T.NEWLINE,
+    '\r\n'              : T.NEWLINE,
+
     // ' '                 : T.SPACE,
     // '\t'                : T.SPACE,
     // '    \t   '         : T.SPACE,
 
-    // '#red'              : [T.COLOR, 'red'],
-    // '#ff0000'           : [T.COLOR, 'ff0000'],
-    // '#'                 : T.COLOR_CTOR,
-
+    '#'                 : T.POUND,
+    '#red'              : [T.COLOR, '#red'],
+    '#ff0000'           : [T.COLOR, '#ff0000'],
+    
     '$'                 : T.DOLLAR,
     '$foo'              : [T.GLOBAL_IDENT, '$foo'],
 
@@ -109,5 +112,10 @@ testTokens({
     // binary literals
     '0b1'               : [T.BINARY, '0b1'],
     '0b1100'            : [T.BINARY, '0b1100'],
+
+    // strings
+    '""'                : [T.STRING, '""'],
+    '"foo"'             : [T.STRING, '"foo"'],
+    '"foo\\"bar"'       : [T.STRING, '"foo\\"bar"']
 
 });

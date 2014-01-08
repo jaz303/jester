@@ -71,6 +71,7 @@ addTokens([
     'HEX',
     'BINARY',
     'STRING',
+    'POUND',
     'COLOR',
     'IDENT',
 
