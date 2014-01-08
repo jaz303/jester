@@ -88,8 +88,8 @@ testTokens({
     // '#ff0000'           : [T.COLOR, 'ff0000'],
     // '#'                 : T.COLOR_CTOR,
 
-    // '$'                 : T.DOLLAR,
-    // '$foo'              : [T.GLOBAL, 'foo']
+    '$'                 : T.DOLLAR,
+    '$foo'              : [T.GLOBAL_IDENT, '$foo'],
 
     'foo'               : [T.IDENT, 'foo'],
     'foo_bar'           : [T.IDENT, 'foo_bar'],

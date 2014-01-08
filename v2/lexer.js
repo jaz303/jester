@@ -46,10 +46,35 @@ function color_rest_p(ch) {
 
 module.exports = function(src) {
 
-    var OP        = /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
-        IDENT     = /^[a-zA-Z_][a-zA-Z0-9_]*[\!\?]?/;
+    var TOKENS = [
+        // symbols
+        {   pattern: /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
+            cb: function(match) {
+                return SYMBOLS[match[0]];
+            }
+        },
+        // foo, bar, return
+        {   pattern: /^[a-zA-Z_][a-zA-Z0-9_]*[\!\?]?/,
+            cb: function(match) {
+                return KEYWORDS[text] || T.IDENT;
+            }
+        },
+        // 0xb1010, 0xffff
+        {   pattern: /^0(b[01]+|x[0-9A-F-a-f]+)/,
+            cb: function(match) {
+                return (match[0].charAt(1) === 'x') ? T.HEX : T.BINARY;
+            }
+        },
+        // $, $foo
+        {   pattern: /^\$([a-zA-Z_][a-zA-Z0-9_]*)?/,
+            cb: function(match) {
+                return (match[0].length === 1) ? T.DOLLAR : T.GLOBAL_IDENT;
+            }
+        }
+    ];
 
-    
+    var N_TOKENS = TOKENS.length;
+
     var p         = 0,            /* current position in src */
         len       = src.length,   /* length of src */
         tok       = null,         /* result of last call to nextToken() */
@@ -106,34 +131,17 @@ module.exports = function(src) {
 
         var remainder = src.substring(p);
 
-        var matchResult = OP.exec(remainder);
-        if (matchResult) {
-            adv(matchResult[0].length);
-            return SYMBOLS[matchResult[0]];
-        }
-
-        var matchResult = IDENT.exec(remainder);
-        if (matchResult) {
-            adv(matchResult[0].length);
-            text = matchResult[0];
-            return KEYWORDS[text] || T.IDENT;
+        for (var i = 0; i < N_TOKENS; ++i) {
+            var matchResult = TOKENS[i].pattern.exec(remainder);
+            if (matchResult) {
+                adv(matchResult[0].length);
+                text = matchResult[0];
+                return TOKENS[i].cb(matchResult);
+            }
         }
         
         var ch = src[p];
         switch (ch) {
-            case '$':
-                if (more() && ident_start_p(src[p+1])) {
-                    start = ++p;
-                    while (more() && ident_rest_p(src[p+1]))
-                        adv();
-
-                    text = src.substring(start, p + 1);
-                    tok = T.GLOBAL_IDENT;
-                } else {
-                    error = "expected: global variable name";
-                    tok = T.ERROR;
-                }
-                break;
             case '\r':
                 if (more() && src[p+1] === '\n') {
                     p++;
@@ -159,52 +167,26 @@ module.exports = function(src) {
                     }
                     
                 } else if (digit_p(ch)) {
+
+                    start = p;
                     
-                    if (ch === '0' && two_more() && src[p+1] === 'x' && hex_digit_p(src[p+2])) {
+                    while (more() && digit_p(src[p+1]))
+                        adv();
                         
-                        start = p;
-                        adv(2);
-                        
-                        while (more() && hex_digit_p(src[p+1]))
-                            adv();
-                        
-                        text = src.substring(start, p + 1);
-                        tok = T.HEX;
-                        
-                    } else if (ch === '0' && two_more() && src[p+1] === 'b' && binary_digit_p(src[p+2])) {
-                        
-                        start = p;
-                        adv(2);
-                        
-                        while (more() && binary_digit_p(src[p+1]))
-                            adv();
-                            
-                        text = src.substring(start, p + 1);
-                        tok = T.BINARY;
-                        
-                    } else {
-                        
-                        start = p;
-                        
-                        while (more() && digit_p(src[p+1]))
-                            adv();
-                            
-                        if (more() && src[p+1] === '.') {
-                            adv();
-                            if (!more() || !digit_p(src[p+1])) {
-                                error = "invalid float literal";
-                                tok = T.ERROR;
-                            } else {
-                                while (more() && digit_p(src[p+1]))
-                                    adv();
-                                text = src.substring(start, p + 1);
-                                tok = T.FLOAT;
-                            }
+                    if (more() && src[p+1] === '.') {
+                        adv();
+                        if (!more() || !digit_p(src[p+1])) {
+                            error = "invalid float literal";
+                            tok = T.ERROR;
                         } else {
+                            while (more() && digit_p(src[p+1]))
+                                adv();
                             text = src.substring(start, p + 1);
-                            tok = T.INTEGER;
+                            tok = T.FLOAT;
                         }
-                        
+                    } else {
+                        text = src.substring(start, p + 1);
+                        tok = T.INTEGER;
                     }
                     
                 } else if (ch === '"') {

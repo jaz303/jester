@@ -64,6 +64,7 @@ addTokens([
     'NEWLINE',          // \n
 
     'IDENT',
+    'DOLLAR',
     'GLOBAL_IDENT',
     'INTEGER',
     'FLOAT',
@@ -72,7 +73,7 @@ addTokens([
     'STRING',
     'COLOR',
     'IDENT',
-    
+
     'EOF',          // <eof>
     'ERROR'         // <error>
 ]);
