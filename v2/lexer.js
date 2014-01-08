@@ -46,7 +46,9 @@ function color_rest_p(ch) {
 
 module.exports = function(src) {
 
-    var OP_RE     = /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/;
+    var OP        = /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
+        IDENT     = /^[a-zA-Z_][a-zA-Z0-9_]*[\!\?]?/;
+
     
     var p         = 0,            /* current position in src */
         len       = src.length,   /* length of src */
@@ -102,10 +104,19 @@ module.exports = function(src) {
             return T.NEWLINE;
         }
 
-        var matchResult = OP_RE.exec(src.substring(p));
+        var remainder = src.substring(p);
+
+        var matchResult = OP.exec(remainder);
         if (matchResult) {
             adv(matchResult[0].length);
             return SYMBOLS[matchResult[0]];
+        }
+
+        var matchResult = IDENT.exec(remainder);
+        if (matchResult) {
+            adv(matchResult[0].length);
+            text = matchResult[0];
+            return KEYWORDS[text] || T.IDENT;
         }
         
         var ch = src[p];
@@ -146,15 +157,6 @@ module.exports = function(src) {
                         error = "invalid colour literal";
                         tok = T.ERROR;
                     }
-                    
-                } else if (ident_start_p(ch)) {
-                    
-                    start = p;
-                    while (more() && ident_rest_p(src[p+1]))
-                        adv();
-                    
-                    text = src.substring(start, p + 1);
-                    tok = KEYWORDS[text] || T.IDENT;
                     
                 } else if (digit_p(ch)) {
                     

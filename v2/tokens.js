@@ -95,7 +95,7 @@ addKeywords({
     'IMPORT'        : 'import',
     'IMPORT_BANG'   : 'import!',
     'EXPORT'        : 'export',
-    'EXPORT_BANG!'  : 'export!'
+    'EXPORT_BANG'   : 'export!'
 });
 
 exports.tokens      = TOKENS;
