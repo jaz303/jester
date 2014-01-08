@@ -98,6 +98,10 @@ testTokens({
 
     '123'               : [T.INTEGER, '123'],
 
+    '1.5'               : [T.FLOAT, '1.5'],
+    '0.00001'           : [T.FLOAT, '0.00001'],
+    '5532.1112'         : [T.FLOAT, '5532.1112'],
+
     // hex literals
     '0xff'              : [T.HEX, '0xff'],
     '0xDEADBEEF'        : [T.HEX, '0xDEADBEEF'],
