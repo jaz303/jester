@@ -22,6 +22,7 @@ var nextAstNode = 1;
 
     'IDENT',
     'INTEGER',
+    'FLOAT',
 
     'COLOR',
     'COLOR_CTOR',

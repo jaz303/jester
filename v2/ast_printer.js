@@ -23,6 +23,9 @@ module.exports = function(ast) {
             case A.INTEGER:
                 write('(integer ' + node.value + ')');
                 break;
+            case A.FLOAT:
+                write('(float ' + node.value + ')');
+                break;
             default:
                 if (node === true) {
                     write('true');

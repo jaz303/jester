@@ -75,6 +75,12 @@ module.exports = function(lexer) {
                 value: parseInt(text(), 10)
             };
             next();
+        } else if (at(T.FLOAT)) {
+            exp = {
+                type: A.FLOAT,
+                value: parseFloat(text(), 10)
+            };
+            next();
         }
 
         return exp;
