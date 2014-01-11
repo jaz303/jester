@@ -1,6 +1,29 @@
 # jester
 
-None of the below is implemented yet.
+The idea is to create beginner-friendly, forgiving language with solid theoretical underpinnings. So you could start with a simple program like this:
+
+    import! canvas
+
+    pen #red
+    moveto 10, 10
+    lineto 30, 30
+    lineto 10, 30
+    lineto 10, 10
+
+And progress to this:
+
+    import! fun
+    
+    doubler = map .{ _ * 2 }, ?
+    summer = reduce .{ l,r| l + r }, 0, ?
+
+    sum_of_doubles = summer . doubler
+
+    print sum_of_doubles([1,2,3,4,5])
+
+The initial implementation is a register-based virtual machine running in Javascript. Bypassing the JS call-stack in the interpreter allows us to implement Go-style async concurrency written in a blocking style, but without crazy syntax tree transformations that you see in other compile-to-JS languages.
+
+I've outlined the eventual syntax below, very little of this is implemented yet.
 
 ## TODO
 
@@ -19,6 +42,9 @@ Stuff I might add
   * multiple return values/assignment
   * splat operator
   * kwargs
+  * matrices?
+  * rational numbers?
+  * channels
 
 There's a bit of punctuation still available for future work:
 
@@ -162,7 +188,7 @@ Return is implicit but explicit returns are also allowed:
 
     foo(a, b, c)
 
-Parens are options:
+Parens are optional:
 
     foo a, b, c
 
@@ -186,15 +212,15 @@ While:
 
     }
 
-Loop:
+A loop is like `while` but there's an implicit `yield` at the end of the loop body:
 
-    loop {
+    loop while exp {
 
     }
 
-Loop while:
+Convenient shorthand for `loop while true`:
 
-    loop while exp {
+    loop {
 
     }
 
@@ -284,7 +310,7 @@ Functions may also be composed:
     f = .{ _ * 2 }
     g = .{ _ + 5 }
     
-    -- whitespace is significant here; f.g is a property lookup
+    -- whitespace is significant here; f.g would be a property lookup
     f_of_g = f . g
     print f_of_g(10)
     -- => 30
