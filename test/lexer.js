@@ -51,6 +51,7 @@ testTokens({
     '|'                 : T.B_OR,
     '^'                 : T.B_XOR,
     '='                 : T.ASSIGN,
+    '?'                 : T.QUESTION,
     ';'                 : T.SEMICOLON,
     ','                 : T.COMMA,
     '.'                 : T.DOT,

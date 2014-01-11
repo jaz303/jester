@@ -49,6 +49,7 @@ addSymbols({
     'B_OR'          : '|',
     'B_XOR'         : '^',
     'ASSIGN'        : '=',
+    'QUESTION'      : '?',
     'SEMICOLON'     : ';',
     'COMMA'         : ',',
     'DOT'           : '.',
