@@ -21,7 +21,7 @@ var nextAstNode = 1;
     'RETURN',
 
     'IDENT',
-    'LITERAL',
+    'INTEGER',
 
     'COLOR',
     'COLOR_CTOR',

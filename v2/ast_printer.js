@@ -5,43 +5,67 @@ module.exports = function(ast) {
     var buffer      = '',
         currIndent  = 0;
 
-    function write(str) {
+    function tab() {
         for (var i = 0; i < currIndent; ++i) {
             buffer += '    ';
         }
+    }
+
+    function write(str) {
         buffer += str;
     }
 
     function indent() { currIndent += 1; }
     function outdent() { currIndent -= 1; }
 
-    function emit(node) {
-
-        if (Array.isArray(node)) {
-            node.forEach(emit);
-            return;
-        }
-
+    function emitExpression(node) {
         switch (node.type) {
-            case A.MODULE:
-                write("(program\n");
-                indent();
-                emit(node.body);
-                buffer += ')';
+            case A.INTEGER:
+                write('(integer ' + node.value + ')');
                 break;
             default:
                 if (node === true) {
-                    write("true");
+                    write('true');
                 } else if (node === false) {
-                    write("false");
-                } else if (typeof node === 'number') {
-                    write(node);
+                    write('false');
                 }
+        }
+    }
+
+    function emitStatement(node) {
+
+        if (buffer.length > 0) {
+            write("\n");
+        }
+        
+        switch (node.type) {
+            case A.MODULE:
+                buffer += '(module\n';
+                indent();
+                // tab();
+                // write('(imports)\n');
+                tab();
+                write('(body');
+                indent();
+                emitStatements(node.body);
+                write('))\n');
+                outdent();
+                outdent();
+                break;
+            default:
+                tab();
+                write('(expr ');
+                emitExpression(node);
+                write(')');
         }
 
     }
 
-    emit(ast);
+    function emitStatements(lst) {
+        lst.forEach(emitStatement);
+    }
+
+    emitStatement(ast);
 
     return buffer;
 

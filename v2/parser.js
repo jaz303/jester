@@ -70,7 +70,10 @@ module.exports = function(lexer) {
             exp = false;
             next();
         } else if (at(T.INTEGER)) {
-            exp = parseInt(text(), 10);
+            exp = {
+                type: A.INTEGER,
+                value: parseInt(text(), 10)
+            };
             next();
         }
 

@@ -1,2 +1,3 @@
-(program
-    false)
+(module
+    (body
+        (expr false)))
