@@ -21,7 +21,22 @@ And progress to this:
 
     print sum_of_doubles([1,2,3,4,5])
 
-The initial implementation is a register-based virtual machine running in Javascript. Bypassing the JS call-stack in the interpreter allows us to implement Go-style async concurrency written in a blocking style, but without crazy syntax tree transformations that you see in other compile-to-JS languages.
+Jester supports concurrency:
+    
+    def get(url) {
+        -- perform HTTP GET of url
+        -- return string
+    }
+
+    t1 = spawn get "http://google.com"
+    t2 = spawn get "http://yahoo.com"
+    t3 = spawn get "http://cuil.com"
+
+    google = wait t1
+    yahoo = wait t2
+    cuil = wait t3
+
+The initial implementation is a register-based virtual machine running in Javascript. Bypassing the JS call-stack in the interpreter allows us to implement Go-style async concurrency written in a blocking style, but without crazy syntax tree transformations that you see in compile-to-JS languages.
 
 I've outlined the eventual syntax below, very little of this is implemented yet.
 
