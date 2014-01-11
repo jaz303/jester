@@ -1,0 +1,8 @@
+#!/bin/bash
+
+TEST_DIR=$(dirname $0)
+
+for src in `find $TEST_DIR -name '*.jester'`
+do
+    node $TEST_DIR/one.js $src $(echo $src | sed s/\.jester/\.ast/)
+done
