@@ -1,0 +1,85 @@
+a = 10
+b = 20
+c = 30
+
+my_array = [1,2,3]
+
+push my_array, 20
+a = pop my_array
+
+
+
+-- this is a comment
+-- yadda yadda yadda
+def calculate(a, b = 20, c = 30) {
+  local x, y, z
+  
+  length(my_array)
+  
+  while a < b {
+    a = a + c
+  }
+  
+  if c % 2 == 1 {
+    
+  } else if c % 3 == 1 {
+    
+  } else {
+  
+  }
+  
+  -- for, foreach
+  
+  
+  
+  foreach my_array => i {
+    print i
+  }
+
+}
+
+def draw(a, b, c) {
+  pen #ff0000  -- function calls
+  linewidth 5
+  moveto 10, 10
+  lineto 30, 30
+  lineto 50, 100
+}
+
+def blue(isOn) {
+  fill isOn ? #blue : #black
+  pen #white
+  circle 100, 100, 50
+}
+
+def red(isOn) {
+  fill isOn ? #red : #black
+  pen #white
+  circle 300, 100, 50
+}
+
+def run {
+  while true {
+    red on
+    blue off
+    wait 0.5
+    red off
+    blue on
+    wait 0.5
+  }
+}
+
+how does scoping work?
+ - in the root scope, variables can be declared without `local`
+ - variables declared in root scope never escape the compilation unit
+ - variables are lexically scoped
+ - block scoping for locals
+ 
+open questions:
+ - computed properties e.g. canvas width/height
+ - constants
+ 
+ternary operator
+  - modify to support stashing of last computed result
+  - in empty 'if' blocks, set last result to null/undefined
+  - ternary operator then becomes if/else compilation + push last computed value
