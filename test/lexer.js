@@ -86,9 +86,9 @@ testTokens({
     '\r'                : T.NEWLINE,
     '\r\n'              : T.NEWLINE,
 
-    // ' '                 : T.SPACE,
-    // '\t'                : T.SPACE,
-    // '    \t   '         : T.SPACE,
+    ' '                 : T.SPACE,
+    '\t'                : T.SPACE,
+    '    \t   '         : T.SPACE,
 
     '#'                 : T.POUND,
     '#red'              : [T.COLOR, '#red'],
