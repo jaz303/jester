@@ -27,6 +27,7 @@ module.exports = function(ast) {
                 write('(float ' + node.value + ')');
                 break;
             case A.STRING:
+                // TODO: encode string properly
                 write('(string "' + node.value + '")');
                 break;
             default:

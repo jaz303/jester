@@ -85,6 +85,18 @@ module.exports = function(lexer) {
                 value: parseInt(text(), 10)
             };
             next();
+        } else if (at(T.HEX)) {
+            exp = {
+                type: A.INTEGER,
+                value: parseInt(text().substring(2), 16)
+            };
+            next();
+        } else if (at(T.BINARY)) {
+            exp = {
+                type: A.INTEGER,
+                value: parseInt(text().substring(2), 2)
+            };
+            next();
         } else if (at(T.FLOAT)) {
             exp = {
                 type: A.FLOAT,
