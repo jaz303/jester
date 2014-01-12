@@ -1,17 +1,8 @@
 var T           = require('./tokens').tokens,
     TN          = require('./tokens').names,
     A           = require('./ast_nodes'),
+    COLORS      = require('./colors'),
     ParseError  = require('./parse_error');
-
-function decodeString(str) {
-    return str.substr(1, str.length - 2)
-              .replace(/\\r/g,  "\r")
-              .replace(/\\n/g,  "\n")
-              .replace(/\\t/g,  "\t")
-              .replace(/\\\\/g, "\\")
-              .replace(/\\'/g,  "'")
-              .replace(/\\"/g,  "\"");
-}
 
 module.exports = function(lexer) {
 
@@ -52,6 +43,37 @@ module.exports = function(lexer) {
             expectedToken ? TN[expectedToken] : null,
             TN[curr]
         );
+    }
+
+    //
+    // decoders
+
+    function decodeString(str) {
+        return str.substr(1, str.length - 2)
+                  .replace(/\\r/g,  "\r")
+                  .replace(/\\n/g,  "\n")
+                  .replace(/\\t/g,  "\t")
+                  .replace(/\\\\/g, "\\")
+                  .replace(/\\'/g,  "'")
+                  .replace(/\\"/g,  "\"");
+    }
+
+    function decodeColor(text) {
+        var resolved    = COLORS[text.substring(1).replace(/_/g, '').toLowerCase()],
+            hex         = resolved || text,
+            matches     = null;
+        
+        if (matches = hex.match(/^#([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})([0-9a-z]{2})?$/i)) {
+            return {
+                type  : A.COLOR,
+                r     : parseInt(matches[1], 16),
+                g     : parseInt(matches[2], 16),
+                b     : parseInt(matches[3], 16),
+                a     : (typeof matches[4] === 'string') ? parseInt(matches[4], 16) : 255
+            };
+        } else {
+            error("Invalid color literal '" + text + "'. Color literals must be 6/8 character hex strings, or valid color names.");
+        }
     }
 
     //
@@ -123,6 +145,9 @@ module.exports = function(lexer) {
                 type: A.GLOBAL_IDENT,
                 name: text().substring(1)
             };
+            next();
+        } else if (at(T.COLOR)) {
+            exp = decodeColor(text());
             next();
         }
 

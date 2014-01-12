@@ -39,6 +39,9 @@ module.exports = function(ast) {
             case A.GLOBAL_IDENT:
                 write('(global-ident ' + node.name + ')');
                 break;
+            case A.COLOR:
+                write('(color ' + node.r + ' ' + node.g + ' ' + node.b + ' ' + node.a + ')');
+                break;
             default:
                 if (node === true) {
                     write('true');

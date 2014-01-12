@@ -1,0 +1,3 @@
+(module
+    (body
+        (expr (color 255 0 0 255))))
