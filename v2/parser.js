@@ -112,6 +112,12 @@ module.exports = function(lexer) {
         } else if (at(T.TRACE)) {
             exp = { type: A.TRACE };
             next();
+        } else if (at(T.IDENT)) {
+            exp = {
+                type: A.IDENT,
+                name: text()
+            };
+            next();
         }
 
         return exp;

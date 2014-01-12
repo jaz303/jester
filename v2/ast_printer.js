@@ -33,6 +33,9 @@ module.exports = function(ast) {
             case A.TRACE:
                 write('(trace)');
                 break;
+            case A.IDENT:
+                write('(ident ' + node.name + ')');
+                break;
             default:
                 if (node === true) {
                     write('true');
