@@ -23,6 +23,7 @@ var nextAstNode = 1;
     'IDENT',
     'INTEGER',
     'FLOAT',
+    'STRING',
 
     'COLOR',
     'COLOR_CTOR',

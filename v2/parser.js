@@ -3,6 +3,16 @@ var T           = require('./tokens').tokens,
     A           = require('./ast_nodes'),
     ParseError  = require('./parse_error');
 
+function decodeString(str) {
+    return str.substr(1, str.length - 2)
+              .replace(/\\r/g,  "\r")
+              .replace(/\\n/g,  "\n")
+              .replace(/\\t/g,  "\t")
+              .replace(/\\\\/g, "\\")
+              .replace(/\\'/g,  "'")
+              .replace(/\\"/g,  "\"");
+}
+
 module.exports = function(lexer) {
 
     //
@@ -79,6 +89,12 @@ module.exports = function(lexer) {
             exp = {
                 type: A.FLOAT,
                 value: parseFloat(text(), 10)
+            };
+            next();
+        } else if (at(T.STRING)) {
+            exp = {
+                type: A.STRING,
+                value: decodeString(text())
             };
             next();
         }
