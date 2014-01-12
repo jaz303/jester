@@ -30,6 +30,9 @@ module.exports = function(ast) {
                 // TODO: encode string properly
                 write('(string "' + node.value + '")');
                 break;
+            case A.TRACE:
+                write('(trace)');
+                break;
             default:
                 if (node === true) {
                     write('true');

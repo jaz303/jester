@@ -109,6 +109,9 @@ module.exports = function(lexer) {
                 value: decodeString(text())
             };
             next();
+        } else if (at(T.TRACE)) {
+            exp = { type: A.TRACE };
+            next();
         }
 
         return exp;
