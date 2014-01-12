@@ -49,7 +49,7 @@ module.exports = function(src) {
             }
         },
         // #, #red, #ff0000
-        {   pattern: /^#([0-9a-fA-F]{6}|[a-zA-Z]+)?/,
+        {   pattern: /^#([0-9a-fA-F]{6}|[a-zA-Z_]+)?/,
             cb: function(match) {
                 return (match[0].length === 1) ? T.POUND : T.COLOR;
             }

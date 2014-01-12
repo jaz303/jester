@@ -92,6 +92,7 @@ testTokens({
 
     '#'                 : T.POUND,
     '#red'              : [T.COLOR, '#red'],
+    '#r_e_d'            : [T.COLOR, '#r_e_d'],
     '#ff0000'           : [T.COLOR, '#ff0000'],
     
     '$'                 : T.DOLLAR,
