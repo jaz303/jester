@@ -36,6 +36,9 @@ module.exports = function(ast) {
             case A.IDENT:
                 write('(ident ' + node.name + ')');
                 break;
+            case A.GLOBAL_IDENT:
+                write('(global-ident ' + node.name + ')');
+                break;
             default:
                 if (node === true) {
                     write('true');

@@ -1,0 +1,3 @@
+(module
+    (body
+        (expr (global-ident a_global))))

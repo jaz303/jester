@@ -118,6 +118,12 @@ module.exports = function(lexer) {
                 name: text()
             };
             next();
+        } else if (at(T.GLOBAL_IDENT)) {
+            exp = {
+                type: A.GLOBAL_IDENT,
+                name: text().substring(1)
+            };
+            next();
         }
 
         return exp;
