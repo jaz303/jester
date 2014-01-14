@@ -126,11 +126,41 @@ module.exports = function(lexer) {
     }
     
     function parseLogicalAndExpression() {
-        var exp = parseEqualityExpression();
+        var exp = parseBitwiseOrExpression();
         while (at(T.L_AND)) {
             var line = lexer.line();
             next();
-            exp = { type: A.BIN_OP, op: T.L_AND, line: line, left: exp, right: parseEqualityExpression() };
+            exp = { type: A.BIN_OP, op: T.L_AND, line: line, left: exp, right: parseBitwiseOrExpression() };
+        }
+        return exp;
+    }
+    
+    function parseBitwiseOrExpression() {
+        var exp = parseBitwiseXorExpression();
+        while (at(T.PIPE)) {
+            var line = lexer.line();
+            next();
+            exp = { type: A.BIN_OP, op: T.PIPE, line: line, left: exp, right: parseBitwiseXorExpression() };
+        }
+        return exp;
+    }
+    
+    function parseBitwiseXorExpression() {
+        var exp = parseBitwiseAndExpression();
+        while (at(T.HAT)) {
+            var line = lexer.line();
+            next();
+            exp = { type: A.BIN_OP, op: T.HAT, line: line, left: exp, right: parseBitwiseAndExpression() };
+        }
+        return exp;
+    }
+    
+    function parseBitwiseAndExpression() {
+        var exp = parseEqualityExpression();
+        while (at(T.AMP)) {
+            var line = lexer.line();
+            next();
+            exp = { type: A.BIN_OP, op: T.AMP, line: line, left: exp, right: parseEqualityExpression() };
         }
         return exp;
     }
