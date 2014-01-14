@@ -84,12 +84,116 @@ module.exports = function(lexer) {
         var program = { type: A.MODULE, body: [] };
 
         next();
-        program.body.push(parseAtom());
+        program.body.push(parseExpression());
 
         accept(T.EOF);
 
         return program;
 
+    }
+    
+    function parseExpression() {
+        return parseAssignExpression();
+    }
+    
+    // foo = "bar"
+    function parseAssignExpression() {
+        var exp = parseLogicalOrExpression();
+        if (at(T.ASSIGN)) {
+            var line = lexer.line();
+            next();
+            var root = { type: A.ASSIGN, line: line, left: exp, right: parseLogicalOrExpression() }, curr = root;
+            while (at(T.ASSIGN)) {
+                line = lexer.line();
+                next();
+                curr.right = { type: A.ASSIGN, line: line, left: curr.right, right: parseLogicalOrExpression() };
+                curr = curr.right;
+            }
+            return root;
+        } else {
+            return exp;
+        }
+    }
+    
+    function parseLogicalOrExpression() {
+        var exp = parseLogicalAndExpression();
+        while (at(T.L_OR)) {
+            var line = lexer.line();
+            next();
+            exp = { type: A.BIN_OP, op: T.L_OR, line: line, left: exp, right: parseLogicalAndExpression() };
+        }
+        return exp;
+    }
+    
+    function parseLogicalAndExpression() {
+        var exp = parseEqualityExpression();
+        while (at(T.L_AND)) {
+            var line = lexer.line();
+            next();
+            exp = { type: A.BIN_OP, op: T.L_AND, line: line, left: exp, right: parseEqualityExpression() };
+        }
+        return exp;
+    }
+    
+    function parseEqualityExpression() {
+        var exp = parseCmpExpression();
+        while (at(T.EQ) || at(T.NEQ)) {
+            var line = lexer.line(), op = curr;
+            next();
+            exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseCmpExpression() };
+        }
+        return exp;
+    }
+    
+    function parseCmpExpression() {
+        var exp = parseAddSubExpression();
+        while (at(T.LT) || at(T.GT) || at(T.LE) || at(T.GE)) {
+            var line = lexer.line(), op = curr;
+            next();
+            exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseAddSubExpression() };
+        }
+        return exp;
+    }
+    
+    // a + b, a - b
+    function parseAddSubExpression() {
+        var exp = parseMulDivExpression();
+        while (at(T.ADD) || at(T.SUB)) {
+            var line = lexer.line(), op = curr;
+            next();
+            exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseMulDivExpression() };
+        }
+        return exp;
+    }
+    
+    // a * b, a / b
+    function parseMulDivExpression() {
+        var exp = parseUnary();
+        while (at(T.MUL) || at(T.DIV)) {
+            var line = lexer.line(), op = curr;
+            next();
+            exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseUnary() };
+        }
+        return exp;
+    }
+    
+    // !foo, ~foo, -foo, +foo
+    function parseUnary() {
+        if (at(T.BANG) || at(T.TILDE) || at(T.SUB) || at(T.ADD)) {
+            var line = lexer.line();
+            var root = { type: A.UN_OP, op: curr, line: line, exp: null }, curr = root;
+            next();
+            while (at(T.BANG) || at(T.TILDE) || at(T.SUB) || at(T.ADD)) {
+                line = lexer.line();
+                curr.exp = { type: A.UN_OP, op: curr, line: line, exp: null };
+                curr = curr.exp;
+                next();
+            }
+            curr.exp = parseAtom();
+            return root;
+        } else {
+            return parseAtom();
+        }
     }
 
     function parseAtom() {
@@ -149,6 +253,12 @@ module.exports = function(lexer) {
         } else if (at(T.COLOR)) {
             exp = decodeColor(text());
             next();
+        } else if (at(T.L_PAREN)) {
+            next();
+            exp = parseExpression();
+            accept(T.R_PAREN);
+        } else {
+            error("expected: expression");
         }
 
         return exp;
