@@ -63,7 +63,6 @@ addSymbols({
 });
 
 addTokens([
-    'SPACE',
     'NEWLINE',          // \n
 
     'IDENT',

@@ -11,12 +11,6 @@ function space_p(ch) {
 module.exports = function(src) {
 
     var TOKENS = [
-        // space
-        {   pattern: /^[ \t]+/,
-            cb: function() {
-                return T.SPACE
-            }
-        },
         // symbols
         {   pattern: /^(<=|>=|<<|>>|==|\?|\!=|\*\*|\|\||&&|\.\{|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
             cb: function(match) {
@@ -86,6 +80,13 @@ module.exports = function(src) {
         
         if (p === len)
             return T.EOF;
+        
+        // skip whitespace
+        while (space_p(src[p])) {
+            adv();
+            if (p === len)
+                return T.EOF;
+        }
         
         // skip comments
         if (src[p] === '-' && more() && src[p+1] === '-') {
