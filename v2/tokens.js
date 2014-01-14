@@ -1,8 +1,10 @@
-var TOKENS          = {},
-    TOKEN_NAMES     = {},
-    SYMBOLS         = {},
-    KEYWORDS        = {},
-    nextToken       = 1;
+var TOKENS              = {},
+    TOKEN_NAMES         = {},
+    TOKENS_TO_SYMBOLS   = {},
+    SYMBOLS_TO_TOKENS   = {},
+    SYMBOLS             = {},
+    KEYWORDS            = {},
+    nextToken           = 1;
 
 function addToken(name) {
     var tokenId = nextToken++;
@@ -13,7 +15,9 @@ function addToken(name) {
 
 function addSymbols(syms) {
     for (var s in syms) {
-        SYMBOLS[syms[s]] = addToken(s);
+        var token = addToken(s);
+        TOKENS_TO_SYMBOLS[token] = syms[s];
+        SYMBOLS_TO_TOKENS[syms[s]] = token;
     }
 }
 
@@ -103,7 +107,8 @@ addKeywords({
     'AS'            : 'as'
 });
 
-exports.tokens      = TOKENS;
-exports.names       = TOKEN_NAMES;
-exports.symbols     = SYMBOLS;
-exports.keywords    = KEYWORDS;
+exports.tokens          = TOKENS;
+exports.names           = TOKEN_NAMES;
+exports.symbolsToTokens = SYMBOLS_TO_TOKENS;
+exports.tokensToSymbols = TOKENS_TO_SYMBOLS;
+exports.keywords        = KEYWORDS;

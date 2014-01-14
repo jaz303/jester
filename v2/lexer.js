@@ -1,7 +1,7 @@
 "use strict";
 
 var T           = require('./tokens').tokens,
-    SYMBOLS     = require('./tokens').symbols,
+    SYMBOLS     = require('./tokens').symbolsToTokens,
     KEYWORDS    = require('./tokens').keywords;
 
 function space_p(ch) {
