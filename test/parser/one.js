@@ -32,7 +32,9 @@ try {
 
 } catch (e) {
     if (e instanceof $.jester.ParseError) {
-        console.log(input + ": parse error, expected token: " + e.expectedToken);    
+        console.log(input + ": parse error");
+        console.log("expected token: " + e.expectedToken);
+        console.log("actual token: " + e.actualToken);
     } else {
         console.log(e.message);
     }
