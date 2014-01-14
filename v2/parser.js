@@ -115,6 +115,7 @@ module.exports = function(lexer) {
         }
     }
     
+    // a || b
     function parseLogicalOrExpression() {
         var exp = parseLogicalAndExpression();
         while (at(T.L_OR)) {
@@ -125,6 +126,7 @@ module.exports = function(lexer) {
         return exp;
     }
     
+    // a && b
     function parseLogicalAndExpression() {
         var exp = parseBitwiseOrExpression();
         while (at(T.L_AND)) {
@@ -135,6 +137,7 @@ module.exports = function(lexer) {
         return exp;
     }
     
+    // a | b
     function parseBitwiseOrExpression() {
         var exp = parseBitwiseXorExpression();
         while (at(T.PIPE)) {
@@ -145,6 +148,7 @@ module.exports = function(lexer) {
         return exp;
     }
     
+    // a ^ b
     function parseBitwiseXorExpression() {
         var exp = parseBitwiseAndExpression();
         while (at(T.HAT)) {
@@ -155,6 +159,7 @@ module.exports = function(lexer) {
         return exp;
     }
     
+    // a & b
     function parseBitwiseAndExpression() {
         var exp = parseEqualityExpression();
         while (at(T.AMP)) {
@@ -165,6 +170,7 @@ module.exports = function(lexer) {
         return exp;
     }
     
+    // a == b, a != b
     function parseEqualityExpression() {
         var exp = parseCmpExpression();
         while (at(T.EQ) || at(T.NEQ)) {
@@ -175,9 +181,21 @@ module.exports = function(lexer) {
         return exp;
     }
     
+    // a < b, a > b, a <= b, a >= b
     function parseCmpExpression() {
-        var exp = parseAddSubExpression();
+        var exp = parseShiftExpression();
         while (at(T.LT) || at(T.GT) || at(T.LE) || at(T.GE)) {
+            var line = lexer.line(), op = curr;
+            next();
+            exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseShiftExpression() };
+        }
+        return exp;
+    }
+    
+    // a << b, a >> b
+    function parseShiftExpression() {
+        var exp = parseAddSubExpression();
+        while (at(T.L_SHIFT) || at(T.R_SHIFT)) {
             var line = lexer.line(), op = curr;
             next();
             exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseAddSubExpression() };
@@ -187,19 +205,19 @@ module.exports = function(lexer) {
     
     // a + b, a - b
     function parseAddSubExpression() {
-        var exp = parseMulDivExpression();
+        var exp = parseMulDivPowModExpression();
         while (at(T.ADD) || at(T.SUB)) {
             var line = lexer.line(), op = curr;
             next();
-            exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseMulDivExpression() };
+            exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseMulDivPowModExpression() };
         }
         return exp;
     }
     
-    // a * b, a / b
-    function parseMulDivExpression() {
+    // a * b, a / b, a ** b, a % b
+    function parseMulDivPowModExpression() {
         var exp = parseUnary();
-        while (at(T.MUL) || at(T.DIV)) {
+        while (at(T.MUL) || at(T.DIV) || at(T.POW) || at(T.MOD)) {
             var line = lexer.line(), op = curr;
             next();
             exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseUnary() };
