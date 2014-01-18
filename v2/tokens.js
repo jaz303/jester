@@ -1,33 +1,22 @@
-var TOKENS              = {},
-    TOKEN_NAMES         = {},
-    TOKENS_TO_SYMBOLS   = {},
+var TOKENS_TO_SYMBOLS   = {},
     SYMBOLS_TO_TOKENS   = {},
-    SYMBOLS             = {},
-    KEYWORDS            = {},
-    nextToken           = 1;
-
-function addToken(name) {
-    var tokenId = nextToken++;
-    TOKENS[name] = tokenId;
-    TOKEN_NAMES[tokenId] = name;
-    return tokenId;
-}
+    KEYWORDS            = {};
 
 function addSymbols(syms) {
     for (var s in syms) {
-        var token = addToken(s);
-        TOKENS_TO_SYMBOLS[token] = syms[s];
-        SYMBOLS_TO_TOKENS[syms[s]] = token;
+        TOKENS_TO_SYMBOLS[s] = syms[s];
+        SYMBOLS_TO_TOKENS[syms[s]] = s;
     }
 }
 
-function addTokens(list) {
-    list.forEach(addToken);
+function addTokens(tokens) {
+    // no-op
 }
 
 function addKeywords(kws) {
+    addSymbols(kws);
     for (var k in kws) {
-        KEYWORDS[kws[k]] = addToken(k);
+        KEYWORDS[kws[k]] = k;
     }
 }
 
@@ -52,6 +41,7 @@ addSymbols({
     'AMP'           : '&',
     'PIPE'          : '|',
     'HAT'           : '^',
+    'TILDE'         : '~',
     'ASSIGN'        : '=',
     'QUESTION'      : '?',
     'SEMICOLON'     : ';',
@@ -107,8 +97,6 @@ addKeywords({
     'AS'            : 'as'
 });
 
-exports.tokens          = TOKENS;
-exports.names           = TOKEN_NAMES;
 exports.symbolsToTokens = SYMBOLS_TO_TOKENS;
 exports.tokensToSymbols = TOKENS_TO_SYMBOLS;
 exports.keywords        = KEYWORDS;
