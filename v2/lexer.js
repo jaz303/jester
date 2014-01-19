@@ -94,10 +94,19 @@ module.exports = function() {
             return 'EOF';
         
         // skip whitespace
-        while (space_p(src[p])) {
-            adv();
-            if (p === len)
-                return 'EOF';
+        if (space_p(src[p])) {
+            while (space_p(src[p])) {
+                adv();
+                if (p === len)
+                    return 'EOF';
+            }
+            // compose operator requires surrounding space e.g. ' . '
+            // it's the only time space is significant so it's easiest just to
+            // special-case it here.
+            if (src[p] === '.' && more() && src[p+1] === ' ') {
+                adv(2);
+                return 'COMPOSE';
+            }
         }
         
         // skip comments

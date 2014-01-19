@@ -47,6 +47,7 @@ addSymbols({
     'SEMICOLON'     : ';',
     'COMMA'         : ',',
     'DOT'           : '.',
+    'COMPOSE'       : ' . ',
     'LAMBDA_BRACE'  : '.{',
     'L_BRACE'       : '{',
     'R_BRACE'       : '}',

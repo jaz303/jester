@@ -53,7 +53,13 @@ testTokens({
     '?'                 : 'QUESTION',
     ';'                 : 'SEMICOLON',
     ','                 : 'COMMA',
+    
     '.'                 : 'DOT',
+    ' .'                : 'DOT',
+    '. '                : 'DOT',
+    ' . '               : 'COMPOSE',
+    '  .  '             : 'COMPOSE',
+
     '.{'                : 'LAMBDA_BRACE',
     '{'                 : 'L_BRACE',
     '}'                 : 'R_BRACE',
