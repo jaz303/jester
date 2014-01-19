@@ -23,7 +23,7 @@ module.exports = function() {
             }
         },
         // 0xb1010, 0xffff
-        {   pattern: /^0(b[01]+|x[0-9A-F-a-f]+)/,
+        {   pattern: /^0(b[01]+|x[0-9A-Fa-f]+)/,
             cb: function(match) {
                 return (match[0].charAt(1) === 'x') ? 'HEX' : 'BINARY';
             }
