@@ -30,7 +30,7 @@ module.exports = function() {
         },
         // numbers
         {
-            pattern: /^[0-9]+(\.[0-9]+)?/,
+            pattern: /^[0-9][0-9_]*(\.[0-9][0-9_]*)?/,
             cb: function(match) {
                 return match[1] ? 'FLOAT' : 'INTEGER';
             }
