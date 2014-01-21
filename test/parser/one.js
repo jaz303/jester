@@ -6,8 +6,10 @@ var input   = process.argv[2]
     output  = process.argv[3],
     source  = rfs(input, {encoding: 'utf8'}),
     expect  = rfs(output, {encoding: 'utf8'}),
-    lexer   = $.jester.lexer(source),
+    lexer   = $.jester.lexer(),
     parser  = $.jester.parser(lexer);
+
+lexer.setInput(source);
 
 function sanitise(code) {
     return code.replace(/\t/g, '    ').trim();
@@ -15,7 +17,7 @@ function sanitise(code) {
 
 try {
     
-    var pretty = $.jester.prettyPrint(parser.parseTopLevel());
+    var pretty = $.jester.prettyPrint(parser.parseModule());
 
     if (sanitise(pretty) !== sanitise(expect)) {
 
@@ -32,7 +34,7 @@ try {
 
 } catch (e) {
     if (e instanceof $.jester.ParseError) {
-        console.log(input + ": parse error");
+        console.log(input + ": " + (e.message || "parse error"));
         console.log("expected token: " + e.expectedToken);
         console.log("actual token: " + e.actualToken);
     } else {

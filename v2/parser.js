@@ -1,6 +1,4 @@
-var T           = require('./tokens').tokens,
-    TN          = require('./tokens').names,
-    A           = require('./ast_nodes'),
+var A           = require('./ast_nodes'),
     COLORS      = require('./colors'),
     ParseError  = require('./parse_error');
 
@@ -12,7 +10,7 @@ module.exports = function(lexer) {
     var curr = null;
 
     function next() {
-        curr = lexer.next();
+        curr = lexer.lex();
         return curr;
     }
 
@@ -33,16 +31,43 @@ module.exports = function(lexer) {
     }
 
     function error(msg, expectedToken) {
-        if (curr === T.ERROR) {
+        if (curr === 'ERROR') {
             msg = lexer.error();
         }
         throw new ParseError(
             msg,
             lexer.line(),
             lexer.column(),
-            expectedToken ? TN[expectedToken] : null,
-            TN[curr]
+            expectedToken || '<unknown>',
+            curr
         );
+    }
+
+    function atBlockTerminator() {
+        return curr === R_BRACE;
+    }
+
+    function atStatementTerminator() {
+        return curr === 'SEMICOLON' || curr === 'NL';
+    }
+
+    function skipNewlines() {
+        while (curr === 'NL')
+            next();
+    }
+
+    function skipStatementTerminators() {
+        while (atStatementTerminator())
+            next();
+    }
+
+    function eos() {
+        if (atStatementTerminator()) {
+            next();
+            skipStatementTerminators();
+        } else {
+            error("expected: end-of-statement (newline or semicolon)");
+        }
     }
 
     //
@@ -79,17 +104,70 @@ module.exports = function(lexer) {
     //
     //
 
-    function parseTopLevel() {
+    function parseModule() {
 
         var program = { type: A.MODULE, body: [] };
 
         next();
-        program.body.push(parseExpression());
+        program.body = parseStatements();
 
-        accept(T.EOF);
+        accept('EOF');
 
         return program;
 
+    }
+
+    function parseStatementBlock() {
+        accept('L_BRACE');
+        var statements = parseStatements();
+        accept('R_BRACE');
+        return statements;
+    }
+
+    function parseStatements() {
+        var statements = [];
+        skipStatementTerminators();
+        while (curr !== 'EOF' && curr !== 'R_BRACE') {
+            statements.push(parseStatement());
+        }
+        return statements;
+    }
+
+    function parseStatement() {
+        if (curr === 'WHILE') {
+            return parseWhileStatement();
+        } else if (curr === 'LOOP') {
+            return parseLoopStatement();
+        } else {
+            var stmt = parseExpression();
+            eos();
+            return stmt;
+        }
+    }
+
+    function parseWhileStatement() {
+        var line = lexer.line();
+        accept('WHILE');
+        var node = { type: A.WHILE, line: line };
+        node.condition = parseExpression();
+        skipNewlines();
+        node.body = parseStatementBlock();
+        return node;
+    }
+
+    function parseLoopStatement() {
+        var line = lexer.line();
+        accept('LOOP');
+        var node = { type: A.LOOP, line: line };
+        if (at('WHILE')) {
+            next();
+            node.condition = parseExpression();
+        } else {
+            node.condition = true;
+        }
+        skipNewlines();
+        node.body = parseStatementBlock();
+        return node;
     }
     
     function parseExpression() {
@@ -99,11 +177,11 @@ module.exports = function(lexer) {
     // foo = "bar"
     function parseAssignExpression() {
         var exp = parseLogicalOrExpression();
-        if (at(T.ASSIGN)) {
+        if (at('ASSIGN')) {
             var line = lexer.line();
             next();
             var root = { type: A.ASSIGN, line: line, left: exp, right: parseLogicalOrExpression() }, curr = root;
-            while (at(T.ASSIGN)) {
+            while (at('ASSIGN')) {
                 line = lexer.line();
                 next();
                 curr.right = { type: A.ASSIGN, line: line, left: curr.right, right: parseLogicalOrExpression() };
@@ -118,10 +196,10 @@ module.exports = function(lexer) {
     // a || b
     function parseLogicalOrExpression() {
         var exp = parseLogicalAndExpression();
-        while (at(T.L_OR)) {
+        while (at('L_OR')) {
             var line = lexer.line();
             next();
-            exp = { type: A.BIN_OP, op: T.L_OR, line: line, left: exp, right: parseLogicalAndExpression() };
+            exp = { type: A.BIN_OP, op: 'L_OR', line: line, left: exp, right: parseLogicalAndExpression() };
         }
         return exp;
     }
@@ -129,10 +207,10 @@ module.exports = function(lexer) {
     // a && b
     function parseLogicalAndExpression() {
         var exp = parseBitwiseOrExpression();
-        while (at(T.L_AND)) {
+        while (at('L_AND')) {
             var line = lexer.line();
             next();
-            exp = { type: A.BIN_OP, op: T.L_AND, line: line, left: exp, right: parseBitwiseOrExpression() };
+            exp = { type: A.BIN_OP, op: 'L_AND', line: line, left: exp, right: parseBitwiseOrExpression() };
         }
         return exp;
     }
@@ -140,10 +218,10 @@ module.exports = function(lexer) {
     // a | b
     function parseBitwiseOrExpression() {
         var exp = parseBitwiseXorExpression();
-        while (at(T.PIPE)) {
+        while (at('PIPE')) {
             var line = lexer.line();
             next();
-            exp = { type: A.BIN_OP, op: T.PIPE, line: line, left: exp, right: parseBitwiseXorExpression() };
+            exp = { type: A.BIN_OP, op: 'PIPE', line: line, left: exp, right: parseBitwiseXorExpression() };
         }
         return exp;
     }
@@ -151,10 +229,10 @@ module.exports = function(lexer) {
     // a ^ b
     function parseBitwiseXorExpression() {
         var exp = parseBitwiseAndExpression();
-        while (at(T.HAT)) {
+        while (at('HAT')) {
             var line = lexer.line();
             next();
-            exp = { type: A.BIN_OP, op: T.HAT, line: line, left: exp, right: parseBitwiseAndExpression() };
+            exp = { type: A.BIN_OP, op: 'HAT', line: line, left: exp, right: parseBitwiseAndExpression() };
         }
         return exp;
     }
@@ -162,10 +240,10 @@ module.exports = function(lexer) {
     // a & b
     function parseBitwiseAndExpression() {
         var exp = parseEqualityExpression();
-        while (at(T.AMP)) {
+        while (at('AMP')) {
             var line = lexer.line();
             next();
-            exp = { type: A.BIN_OP, op: T.AMP, line: line, left: exp, right: parseEqualityExpression() };
+            exp = { type: A.BIN_OP, op: 'AMP', line: line, left: exp, right: parseEqualityExpression() };
         }
         return exp;
     }
@@ -173,7 +251,7 @@ module.exports = function(lexer) {
     // a == b, a != b
     function parseEqualityExpression() {
         var exp = parseCmpExpression();
-        while (at(T.EQ) || at(T.NEQ)) {
+        while (at('EQ') || at('NEQ')) {
             var line = lexer.line(), op = curr;
             next();
             exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseCmpExpression() };
@@ -184,7 +262,7 @@ module.exports = function(lexer) {
     // a < b, a > b, a <= b, a >= b
     function parseCmpExpression() {
         var exp = parseShiftExpression();
-        while (at(T.LT) || at(T.GT) || at(T.LE) || at(T.GE)) {
+        while (at('LT') || at('GT') || at('LE') || at('GE')) {
             var line = lexer.line(), op = curr;
             next();
             exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseShiftExpression() };
@@ -195,7 +273,7 @@ module.exports = function(lexer) {
     // a << b, a >> b
     function parseShiftExpression() {
         var exp = parseAddSubExpression();
-        while (at(T.L_SHIFT) || at(T.R_SHIFT)) {
+        while (at('L_SHIFT') || at('R_SHIFT')) {
             var line = lexer.line(), op = curr;
             next();
             exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseAddSubExpression() };
@@ -206,7 +284,7 @@ module.exports = function(lexer) {
     // a + b, a - b
     function parseAddSubExpression() {
         var exp = parseMulDivPowModExpression();
-        while (at(T.ADD) || at(T.SUB)) {
+        while (at('ADD') || at('SUB')) {
             var line = lexer.line(), op = curr;
             next();
             exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseMulDivPowModExpression() };
@@ -217,7 +295,7 @@ module.exports = function(lexer) {
     // a * b, a / b, a ** b, a % b
     function parseMulDivPowModExpression() {
         var exp = parseUnary();
-        while (at(T.MUL) || at(T.DIV) || at(T.POW) || at(T.MOD)) {
+        while (at('MUL') || at('DIV') || at('POW') || at('MOD')) {
             var line = lexer.line(), op = curr;
             next();
             exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseUnary() };
@@ -227,11 +305,11 @@ module.exports = function(lexer) {
     
     // !foo, ~foo, -foo, +foo
     function parseUnary() {
-        if (at(T.BANG) || at(T.TILDE) || at(T.SUB) || at(T.ADD)) {
+        if (at('BANG') || at('TILDE') || at('SUB') || at('ADD')) {
             var line = lexer.line();
             var root = { type: A.UN_OP, op: curr, line: line, exp: null }, curr = root;
             next();
-            while (at(T.BANG) || at(T.TILDE) || at(T.SUB) || at(T.ADD)) {
+            while (at('BANG') || at('TILDE') || at('SUB') || at('ADD')) {
                 line = lexer.line();
                 curr.exp = { type: A.UN_OP, op: curr, line: line, exp: null };
                 curr = curr.exp;
@@ -247,64 +325,64 @@ module.exports = function(lexer) {
     function parseAtom() {
         var exp = null, line = lexer.line();
 
-        if (at(T.TRUE)) {
+        if (at('TRUE')) {
             exp = true;
             next();
-        } else if (at(T.FALSE)) {
+        } else if (at('FALSE')) {
             exp = false;
             next();
-        } else if (at(T.INTEGER)) {
+        } else if (at('INTEGER')) {
             exp = {
                 type: A.INTEGER,
                 value: parseInt(text(), 10)
             };
             next();
-        } else if (at(T.HEX)) {
+        } else if (at('HEX')) {
             exp = {
                 type: A.INTEGER,
                 value: parseInt(text().substring(2), 16)
             };
             next();
-        } else if (at(T.BINARY)) {
+        } else if (at('BINARY')) {
             exp = {
                 type: A.INTEGER,
                 value: parseInt(text().substring(2), 2)
             };
             next();
-        } else if (at(T.FLOAT)) {
+        } else if (at('FLOAT')) {
             exp = {
                 type: A.FLOAT,
                 value: parseFloat(text(), 10)
             };
             next();
-        } else if (at(T.STRING)) {
+        } else if (at('STRING')) {
             exp = {
                 type: A.STRING,
                 value: decodeString(text())
             };
             next();
-        } else if (at(T.TRACE)) {
+        } else if (at('TRACE')) {
             exp = { type: A.TRACE };
             next();
-        } else if (at(T.IDENT)) {
+        } else if (at('IDENT')) {
             exp = {
                 type: A.IDENT,
                 name: text()
             };
             next();
-        } else if (at(T.GLOBAL_IDENT)) {
+        } else if (at('GLOBAL_IDENT')) {
             exp = {
                 type: A.GLOBAL_IDENT,
                 name: text().substring(1)
             };
             next();
-        } else if (at(T.COLOR)) {
+        } else if (at('COLOR')) {
             exp = decodeColor(text());
             next();
-        } else if (at(T.L_PAREN)) {
+        } else if (at('L_PAREN')) {
             next();
             exp = parseExpression();
-            accept(T.R_PAREN);
+            accept('R_PAREN');
         } else {
             error("expected: expression");
         }
@@ -313,7 +391,7 @@ module.exports = function(lexer) {
     }
 
     return {
-        parseTopLevel       : parseTopLevel
+        parseModule         : parseModule
     };
 
 }
