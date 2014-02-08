@@ -35,6 +35,7 @@ WAIT            = "wait"        !identifier_rest
 SPAWN           = "spawn"       !identifier_rest
 IF              = "if"          !identifier_rest
 ELSE            = "else"        !identifier_rest
+TRACE           = "trace"       !identifier_rest
 
 _
     = ( ws )*
