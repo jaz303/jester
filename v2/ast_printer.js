@@ -1,4 +1,5 @@
-var A = require('./ast_nodes');
+var A   = require('./ast_nodes'),
+    TS  = require('./tokens').tokensToSymbols;
 
 module.exports = function(ast) {
 
@@ -20,6 +21,13 @@ module.exports = function(ast) {
 
     function emitExpression(node) {
         switch (node.type) {
+            case A.ASSIGN:
+                write('(assign ');
+                emitExpression(node.left);
+                write(' ');
+                emitExpression(node.right);
+                write(')');
+                break;
             case A.INTEGER:
                 write('(integer ' + node.value + ')');
                 break;
@@ -41,6 +49,18 @@ module.exports = function(ast) {
                 break;
             case A.COLOR:
                 write('(color ' + node.r + ' ' + node.g + ' ' + node.b + ' ' + node.a + ')');
+                break;
+            case A.BIN_OP:
+                write('(' + TS[node.op] + ' ');
+                emitExpression(node.left);
+                write(' ');
+                emitExpression(node.right);
+                write(')');
+                break;
+            case A.UN_OP:
+                write('(' + TS[node.op] + ' ');
+                emitExpression(node.exp);
+                write(')');
                 break;
             default:
                 if (node === true) {

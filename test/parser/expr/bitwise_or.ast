@@ -1,0 +1,3 @@
+(module
+    (body
+        (expr (| (integer 5) (integer 300)))))

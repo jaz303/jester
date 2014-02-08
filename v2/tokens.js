@@ -1,29 +1,22 @@
-var TOKENS          = {},
-    TOKEN_NAMES     = {},
-    SYMBOLS         = {},
-    KEYWORDS        = {},
-    nextToken       = 1;
-
-function addToken(name) {
-    var tokenId = nextToken++;
-    TOKENS[name] = tokenId;
-    TOKEN_NAMES[tokenId] = name;
-    return tokenId;
-}
+var TOKENS_TO_SYMBOLS   = {},
+    SYMBOLS_TO_TOKENS   = {},
+    KEYWORDS            = {};
 
 function addSymbols(syms) {
     for (var s in syms) {
-        SYMBOLS[syms[s]] = addToken(s);
+        TOKENS_TO_SYMBOLS[s] = syms[s];
+        SYMBOLS_TO_TOKENS[syms[s]] = s;
     }
 }
 
-function addTokens(list) {
-    list.forEach(addToken);
+function addTokens(tokens) {
+    // no-op
 }
 
 function addKeywords(kws) {
+    addSymbols(kws);
     for (var k in kws) {
-        KEYWORDS[kws[k]] = addToken(k);
+        KEYWORDS[kws[k]] = k;
     }
 }
 
@@ -48,11 +41,13 @@ addSymbols({
     'AMP'           : '&',
     'PIPE'          : '|',
     'HAT'           : '^',
+    'TILDE'         : '~',
     'ASSIGN'        : '=',
     'QUESTION'      : '?',
     'SEMICOLON'     : ';',
     'COMMA'         : ',',
     'DOT'           : '.',
+    'COMPOSE'       : ' . ',
     'LAMBDA_BRACE'  : '.{',
     'L_BRACE'       : '{',
     'R_BRACE'       : '}',
@@ -63,7 +58,6 @@ addSymbols({
 });
 
 addTokens([
-    'SPACE',
     'NEWLINE',          // \n
 
     'IDENT',
@@ -104,7 +98,6 @@ addKeywords({
     'AS'            : 'as'
 });
 
-exports.tokens      = TOKENS;
-exports.names       = TOKEN_NAMES;
-exports.symbols     = SYMBOLS;
-exports.keywords    = KEYWORDS;
+exports.symbolsToTokens = SYMBOLS_TO_TOKENS;
+exports.tokensToSymbols = TOKENS_TO_SYMBOLS;
+exports.keywords        = KEYWORDS;

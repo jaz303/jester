@@ -1,0 +1,3 @@
+(module
+    (body
+        (expr (^ (integer 454) (integer 344)))))
