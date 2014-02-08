@@ -3,176 +3,176 @@
  */
 
 start
-	= body:Statements EOF {
-		return body;
-	}
+    = body:Statements EOF {
+        return body;
+    }
 
 /*
  * Helpers
  */
 
 ws
-	= [\t\v\f \u00A0\uFEFF]
+    = [\t\v\f \u00A0\uFEFF]
 
 identifier_start
-	= [a-zA-Z_]
+    = [a-zA-Z_]
 
 identifier_rest
-	= [a-zA-Z0-9_]
+    = [a-zA-Z0-9_]
 
 /*
  * Tokens
  */
 
-WHILE 			= "while"		!identifier_rest
-LOOP 			= "loop"		!identifier_rest
-FOREACH			= "foreach"		!identifier_rest
-DEF				= "def"			!identifier_rest
-TRUE 			= "true"		!identifier_rest
-FALSE 			= "false"		!identifier_rest
-YIELD 			= "yield"		!identifier_rest
-WAIT 			= "wait"		!identifier_rest
-SPAWN			= "spawn"		!identifier_rest
-IF 				= "if"			!identifier_rest
-ELSE 			= "else"		!identifier_rest
+WHILE           = "while"       !identifier_rest
+LOOP            = "loop"        !identifier_rest
+FOREACH         = "foreach"     !identifier_rest
+DEF             = "def"         !identifier_rest
+TRUE            = "true"        !identifier_rest
+FALSE           = "false"       !identifier_rest
+YIELD           = "yield"       !identifier_rest
+WAIT            = "wait"        !identifier_rest
+SPAWN           = "spawn"       !identifier_rest
+IF              = "if"          !identifier_rest
+ELSE            = "else"        !identifier_rest
 
 _
-	= ( ws )*
+    = ( ws )*
 
 NL
-	= "\n"
-	/ "\r\n"
-	/ "\r"
+    = "\n"
+    / "\r\n"
+    / "\r"
 
 ST
-	= _ ( NL / ";" ) _
+    = _ ( NL / ";" ) _
 
 EOF
-	= !.
+    = !.
 
 __
-	= ( ws / NL )*
+    = ( ws / NL )*
 
 Integer
-	= head:[1-9] tail:[0-9_]* {
-		return head + tail.join('');
-	}
+    = head:[1-9] tail:[0-9_]* {
+        return head + tail.join('');
+    }
 
 Name
-	= start:identifier_start rest:identifier_rest* {
-		return start + rest.join('');
-	}
+    = start:identifier_start rest:identifier_rest* {
+        return start + rest.join('');
+    }
 
 /*
  * Productions
  */
 
 Statements
-	= ST* body:(StatementsInner)? ST* {
-		return body || [];
-	}
+    = ST* body:(StatementsInner)? ST* {
+        return body || [];
+    }
 
 StatementsInner
-	= head:LeadingStatements tail:TrailingStatement {
-		head.push(tail);
-		return head;
-	}
-	/ body:LeadingStatements {
-		return body;
-	}
-	/ stmt:TrailingStatement {
-		return [stmt];
-	}
+    = head:LeadingStatements tail:TrailingStatement {
+        head.push(tail);
+        return head;
+    }
+    / body:LeadingStatements {
+        return body;
+    }
+    / stmt:TrailingStatement {
+        return [stmt];
+    }
 
 LeadingStatements
-	= head:LeadingStatement tail:LeadingStatement* {
-		var result = [head];
-		for (var i = 0; i < tail.length; i++) {
-			result.push(tail[i]);
-		}
-		return result;
-	}
+    = head:LeadingStatement tail:LeadingStatement* {
+        var result = [head];
+        for (var i = 0; i < tail.length; i++) {
+            result.push(tail[i]);
+        }
+        return result;
+    }
 
 LeadingStatement
-	= stmt:BlockStatement ST*	{ return stmt; }
-	/ stmt:InlineStatement ST+ 	{ return stmt; }
+    = stmt:BlockStatement ST*   { return stmt; }
+    / stmt:InlineStatement ST+  { return stmt; }
 
 TrailingStatement
-	= BlockStatement
-	/ InlineStatement
+    = BlockStatement
+    / InlineStatement
 
 BlockStatement
-	= WhileStatement
-	/ LoopWhileStatement
-	/ LoopStatement
+    = WhileStatement
+    / LoopWhileStatement
+    / LoopStatement
 
 InlineStatement
-	= Exp
+    = Exp
 
 WhileStatement
-	= WHILE _ cond:Exp __ body:Block {
-		return {
-			type: 'while',
-			condition: cond,
-			body: body
-		};
-	}
+    = WHILE _ cond:Exp __ body:Block {
+        return {
+            type: 'while',
+            condition: cond,
+            body: body
+        };
+    }
 
 LoopWhileStatement
-	= LOOP _ WHILE _ cond:Exp __ body:Block {
-		return {
-			type: 'loop',
-			condition: cond,
-			body: body
-		};
-	}
+    = LOOP _ WHILE _ cond:Exp __ body:Block {
+        return {
+            type: 'loop',
+            condition: cond,
+            body: body
+        };
+    }
 
 LoopStatement
-	= LOOP __ body:Block {
-		return {
-			type: 'loop',
-			condition: true,
-			body: body
-		};
-	}
+    = LOOP __ body:Block {
+        return {
+            type: 'loop',
+            condition: true,
+            body: body
+        };
+    }
 
 Block
-	= "{" __ body:Statements __ "}" {
-		return body;
-	}
+    = "{" __ body:Statements __ "}" {
+        return body;
+    }
 
 Exp
-	= Atom
-	/ Lambda
+    = Atom
+    / Lambda
 
 Atom
-	= Literal
-	/ Ident
+    = Literal
+    / Ident
 
 Literal
-	= Integer
-	/ TRUE		{ return true; }
-	/ FALSE 	{ return false; }
+    = Integer
+    / TRUE      { return true; }
+    / FALSE     { return false; }
 
 Ident
-	= name:Name {
-		return {type: 'ident', name: name};
-	}
+    = name:Name {
+        return {type: 'ident', name: name};
+    }
 
 Lambda
-	= ".{" _ args:(LambdaArgs _ "|" _)? body:Statements _ "}" {
-		return {
-			type: 'lambda',
-			args: args ? args[0] : [],
-			body: body
-		}
-	}
-	
+    = ".{" _ args:(LambdaArgs _ "|" _)? body:Statements _ "}" {
+        return {
+            type: 'lambda',
+            args: args ? args[0] : [],
+            body: body
+        }
+    }
+    
 LambdaArgs
-	= head:Name tail:(_ "," _ Name)* {
-		var result = [head];
-		for (var i = 0; i < tail.length; ++i) {
-			result.push(tail[i][3]);
-		}
-		return result;
-	}
+    = head:Name tail:(_ "," _ Name)* {
+        var result = [head];
+        for (var i = 0; i < tail.length; ++i) {
+            result.push(tail[i][3]);
+        }
+        return result;
+    }

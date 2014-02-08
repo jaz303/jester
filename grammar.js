@@ -34,8 +34,8 @@ module.exports = (function() {
 
         peg$c0 = peg$FAILED,
         peg$c1 = function(body) {
-        		return body;
-        	},
+                return body;
+            },
         peg$c2 = /^[\t\x0B\f \xA0\uFEFF]/,
         peg$c3 = { type: "class", value: "[\\t\\x0B\\f \\xA0\\uFEFF]", description: "[\\t\\x0B\\f \\xA0\\uFEFF]" },
         peg$c4 = /^[a-zA-Z_]/,
@@ -80,51 +80,51 @@ module.exports = (function() {
         peg$c43 = /^[0-9_]/,
         peg$c44 = { type: "class", value: "[0-9_]", description: "[0-9_]" },
         peg$c45 = function(head, tail) {
-        		return head + tail.join('');
-        	},
+                return head + tail.join('');
+            },
         peg$c46 = function(start, rest) {
-        		return start + rest.join('');
-        	},
+                return start + rest.join('');
+            },
         peg$c47 = null,
         peg$c48 = function(body) {
-        		return body || [];
-        	},
+                return body || [];
+            },
         peg$c49 = function(head, tail) {
-        		head.push(tail);
-        		return head;
-        	},
+                head.push(tail);
+                return head;
+            },
         peg$c50 = function(stmt) {
-        		return [stmt];
-        	},
+                return [stmt];
+            },
         peg$c51 = function(head, tail) {
-        		var result = [head];
-        		for (var i = 0; i < tail.length; i++) {
-        			result.push(tail[i]);
-        		}
-        		return result;
-        	},
+                var result = [head];
+                for (var i = 0; i < tail.length; i++) {
+                    result.push(tail[i]);
+                }
+                return result;
+            },
         peg$c52 = function(stmt) { return stmt; },
         peg$c53 = function(cond, body) {
-        		return {
-        			type: 'while',
-        			condition: cond,
-        			body: body
-        		};
-        	},
+                return {
+                    type: 'while',
+                    condition: cond,
+                    body: body
+                };
+            },
         peg$c54 = function(cond, body) {
-        		return {
-        			type: 'loop',
-        			condition: cond,
-        			body: body
-        		};
-        	},
+                return {
+                    type: 'loop',
+                    condition: cond,
+                    body: body
+                };
+            },
         peg$c55 = function(body) {
-        		return {
-        			type: 'loop',
-        			condition: true,
-        			body: body
-        		};
-        	},
+                return {
+                    type: 'loop',
+                    condition: true,
+                    body: body
+                };
+            },
         peg$c56 = "{",
         peg$c57 = { type: "literal", value: "{", description: "\"{\"" },
         peg$c58 = "}",
@@ -132,28 +132,28 @@ module.exports = (function() {
         peg$c60 = function() { return true; },
         peg$c61 = function() { return false; },
         peg$c62 = function(name) {
-        		return {type: 'ident', name: name};
-        	},
+                return {type: 'ident', name: name};
+            },
         peg$c63 = ".{",
         peg$c64 = { type: "literal", value: ".{", description: "\".{\"" },
         peg$c65 = "|",
         peg$c66 = { type: "literal", value: "|", description: "\"|\"" },
         peg$c67 = function(args, body) {
-        		return {
-        			type: 'lambda',
-        			args: args ? args[0] : [],
-        			body: body
-        		}
-        	},
+                return {
+                    type: 'lambda',
+                    args: args ? args[0] : [],
+                    body: body
+                }
+            },
         peg$c68 = ",",
         peg$c69 = { type: "literal", value: ",", description: "\",\"" },
         peg$c70 = function(head, tail) {
-        		var result = [head];
-        		for (var i = 0; i < tail.length; ++i) {
-        			result.push(tail[i][3]);
-        		}
-        		return result;
-        	},
+                var result = [head];
+                for (var i = 0; i < tail.length; ++i) {
+                    result.push(tail[i][3]);
+                }
+                return result;
+            },
 
         peg$currPos          = 0,
         peg$reportedPos      = 0,
