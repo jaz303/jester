@@ -1,0 +1,140 @@
+/*
+ * Entry
+ */
+
+start
+	= body:Statements EOF {
+		return body;
+	}
+
+/*
+ * Helpers
+ */
+
+WS
+	= [\t\v\f \u00A0\uFEFF]
+
+/*
+ * Tokens
+ */
+
+_
+	= ( WS )*
+
+NL
+	= "\n"
+	/ "\r\n"
+	/ "\r"
+
+ST
+	= _ ( NL / ";" ) _
+
+EOF
+	= !.
+
+__
+	= ( WS / NL )*
+
+Integer
+	= head:[1-9] tail:[0-9_]* {
+		return head + tail.join('');
+	}
+
+Name
+	= start:[a-zA-Z_] rest:[a-zA-Z0-9_]* {
+		return start + rest.join('');
+	}
+
+/*
+ * Productions
+ */
+
+Statements
+	= ST* body:(StatementsInner)? ST* {
+		return body || [];
+	}
+
+StatementsInner
+	= head:LeadingStatements tail:TrailingStatement {
+		head.push(tail);
+		return head;
+	}
+	/ body:LeadingStatements {
+		return body;
+	}
+	/ stmt:TrailingStatement {
+		return [stmt];
+	}
+
+LeadingStatements
+	= head:LeadingStatement tail:LeadingStatement* {
+		var result = [head];
+		for (var i = 0; i < tail.length; i++) {
+			result.push(tail[i]);
+		}
+		return result;
+	}
+
+LeadingStatement
+	= stmt:BlockStatement ST*	{ return stmt; }
+	/ stmt:InlineStatement ST+ 	{ return stmt; }
+
+TrailingStatement
+	= BlockStatement
+	/ InlineStatement
+
+BlockStatement
+	= WhileStatement
+
+InlineStatement
+	= Exp
+
+WhileStatement
+	= "while" _ cond:Exp __ body:Block {
+		return {
+			type: 'while',
+			condition: cond,
+			body: body
+		};
+	}
+
+Block
+	= "{" __ body:Statements __ "}" {
+		return body;
+	}
+
+Exp
+	= Atom
+	/ Lambda
+
+Atom
+	= Literal
+	/ Ident
+
+Literal
+	= Integer
+	/ "true"	{ return true; }
+	/ "false"	{ return false; }
+
+Ident
+	= name:Name {
+		return {type: 'ident', name: name};
+	}
+
+Lambda
+	= ".{" _ args:(LambdaArgs _ "|" _)? body:Statements _ "}" {
+		return {
+			type: 'lambda',
+			args: args ? args[0] : [],
+			body: body
+		}
+	}
+	
+LambdaArgs
+	= head:Name tail:(_ "," _ Name)* {
+		var result = [head];
+		for (var i = 0; i < tail.length; ++i) {
+			result.push(tail[i][3]);
+		}
+		return result;
+	}

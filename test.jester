@@ -1,0 +1,47 @@
+.{ a,b| foo }
+.{ c,d| bar; baz;
+
+while 1 {
+	while false {
+		.{a,b,c|
+			while 3 {
+				.{10}
+			}
+		}
+	}
+}
+
+bleem
+
+}
+1;;;
+
+2
+
+while 1 {
+	1; 2; 3
+	
+
+	4
+
+
+	5;;;;;;
+
+	;;
+
+}
+
+while 1 { }
+while 2 { 2 }
+while 3 { 3; }
+while 4 { 4; 5 }
+while 5 { 6; 7; }
+while 5 { 6; 7;;;; ;;; 
+
+
+}
+
+while 5 { 6; 7;;;; ;;; 
+
+
+8}

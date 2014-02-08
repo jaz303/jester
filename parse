@@ -1,0 +1,4 @@
+#!/bin/bash
+
+./node_modules/pegjs/bin/pegjs grammar.peg && node tp.js test.jester
+

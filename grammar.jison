@@ -98,6 +98,19 @@
  *
  */
 
+%{
+    var i = 0;
+    function iota() { return ++i; }
+
+    var T = {
+        WHILE       : iota(),
+        LOOP        : iota(),
+        BIN_OP      : iota(),
+        RETURN      : iota(),
+        LAMBDA      : iota()
+    };
+%}
+
 %right '='
 %left '||'
 %left '&&'
@@ -116,16 +129,39 @@
 %%
 
 module
-    : statements EOF ;
+    : statements EOF
+        {{ $$ = $1 }}
+    ;
 
 st
     : ';'
     | NL
     ;
 
+nls
+    : NL
+    | nls NL
+    ;
+
+onls
+    :
+    | nls
+    ;
+
+sts
+    : st
+    | sts st
+    ;
+
+osts
+    :
+    | sts
+    ;
+
 statements
-    : st*                   {{ $$ = []; }}
-    | st* statements_inner  {{ $$ = $2; }}
+    : osts
+    | osts statements_inner
+        {{ $$ = $2; }}
     ;
 
 /*
@@ -150,9 +186,11 @@ leading_statements
     | leading_statements leading_statement      {{ $1.push($2); $$ = $1; }}
     ;
 
+
+
 leading_statement
-    : block_statement st*                       {{ $$ = $1; }}
-    | inline_statement st+                      {{ $$ = $1; }}
+    : block_statement osts                      {{ $$ = $1; }}
+    | inline_statement sts                      {{ $$ = $1; }}
     ;
 
 trailing_statement
@@ -172,28 +210,29 @@ block_statement
 inline_statement
     : exp
     | YIELD
+    | return_statement
     ;
 
 block
     : '{' statements '}' ;
 
 while_statement
-    : WHILE exp NL* block
+    : WHILE exp onls block
         {{ $$ = [A.WHILE, $2, $4]; }}
     ;
 
 unconditional_loop_statement
-    : LOOP NL* block
+    : LOOP onls block
         {{ $$ = [A.LOOP, true, $3]; }}
     ;
 
 conditional_loop_statement
-    : LOOP WHILE exp NL* block
+    : LOOP WHILE exp onls block
         {{ $$ = [A.LOOP, $3, $5]; }}
     ;
 
 foreach_statement
-    : FOREACH foreach_iterator IN exp NL* block
+    : FOREACH foreach_iterator IN exp onls block
     ;
 
 foreach_iterator
@@ -202,7 +241,7 @@ foreach_iterator
     ;
 
 if_statement
-    : IF exp NL* block else_ifs? else? ;
+    : IF exp onls block else_ifs? else? ;
 
 else_ifs
     : else_if
@@ -210,14 +249,14 @@ else_ifs
     ;
     
 else_if
-    : ELSE IF NL* block ;
+    : ELSE IF onls block ;
 
 else
-    : ELSE NL* block ;
+    : ELSE onls block ;
 
 function_definition
     : DEF function_name function_params NL* block
-    | DEF function_name NL* block
+    | DEF function_name onls block
     ;
 
 function_name
