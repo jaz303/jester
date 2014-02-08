@@ -11,15 +11,33 @@ start
  * Helpers
  */
 
-WS
+ws
 	= [\t\v\f \u00A0\uFEFF]
+
+identifier_start
+	= [a-zA-Z_]
+
+identifier_rest
+	= [a-zA-Z0-9_]
 
 /*
  * Tokens
  */
 
+WHILE 			= "while"		!identifier_rest
+LOOP 			= "loop"		!identifier_rest
+FOREACH			= "foreach"		!identifier_rest
+DEF				= "def"			!identifier_rest
+TRUE 			= "true"		!identifier_rest
+FALSE 			= "false"		!identifier_rest
+YIELD 			= "yield"		!identifier_rest
+WAIT 			= "wait"		!identifier_rest
+SPAWN			= "spawn"		!identifier_rest
+IF 				= "if"			!identifier_rest
+ELSE 			= "else"		!identifier_rest
+
 _
-	= ( WS )*
+	= ( ws )*
 
 NL
 	= "\n"
@@ -33,7 +51,7 @@ EOF
 	= !.
 
 __
-	= ( WS / NL )*
+	= ( ws / NL )*
 
 Integer
 	= head:[1-9] tail:[0-9_]* {
@@ -41,7 +59,7 @@ Integer
 	}
 
 Name
-	= start:[a-zA-Z_] rest:[a-zA-Z0-9_]* {
+	= start:identifier_start rest:identifier_rest* {
 		return start + rest.join('');
 	}
 
@@ -92,7 +110,7 @@ InlineStatement
 	= Exp
 
 WhileStatement
-	= "while" _ cond:Exp __ body:Block {
+	= WHILE _ cond:Exp __ body:Block {
 		return {
 			type: 'while',
 			condition: cond,
@@ -101,7 +119,7 @@ WhileStatement
 	}
 
 LoopWhileStatement
-	= "loop" _ "while" _ cond:Exp __ body:Block {
+	= LOOP _ WHILE _ cond:Exp __ body:Block {
 		return {
 			type: 'loop',
 			condition: cond,
@@ -110,7 +128,7 @@ LoopWhileStatement
 	}
 
 LoopStatement
-	= "loop" __ body:Block {
+	= LOOP __ body:Block {
 		return {
 			type: 'loop',
 			condition: true,
@@ -133,8 +151,8 @@ Atom
 
 Literal
 	= Integer
-	/ "true"	{ return true; }
-	/ "false"	{ return false; }
+	/ TRUE		{ return true; }
+	/ FALSE 	{ return false; }
 
 Ident
 	= name:Name {
