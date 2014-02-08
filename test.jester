@@ -1,6 +1,10 @@
 .{ a,b| foo }
 .{ c,d| bar; baz;
 
+loop { 1; 2; 3 }
+
+loop while 10 { a; b; c; }
+
 while 1 {
 	while false {
 		.{a,b,c|

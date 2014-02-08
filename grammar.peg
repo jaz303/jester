@@ -85,6 +85,8 @@ TrailingStatement
 
 BlockStatement
 	= WhileStatement
+	/ LoopWhileStatement
+	/ LoopStatement
 
 InlineStatement
 	= Exp
@@ -94,6 +96,24 @@ WhileStatement
 		return {
 			type: 'while',
 			condition: cond,
+			body: body
+		};
+	}
+
+LoopWhileStatement
+	= "loop" _ "while" _ cond:Exp __ body:Block {
+		return {
+			type: 'loop',
+			condition: cond,
+			body: body
+		};
+	}
+
+LoopStatement
+	= "loop" __ body:Block {
+		return {
+			type: 'loop',
+			condition: true,
 			body: body
 		};
 	}
