@@ -6,7 +6,6 @@
  * If statement
  * Array deref
  * Dict deref
- * Color literals
  * Color constructors
  * Vectors
  */
@@ -32,6 +31,18 @@ identifier_start
 
 identifier_rest
     = [a-zA-Z0-9_]
+
+bin_digit
+    = [01]
+
+hex_digit
+    = [0-9a-fA-F]
+
+digit
+    = [0-9]
+
+non_zero_digit
+    = [1-9]
 
 /*
  * Tokens
@@ -67,11 +78,6 @@ EOF
 
 __
     = ( ws / NL )*
-
-Integer
-    = head:[1-9] tail:[0-9_]* {
-        return head + tail.join('');
-    }
 
 Name
     = start:identifier_start rest:identifier_rest* {
@@ -117,7 +123,8 @@ TrailingStatement
     / InlineStatement
 
 BlockStatement
-    = WhileStatement
+    = IfStatement
+    / WhileStatement
     / LoopWhileStatement
     / LoopStatement
     / ForeachStatement
@@ -126,12 +133,37 @@ BlockStatement
 InlineStatement
     = Exp
 
+IfStatement
+    = IF _ cond:Exp __ body:Block elif:ElseIf* el:Else? {
+        var alts = [[cond, body]];
+        for (var i = 0; i < elif.length; ++i) {
+            alts.push(elif[i]);
+        }
+        if (el) {
+            alts.push(el);
+        }
+        return {
+            type    : 'if',
+            clauses : alts
+        };
+    }
+
+ElseIf
+    = __ ELSE _ IF _ cond:Exp __ body:Block {
+        return [cond, body];
+    }
+
+Else
+    = __ ELSE __ body:Block __ {
+        return [null, body];
+    }
+
 WhileStatement
     = WHILE _ cond:Exp __ body:Block {
         return {
-            type: 'while',
-            condition: cond,
-            body: body
+            type        : 'while',
+            condition   : cond,
+            body        : body
         };
     }
 
@@ -247,13 +279,86 @@ Atom
     / Ident
 
 Literal
-    = Integer
+    = Number
+    / Color
     / TRUE      { return true; }
     / FALSE     { return false; }
 
 Ident
     = name:Name {
         return {type: 'ident', name: name};
+    }
+
+Number
+    = Float
+    / Integer
+    / Binary
+    / Hex
+
+Float
+    = rhead:digit rtail:(digit / '_')* '.' ftail:(digit / '_')+ {
+        return {
+            type    : 'float',
+            value   : rhead + rtail.join('') + '.' + ftail.join('')
+        };
+    }
+
+Integer
+    = head:non_zero_digit tail:(digit / '_')* {
+        return head + tail.join('');
+    }
+
+Binary
+    = '0b' head:bin_digit tail:(bin_digit / '_')* {
+        return {
+            type    : 'binary',
+            value   : head + tail.join('')
+        };
+    }
+
+Hex
+    = '0x' head:hex_digit tail:(hex_digit / '_')* {
+        return {
+            type    : 'hex',
+            value   : head + tail.join('')
+        };
+    }
+
+Color
+    = HexColor
+    / NamedColor
+
+HexColor
+    = '#' red:HexComp green:HexComp blue:HexComp alpha:HexComp {
+        return {
+            type    : 'color',
+            red     : red,
+            green   : green,
+            blue    : blue,
+            alpha   : alpha
+        }
+    }
+    / '#' red:HexComp green:HexComp blue:HexComp {
+        return {
+            type    : 'color',
+            red     : red,
+            green   : green,
+            blue    : blue,
+            alpha   : 255
+        }
+    }
+
+HexComp
+    = d1:hex_digit d2:hex_digit {
+        return parseInt(d1 + d2, 16);
+    }
+
+NamedColor
+    = '#' name:Name {
+        return {
+            type    : 'named-color',
+            name    : name
+        }
     }
 
 Lambda
