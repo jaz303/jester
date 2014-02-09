@@ -49,3 +49,11 @@ while 5 { 6; 7;;;; ;;;
 
 
 8}
+
+foreach ix, value in b {
+	
+}
+
+def foo (foo, bar, xyz, z = 1 , a=123,b=true,c=30)  {
+	a; b; c
+}

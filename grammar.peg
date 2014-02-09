@@ -1,4 +1,14 @@
 /*
+ * TODO
+ *
+ * Binary expressions
+ * Unary expressions
+ * If statement
+ * Array deref
+ * Dict deref
+ */
+
+/*
  * Entry
  */
 
@@ -27,6 +37,7 @@ identifier_rest
 WHILE           = "while"       !identifier_rest
 LOOP            = "loop"        !identifier_rest
 FOREACH         = "foreach"     !identifier_rest
+IN              = "in"          !identifier_rest
 DEF             = "def"         !identifier_rest
 TRUE            = "true"        !identifier_rest
 FALSE           = "false"       !identifier_rest
@@ -106,6 +117,8 @@ BlockStatement
     = WhileStatement
     / LoopWhileStatement
     / LoopStatement
+    / ForeachStatement
+    / FunctionDefinition
 
 InlineStatement
     = Exp
@@ -134,6 +147,86 @@ LoopStatement
             type: 'loop',
             condition: true,
             body: body
+        };
+    }
+
+ForeachStatement
+    = FOREACH _ value:Name _ IN _ subject:Exp __ body:Block {
+        return {
+            type        : 'foreach',
+            index       : null,
+            value       : value,
+            subject     : subject,
+            body        : body
+        }
+    }
+    / FOREACH _ index:Name _ ',' _ value:Name _ IN _ subject:Exp __ body:Block {
+        return {
+            type        : 'foreach',
+            index       : index,
+            value       : value,
+            subject     : subject,
+            body        : body
+        };
+    }
+
+FunctionDefinition
+    = DEF _ name:Name _ params:FunctionParameters? __ body:Block {
+        return {
+            type        : 'def',
+            name        : name,
+            params      : params || [],
+            body        : body
+        };
+    }
+
+FunctionParameters
+    = '(' _ req:RequiredFunctionParameters opt:(',' _ OptionalFunctionParameters)? ')' {
+        var params = req;
+        if (opt) {
+            for (var i = 0; i < opt[2].length; ++i) {
+                params.push(opt[2][i]);
+            }
+        }
+        return params;
+    }
+    / '(' _ req:RequiredFunctionParameters ')' {
+        return req;
+    }
+    / '(' _ opt:OptionalFunctionParameters ')' {
+        return opt;
+    }
+
+RequiredFunctionParameters
+    = head:RequiredFunctionParameter tail:(',' _ RequiredFunctionParameter)* {
+        var params = [head];
+        for (var i = 0; i < tail.length; ++i) {
+            params.push(tail[i][2]);
+        }
+        return params;
+    }
+
+RequiredFunctionParameter
+    = name:Name _ !'=' {
+        return {
+            name: name
+        };
+    }
+
+OptionalFunctionParameters
+    = head:OptionalFunctionParameter tail:(',' _ OptionalFunctionParameter)* {
+        var params = [head];
+        for (var i = 0; i < tail.length; ++i) {
+            params.push(tail[i][2]);
+        }
+        return params;
+    }
+
+OptionalFunctionParameter
+    = name:Name _ '=' _ value:Literal _ {
+        return {
+            name: name,
+            value: value
         };
     }
 
@@ -176,4 +269,45 @@ LambdaArgs
             result.push(tail[i][3]);
         }
         return result;
+    }
+
+LiteralArray
+    = '[' _ ']' {
+        return {
+            type    : 'array',
+            values  : []
+        }
+    }
+    / '[' _ head:Exp tail:(',' _ Exp)* ']' {
+        var values = [head];
+        for (var i = 0; i < tail.length; ++i) {
+            values.push(tail[i][2]);
+        }
+        return {
+            type    : 'array',
+            values  : values
+        };
+    }
+
+LiteralDict
+    = '{' _ '}' {
+        return {
+            type    : 'dict',
+            pairs   : [],
+        };
+    }
+    / '{' _ head:Pair tail:(',' _ Pair)* '}' {
+        var pairs = [head];
+        for (var i = 0; i < tail.length; ++i) {
+            pairs.push(tail[i][2]);
+        }
+        return {
+            type    : 'dict',
+            pairs   : pairs
+        };
+    }
+
+Pair
+    = name:Name _ '=' _ value:Exp _ {
+        return [name, value];
     }
