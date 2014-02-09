@@ -57,3 +57,22 @@ foreach ix, value in b {
 def foo (foo, bar, xyz, z = 1 , a=123,b=true,c=30)  {
 	a; b; c
 }
+
+1._2_3_4
+2
+0b110010
+0xaa_ff_12
+
+#red
+#blue
+#salmon
+
+if 1 {
+	1; 2; 3
+} else if foobar {
+
+} else if zzz {
+	ralpha
+}
+
+"\r\n\\foo"

@@ -9,6 +9,16 @@
  * Vectors
  */
 
+ {
+    var ESCAPES = {
+        n       : "\n",
+        r       : "\r",
+        t       : "\t",
+        '\\'    : "\\",
+        '"'     : "\""
+    }
+ }
+
 /*
  * Entry
  */
@@ -280,6 +290,7 @@ Atom
 Literal
     = Number
     / Color
+    / String
     / TRUE      { return true; }
     / FALSE     { return false; }
 
@@ -358,6 +369,22 @@ NamedColor
             type    : 'named-color',
             name    : name
         }
+    }
+
+String
+    = '"' chars:StringChar* '"' {
+        return {
+            type    : 'string',
+            value   : chars.join('')
+        };
+    }
+
+StringChar
+    = '\\' char:[\\rnt"] {
+        return ESCAPES[char];
+    }
+    / ![\\"] char:. {
+        return char;
     }
 
 Lambda
