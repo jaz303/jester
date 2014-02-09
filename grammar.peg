@@ -3,7 +3,6 @@
  *
  * Binary expressions
  * Unary expressions
- * If statement
  * Array deref
  * Dict deref
  * Color constructors
