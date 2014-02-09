@@ -311,6 +311,6 @@ LiteralDict
     }
 
 Pair
-    = name:Name _ '=' _ value:Exp _ {
+    = name:Name _ '=' _ value:Exp {
         return [name, value];
     }
