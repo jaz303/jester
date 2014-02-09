@@ -6,6 +6,9 @@
  * If statement
  * Array deref
  * Dict deref
+ * Color literals
+ * Color constructors
+ * Vectors
  */
 
 /*
