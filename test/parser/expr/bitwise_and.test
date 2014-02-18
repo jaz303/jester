@@ -1,0 +1,5 @@
+1 & 2
+
+-----
+
+{ type: A.MODULE, body: [{type: A.BIN_OP, op: '&', left: 1, right: 2}] }

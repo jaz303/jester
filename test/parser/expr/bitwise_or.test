@@ -1,0 +1,5 @@
+5 | 300
+
+-----
+
+{ type: A.MODULE, body: [{type: A.BIN_OP, op: '|', left: 5, right: 300}] }

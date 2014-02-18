@@ -1,0 +1,5 @@
+#12345630
+
+-----
+
+{ type: A.MODULE, body: [{type: A.COLOR, r: 18, g: 52, b: 86, a: 48}] }

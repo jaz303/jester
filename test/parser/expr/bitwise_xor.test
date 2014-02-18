@@ -1,0 +1,5 @@
+454 ^ 344
+
+-----
+
+{ type: A.MODULE, body: [{type: A.BIN_OP, op: '^', left: 454, right: 344}] }

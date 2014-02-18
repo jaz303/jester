@@ -1,0 +1,5 @@
+true || false
+
+-----
+
+{ type: A.MODULE, body: [{type: A.BIN_OP, op: '||', left: true, right: false}] }

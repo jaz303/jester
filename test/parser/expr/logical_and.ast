@@ -1,3 +1,0 @@
-(module
-    (body
-        (expr (&& true false))))

@@ -1,0 +1,5 @@
+$a_global
+
+-----
+
+{ type: A.MODULE, body: [{type: A.GLOBAL_IDENT, name: 'a_global'}] }

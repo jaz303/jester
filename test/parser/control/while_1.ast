@@ -1,6 +1,0 @@
-(module
-    (body
-        (while true (
-            (ident a)
-            (ident b)
-            (ident c)))))

@@ -1,0 +1,8 @@
+.{ true }
+-----
+{ type: A.MODULE, body: [
+	{ 	type: A.LAMBDA,
+		args: [],
+		body: [true]
+	}
+] }

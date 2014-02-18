@@ -1,0 +1,17 @@
+loop {
+	a
+	b
+	c
+}
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.LOOP,
+		condition: true,
+		body: [
+			{type: A.IDENT, name: 'a'},
+			{type: A.IDENT, name: 'b'},
+			{type: A.IDENT, name: 'c'}
+		]
+	}
+] }

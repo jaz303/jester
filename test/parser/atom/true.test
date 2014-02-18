@@ -1,0 +1,5 @@
+true
+
+-----
+
+{ type: A.MODULE, body: [true] }

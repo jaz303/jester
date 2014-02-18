@@ -1,0 +1,9 @@
+.{ a , b,c,d,  e, f | true }
+-----
+
+{ type: A.MODULE, body: [
+	{ 	type: A.LAMBDA,
+		args: ['a', 'b', 'c', 'd', 'e', 'f'],
+		body: [true]
+	}
+] }
