@@ -3,23 +3,19 @@
 var SYMBOLS     = require('./tokens').symbolsToTokens,
     KEYWORDS    = require('./tokens').keywords;
 
-function space_p(ch) {
-    return ch === ' ' || ch === '\t';
-}
-
 module.exports = function() {
 
     var TOKENS = [
         // symbols
-        {   pattern: /^(<=|>=|<<|>>|==|\?|\!=|\*\*|\|\||&&|\.\{|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
+        {   pattern: /^(<=|>=|<<|>>|==|\?|\!=|\*\*|\|\||&&|\||&|\.\{|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
             cb: function(match) {
-                return SYMBOLS[match[0]];
+                return SYMBOLS[match[0]] || match[0];
             }
         },
         // foo, bar, return
         {   pattern: /^[a-zA-Z_][a-zA-Z0-9_]*[\!\?]?/,
             cb: function(match) {
-                return KEYWORDS[text] || 'IDENT';
+                return KEYWORDS[match[0]] || 'IDENT';
             }
         },
         // 0xb1010, 0xffff
@@ -58,113 +54,115 @@ module.exports = function() {
 
     var N_TOKENS  = TOKENS.length;
 
-    var src,        /* source we're scanning */
-        p,          /* current position in src */
-        len,        /* length of src */
-        tok,        /* result of last call to nextToken() */
-        text,       /* parsed text of last token */
-        error,      /* error */
-        curLine,
-        curCol,
-        tokLine,
-        tokCol;
+    var src, len;
 
-    function more() { return p < len - 1; }
-    function two_more() { return p < len - 2; }
-    function adv(n) { n = n || 1; p += n; curCol += n; }
+    function start(input) {
+
+        src = input;
+        len = input.length;
+
+        return {
+            p           : 0,        // current position in text
+            text        : null,     // text of last token
+            error       : null,     // last error
+            line        : null,     // start line of last token
+            column      : null,     // start column of last token
+            scanLine    : 1,        // current line
+            scanColumn  : 1,        // current column
+        };
     
-    function setInput(input) {
-        src         = input;
-        p           = 0;
-        len         = input.length;
-        tok         = null;
-        text        = null;
-        error       = null;
-        curLine     = 1;
-        curCol      = 1;
-        tokLine     = null;
-        tokCol      = null;
     }
 
-    function nextToken() {
-        
-        text = null;
-        
-        if (p === len)
+    function clone(state) {
+        return {
+            p           : state.p,
+            text        : state.text,
+            error       : state.error,
+            line        : state.line,
+            column      : state.column,
+            scanLine    : state.scanLine,
+            scanColumn  : state.scanColumn
+        };
+    }
+
+    function more(s) { return s.p < len - 1; }
+    function two_more(s) { return s.p < len - 2; }
+    function adv(s, n) { s.p += n; s.scanColumn += n; }
+
+    function nextToken(s) {
+
+        if (s.p === len)
             return 'EOF';
         
         // skip whitespace
-        if (space_p(src[p])) {
-            while (space_p(src[p])) {
-                adv();
-                if (p === len)
+        if (src[s.p] === ' ' || src[s.p] === '\t') {
+            while (src[s.p] === ' ' || src[s.p] === '\t') {
+                adv(s, 1);
+                if (s.p === len)
                     return 'EOF';
             }
             // compose operator requires surrounding space e.g. ' . '
             // it's the only time space is significant so it's easiest just to
             // special-case it here.
-            if (src[p] === '.' && more() && src[p+1] === ' ') {
-                adv(2);
+            if (src[s.p] === '.' && more(s) && src[s.p+1] === ' ') {
+                adv(s, 2);
                 return 'COMPOSE';
             }
         }
         
         // skip comments
-        if (src[p] === '-' && more() && src[p+1] === '-') {
-            adv(2);
+        if (src[s.p] === '-' && more(s) && src[s.p+1] === '-') {
+            adv(s, 2);
             while (true) {
-                if (p === len)
+                if (s.p === len)
                     return 'EOF';
-                if (src[p] === '\r' || src[p] === '\n')
+                if (src[s.p] === '\r' || src[s.p] === '\n')
                     break;
-                adv();
+                adv(s, 1);
             }
         }
         
         // if we get to this point we known we're at a token
         // stash its position in the source.
-        tokLine = curLine;
-        tokCol = curCol;
+        s.line      = s.scanLine;
+        s.column    = s.scanColumn;
         
         // newline
-        if (src[p] === '\n') {
-            p++;
-            curLine++;
-            curCol = 1;
+        if (src[s.p] === '\n') {
+            s.p++;
+            s.scanLine++;
+            s.scanColumn = 1;
             return 'NL';
-        } else if (src[p] === '\r') {
-            if (more() && src[p+1] === '\n') {
-                p++;
+        } else if (src[s.p] === '\r') {
+            if (more(s) && src[s.p+1] === '\n') {
+                s.p++;
             }
-            p++;
-            curLine++;
-            curCol = 1;
+            s.p++;
+            s.scanLine++;
+            s.scanColumn = 1;
             return 'NL';
         }
 
-        var remainder = src.substring(p);
+        var remainder = src.substring(s.p);
 
         for (var i = 0; i < N_TOKENS; ++i) {
             var matchResult = TOKENS[i].pattern.exec(remainder);
             if (matchResult) {
-                adv(matchResult[0].length);
-                text = matchResult[0];
+                adv(s, matchResult[0].length);
+                s.text = matchResult[0];
                 return TOKENS[i].cb(matchResult);
             }
         }
 
-        error = "unexpected character in input: '" + ch + "'";
+        s.error = "unexpected character in input: '" + ch + "'";
         return 'ERROR';
 
     }
     
     return {
-        lex           : nextToken,                      /* advance to next token and return */
-        setInput      : setInput,
-        text          : function() { return text; },    /* text of current token */
-        error         : function() { return error; },   /* error message */
-        line          : function() { return tokLine; }, /* start line of current token */
-        column        : function() { return tokCol; }   /* start column of current token */
+        start   : start,
+        clone   : clone,
+        lex     : nextToken     /* advance to next token and return */
     };
     
 };

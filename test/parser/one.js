@@ -1,23 +1,25 @@
 var $ = require('../_prelude');
 
-var rfs = require('fs').readFileSync;
+var rfs     = require('fs').readFileSync,
+    inspect = require('util').inspect;
 
 var input   = process.argv[2]
     output  = process.argv[3],
     source  = rfs(input, {encoding: 'utf8'}),
     expect  = rfs(output, {encoding: 'utf8'}),
-    lexer   = $.jester.lexer(),
-    parser  = $.jester.parser(lexer);
-
-lexer.setInput(source);
+    parser  = $.jester.parser(source);
 
 function sanitise(code) {
     return code.replace(/\t/g, '    ').trim();
 }
 
 try {
+
+    var result = parser.parseModule();
+
+    console.log(inspect(result, {colors: true, depth: null}));
     
-    var pretty = $.jester.prettyPrint(parser.parseModule());
+    var pretty = $.jester.prettyPrint(result);
 
     if (sanitise(pretty) !== sanitise(expect)) {
 

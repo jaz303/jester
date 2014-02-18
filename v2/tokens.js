@@ -21,40 +21,11 @@ function addKeywords(kws) {
 }
 
 addSymbols({
-    'SUB'           : '-',
-    'ADD'           : '+',
-    'MUL'           : '*',
-    'DIV'           : '/',
-    'POW'           : '**',
-    'MOD'           : '%',
-    'BANG'          : '!',
-    'LT'            : '<',
-    'GT'            : '>',
-    'LE'            : '<=',
-    'GE'            : '>=',
-    'EQ'            : '==',
-    'NEQ'           : '!=',
-    'L_AND'         : '&&',
-    'L_OR'          : '||',
-    'L_SHIFT'       : '<<',
-    'R_SHIFT'       : '>>',
-    'AMP'           : '&',
-    'PIPE'          : '|',
-    'HAT'           : '^',
-    'TILDE'         : '~',
-    'ASSIGN'        : '=',
     'QUESTION'      : '?',
-    'SEMICOLON'     : ';',
-    'COMMA'         : ',',
     'DOT'           : '.',
     'COMPOSE'       : ' . ',
-    'LAMBDA_BRACE'  : '.{',
-    'L_BRACE'       : '{',
-    'R_BRACE'       : '}',
     'L_BRACKET'     : '[',
-    'R_BRACKET'     : ']',
-    'L_PAREN'       : '(',
-    'R_PAREN'       : ')'
+    'R_BRACKET'     : ']'
 });
 
 addTokens([
