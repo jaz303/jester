@@ -1,0 +1,16 @@
+if a {
+	1
+}
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.IF,
+		conditions: [
+			{type: A.IDENT, name: 'a'}
+		],
+		bodies: [
+			[{type: A.INTEGER, value: 1}]
+		]
+	}
+] }

@@ -163,6 +163,8 @@ module.exports = function(input) {
             return parseLoopStatement();
         } else if (curr === 'FOREACH') {
             return parseForeachStatement();
+        } else if (curr === 'IF') {
+            return parseIfStatement();
         } else {
             error("expected 'while', 'loop'");
         }
@@ -238,7 +240,39 @@ module.exports = function(input) {
 
         skipNewlines();
         node.body = parseBlock();
-        
+
+        return node;
+
+    }
+
+    function parseIfStatement() {
+
+        var node = { type: A.IF, conditions: [], bodies: [], line: state.line };
+
+        accept('IF');
+
+        node.conditions.push(parseExpression());
+        skipNewlines();
+        node.bodies.push(parseBlock());
+        skipNewlines();
+
+        while (curr === 'ELSE') {
+            next();
+            if (curr === 'IF') {
+                next();
+                node.conditions.push(parseExpression());
+                skipNewlines();
+                node.bodies.push(parseBlock());
+                skipNewlines();
+            } else {
+                skipNewlines();
+                node.conditions.push(null);
+                node.bodies.push(parseBlock());
+                skipNewlines();
+                break;
+            }
+        }
+
         return node;
 
     }
