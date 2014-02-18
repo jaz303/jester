@@ -165,6 +165,8 @@ module.exports = function(input) {
             return parseForeachStatement();
         } else if (curr === 'IF') {
             return parseIfStatement();
+        } else if (curr === 'DEF') {
+            return parseFunctionDefinition();
         } else {
             error("expected 'while', 'loop'");
         }
@@ -275,6 +277,58 @@ module.exports = function(input) {
 
         return node;
 
+    }
+
+    function parseFunctionDefinition() {
+
+        var node = { type: A.DEF };
+
+        accept('DEF');
+
+        if (curr !== 'IDENT') {
+            error("expected identifier", 'IDENT');
+        }
+
+        node.name = state.text;
+        next();
+
+        if (curr === '(') {
+            next();
+            node.params = parseFunctionParameters();
+            accept(')');
+        } else {
+            node.params = [];
+        }
+
+        skipNewlines();
+        node.body = parseBlock();
+
+        return node;
+
+    }
+
+    function parseFunctionParameters() {
+        var params = [], optional = false;
+        while (curr === 'IDENT') {
+            var param = {name: state.text, optional: false};
+            next();
+            if (curr === '=') {
+                next();
+                param.optional = true;
+                // FIXME: shouldn't be allowing full expressions in here
+                param.defaultValue = parseExpression();
+                optional = true;
+            } else if (optional) {
+                error("required parameters cannot follow optional parameters");
+            }
+            params.push(param);
+            if (curr === ',') {
+                next();
+            } else {
+                break;
+            }
+        }
+        return params;
     }
 
     function parseReturnStatement() {

@@ -1,0 +1,19 @@
+def foo(a, c = 10, d = 20) {
+	1
+}
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.DEF,
+		name: 'foo',
+		params: [
+			{name: 'a', optional: false},
+			{name: 'c', optional: true, defaultValue: {type: A.INTEGER, value: 10}},
+			{name: 'd', optional: true, defaultValue: {type: A.INTEGER, value: 20}}
+		],
+		body: [
+			{type: A.INTEGER, value: 1}
+		]
+	}
+] }
