@@ -2,4 +2,4 @@
 
 -----
 
-{ type: A.MODULE, body: [6] }
+{ type: A.MODULE, body: [{type: A.INTEGER, value: 6}] }

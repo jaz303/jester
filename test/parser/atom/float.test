@@ -2,4 +2,4 @@
 
 -----
 
-{ type: A.MODULE, body: [510.8] }
+{ type: A.MODULE, body: [{type: A.FLOAT, value: 510.8}] }

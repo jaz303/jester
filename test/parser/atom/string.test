@@ -2,4 +2,4 @@
 
 -----
 
-{ type: A.MODULE, body: ["hello"] }
+{ type: A.MODULE, body: [{type: A.STRING, value: "hello"}] }

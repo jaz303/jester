@@ -2,4 +2,4 @@
 
 -----
 
-{ type: A.MODULE, body: [{type: A.BIN_OP, op: '|', left: 5, right: 300}] }
+{ type: A.MODULE, body: [{type: A.BIN_OP, op: '|', left: {type: A.INTEGER, value: 5}, right: {type: A.INTEGER, value: 300}}] }

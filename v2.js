@@ -6,5 +6,6 @@ module.exports = {
     lexer       : require('./v2/lexer'),
     parser      : require('./v2/parser'),
     prettyPrint : require('./v2/ast_printer'),
-    ParseError  : require('./v2/parse_error')
+    ParseError  : require('./v2/parse_error'),
+	ast 		: require('./v2/ast_nodes')
 };

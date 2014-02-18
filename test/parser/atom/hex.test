@@ -2,4 +2,4 @@
 
 -----
 
-{ type: A.MODULE, body: [65298] }
+{ type: A.MODULE, body: [{type: A.INTEGER, value: 65298}] }

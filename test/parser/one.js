@@ -1,47 +1,38 @@
 var $ = require('../_prelude');
 
-var rfs     = require('fs').readFileSync,
+var source  = require('fs').readFileSync(process.argv[2], {encoding: 'utf8'}),
+    chunks  = source.split('-----'),
+    A       = $.jester.ast,
+    expect  = eval('(' + chunks[1] + ')'),
+    eq      = require('assert').deepEqual,
     inspect = require('util').inspect;
 
-var input   = process.argv[2]
-    output  = process.argv[3],
-    source  = rfs(input, {encoding: 'utf8'}),
-    expect  = rfs(output, {encoding: 'utf8'}),
-    parser  = $.jester.parser(source);
-
-function sanitise(code) {
-    return code.replace(/\t/g, '    ').trim();
+// remove line numbers from AST, don't care about testing it here
+function zap(tree) {
+    if (Array.isArray(tree)) {
+        tree.forEach(zap);
+    } else if (tree && typeof tree === 'object') {
+        if ('line' in tree) delete tree.line;
+        for (var k in tree) {
+            zap(tree[k]);
+        }
+    }
+    return tree;
 }
 
 try {
-
-    var result = parser.parseModule();
-
-    console.log(inspect(result, {colors: true, depth: null}));
-    
-    var pretty = $.jester.prettyPrint(result);
-
-    if (sanitise(pretty) !== sanitise(expect)) {
-
-        console.log("Expected");
-        console.log("--------");
-        console.log(expect);
-        
-        console.log("\nActual");
-        console.log("------");
-        console.log(pretty);
-
-        throw new Error("fail: " + input);
-    }
-
+    var result = $.jester.parser(chunks[0]).parseModule();
+    eq(zap(result), zap(expect));
 } catch (e) {
-    if (e instanceof $.jester.ParseError) {
-        console.log(input + ": " + (e.message || "parse error"));
-        console.log("expected token: " + e.expectedToken);
-        console.log("actual token: " + e.actualToken);
+    if (e.name === 'AssertionError') {
+        console.log("Expected\n---------");
+        console.log(inspect(expect, {colors: true, depth: null}));
+        console.log('');
+        console.log("Actual\n------");
+        console.log(inspect(result, {colors: true, depth: null}));
+        console.log('');
     } else {
-        console.log(e.message);
+        console.log(e); 
     }
-    
     process.exit(1);
 }
