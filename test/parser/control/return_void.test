@@ -1,0 +1,9 @@
+return
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.RETURN,
+		exp: null
+	}
+] }

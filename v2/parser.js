@@ -56,6 +56,10 @@ module.exports = function(input) {
                 || curr === 'DEF';
     }
 
+    function eof() {
+        return curr === 'EOF';
+    }
+
     function atBlockTerminator() {
         return curr === '}';
     }
@@ -172,7 +176,11 @@ module.exports = function(input) {
     }
 
     function parseInlineStatement() {
-        return parseExpression();
+        if (curr === 'RETURN') {
+            return parseReturnStatement();
+        } else {
+            return parseExpression();
+        }
     }
 
     function parseWhileStatement() {
@@ -197,6 +205,17 @@ module.exports = function(input) {
         }
         skipNewlines();
         node.body = parseBlock();
+        return node;
+    }
+
+    function parseReturnStatement() {
+        var node = { type: A.RETURN, exp: null, line: state.line };
+        accept('RETURN');
+        if (eof() || atBlockTerminator() || atStatementTerminator()) {
+            // do nothing
+        } else {
+            node.exp = parseExpression();
+        }
         return node;
     }
     
