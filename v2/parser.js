@@ -48,6 +48,14 @@ module.exports = function(input) {
         );
     }
 
+    function atBlockStatementStart() {
+        return curr === 'IF'
+                || curr === 'WHILE'
+                || curr === 'LOOP'
+                || curr === 'FOREACH'
+                || curr === 'DEF';
+    }
+
     function atBlockTerminator() {
         return curr === '}';
     }
@@ -122,7 +130,7 @@ module.exports = function(input) {
 
     }
 
-    function parseStatementBlock() {
+    function parseBlock() {
         accept('{');
         var statements = parseStatements();
         accept('}');
@@ -130,24 +138,41 @@ module.exports = function(input) {
     }
 
     function parseStatements() {
+        
         var statements = [];
+
         skipStatementTerminators();
+
         while (curr !== 'EOF' && curr !== '}') {
-            statements.push(parseStatement());
+            if (atBlockStatementStart()) {
+                statements.push(parseBlockStatement());
+                skipStatementTerminators();
+            } else {
+                statements.push(parseInlineStatement());
+                if (atStatementTerminator()) {
+                    skipStatementTerminators();
+                } else {
+                    break;
+                }
+            }
         }
+
         return statements;
+
     }
 
-    function parseStatement() {
+    function parseBlockStatement() {
         if (curr === 'WHILE') {
             return parseWhileStatement();
         } else if (curr === 'LOOP') {
             return parseLoopStatement();
         } else {
-            var stmt = parseExpression();
-            eos();
-            return stmt;
+            error("expected 'while', 'loop'");
         }
+    }
+
+    function parseInlineStatement() {
+        return parseExpression();
     }
 
     function parseWhileStatement() {
@@ -156,7 +181,7 @@ module.exports = function(input) {
         var node = { type: A.WHILE, line: line };
         node.condition = parseExpression();
         skipNewlines();
-        node.body = parseStatementBlock();
+        node.body = parseBlock();
         return node;
     }
 
@@ -171,7 +196,7 @@ module.exports = function(input) {
             node.condition = true;
         }
         skipNewlines();
-        node.body = parseStatementBlock();
+        node.body = parseBlock();
         return node;
     }
     
