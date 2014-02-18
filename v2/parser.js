@@ -78,15 +78,6 @@ module.exports = function(input) {
             next();
     }
 
-    function eos() {
-        if (atStatementTerminator()) {
-            next();
-            skipStatementTerminators();
-        } else {
-            error("expected: end-of-statement (newline or semicolon)");
-        }
-    }
-
     //
     // decoders
 
@@ -147,7 +138,7 @@ module.exports = function(input) {
 
         skipStatementTerminators();
 
-        while (curr !== 'EOF' && curr !== '}') {
+        while (!atBlockTerminator() && !eof()) {
             if (atBlockStatementStart()) {
                 statements.push(parseBlockStatement());
                 skipStatementTerminators();
@@ -170,6 +161,8 @@ module.exports = function(input) {
             return parseWhileStatement();
         } else if (curr === 'LOOP') {
             return parseLoopStatement();
+        } else if (curr === 'FOREACH') {
+            return parseForeachStatement();
         } else {
             error("expected 'while', 'loop'");
         }
@@ -206,6 +199,48 @@ module.exports = function(input) {
         skipNewlines();
         node.body = parseBlock();
         return node;
+    }
+
+    function parseForeachStatement() {
+        
+        var node    = { type: A.FOREACH, line: state.line },
+            i1      = null,
+            i2      = null;
+
+        accept('FOREACH');
+
+        if (curr !== 'IDENT') {
+            error("expected identifier", 'IDENT');
+        }
+
+        i1 = state.text;
+        next();
+
+        if (curr === ',') {
+            next();
+            if (curr !== 'IDENT') {
+                error("expected identifier", 'IDENT');
+            }
+            i2 = state.text;
+            next();
+        }
+
+        if (i2) {
+            node.index = i1;
+            node.value = i2;
+        } else {
+            node.index = null;
+            node.value = i1;
+        }
+
+        accept('IN');
+        node.exp = parseExpression();
+
+        skipNewlines();
+        node.body = parseBlock();
+        
+        return node;
+
     }
 
     function parseReturnStatement() {

@@ -52,6 +52,7 @@ addKeywords({
     'EVAL'          : 'eval',
     'MY'            : 'my',
     'FOREACH'       : 'foreach',
+    'IN'            : 'in',
     'RETURN'        : 'return',
     'IMPORT'        : 'import',
     'IMPORT_BANG'   : 'import!',

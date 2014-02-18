@@ -1,0 +1,16 @@
+foreach a,b in foo {
+	1
+}
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.FOREACH,
+		index: 'a',
+		value: 'b',
+		exp: {type: A.IDENT, name: 'foo'},
+		body: [
+			{type: A.INTEGER, value: 1}
+		]
+	}
+] }
