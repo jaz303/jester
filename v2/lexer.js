@@ -1,7 +1,6 @@
 "use strict";
 
-var SYMBOLS     = require('./tokens').symbolsToTokens,
-    KEYWORDS    = require('./tokens').keywords;
+var KEYWORDS = require('./tokens').keywords;
 
 module.exports = function() {
 
@@ -9,7 +8,7 @@ module.exports = function() {
         // symbols
         {   pattern: /^(<=|>=|<<|>>|==|\?|\!=|\*\*|\|\||&&|\||&|\.\{|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
             cb: function(match) {
-                return SYMBOLS[match[0]] || match[0];
+                return match[0];
             }
         },
         // foo, bar, return
@@ -34,7 +33,7 @@ module.exports = function() {
         // $, $foo
         {   pattern: /^\$([a-zA-Z_][a-zA-Z0-9_]*)?/,
             cb: function(match) {
-                return (match[0].length === 1) ? 'DOLLAR' : 'GLOBAL_IDENT';
+                return (match[0].length === 1) ? '$' : 'GLOBAL_IDENT';
             }
         },
         // #, #red, #ff0000

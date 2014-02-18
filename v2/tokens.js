@@ -20,19 +20,10 @@ function addKeywords(kws) {
     }
 }
 
-addSymbols({
-    'QUESTION'      : '?',
-    'DOT'           : '.',
-    'COMPOSE'       : ' . ',
-    'L_BRACKET'     : '[',
-    'R_BRACKET'     : ']'
-});
-
 addTokens([
-    'NEWLINE',          // \n
+    'NL',               // \n
 
     'IDENT',
-    'DOLLAR',
     'GLOBAL_IDENT',
     'INTEGER',
     'FLOAT',
