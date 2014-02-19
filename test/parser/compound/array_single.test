@@ -1,0 +1,11 @@
+[1]
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.ARRAY,
+		elements: [
+			{ type: A.INTEGER, value: 1 }
+		]
+	}
+] }

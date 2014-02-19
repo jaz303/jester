@@ -31,6 +31,9 @@ var nextAstNode = 1;
     'GLOBAL_OBJECT',
     'LAMBDA',
 
+    'ARRAY',
+    'DICT',
+
     'ARRAY_DEREF',
     'PROP_DEREF',
 

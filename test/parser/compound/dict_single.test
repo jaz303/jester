@@ -1,0 +1,12 @@
+{a = 1}
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.DICT,
+		pairs: [
+			'a',
+			{ type: A.INTEGER, value: 1 }
+		]
+	}
+] }

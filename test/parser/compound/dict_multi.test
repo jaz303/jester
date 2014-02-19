@@ -1,0 +1,16 @@
+{a = 1, b = 2, c = 3}
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.DICT,
+		pairs: [
+			'a',
+			{ type: A.INTEGER, value: 1 },
+			'b',
+			{ type: A.INTEGER, value: 2 },
+			'c',
+			{ type: A.INTEGER, value: 3 }
+		]
+	}
+] }

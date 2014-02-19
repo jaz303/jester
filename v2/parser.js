@@ -48,6 +48,10 @@ module.exports = function(input) {
         );
     }
 
+    function noident() {
+        error('expected identifier', 'IDENT');
+    }
+
     function atBlockStatementStart() {
         return curr === 'IF'
                 || curr === 'WHILE'
@@ -739,6 +743,10 @@ module.exports = function(input) {
             next();
             exp = parseExpression();
             accept(')');
+        } else if (at('[')) {
+            exp = parseArray();
+        } else if (at('{')) {
+            exp = parseDictionary();
         } else if (at('.{')) {
             exp = parseLambda();
         } else {
@@ -773,6 +781,49 @@ module.exports = function(input) {
         }
         accept(')');
         return args;
+    }
+
+    function parseArray() {
+        var els = [], line = state.line;
+        accept('[');
+        if (curr !== ']') {
+            while (true) {
+                els.push(parseExpression());
+                if (curr === ',') {
+                    next();
+                } else {
+                    break;
+                }
+            }    
+        }
+        accept(']');
+        return { type: A.ARRAY, elements: els, line: line };
+    }
+
+    function parseDictionary() {
+        var pairs = [], line = state.line;
+        accept('{');
+        if (curr !== '}') {
+            while (true) {
+                if (curr === 'STRING') {
+                    pairs.push(decodeString(state.text));
+                } else if (curr === 'IDENT') {
+                    pairs.push(state.text);
+                } else {
+                    error("dictionary key must be either string or identifier");
+                }
+                next();
+                accept('=');
+                pairs.push(parseExpression());
+                if (curr === ',') {
+                    next();
+                } else {
+                    break;
+                }
+            }
+        }
+        accept('}');
+        return { type: A.DICT, pairs: pairs, line: line };
     }
 
     function parseLambda() {

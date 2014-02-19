@@ -1,0 +1,9 @@
+{}
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.DICT,
+		pairs: []
+	}
+] }
