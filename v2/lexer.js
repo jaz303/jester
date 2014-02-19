@@ -39,7 +39,7 @@ module.exports = function() {
         // #, #red, #ff0000
         {   pattern: /^#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[a-zA-Z_]+)?/,
             cb: function(match) {
-                return (match[0].length === 1) ? 'POUND' : 'COLOR';
+                return (match[0].length === 1) ? '#' : 'COLOR';
             }
         },
         // strings

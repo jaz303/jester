@@ -1,0 +1,9 @@
+#()
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.COLOR_CTOR,
+		args: []
+	}
+] }

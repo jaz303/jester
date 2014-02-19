@@ -557,13 +557,15 @@ module.exports = function(input) {
             };
             next();
         } else if (at('$')) {
-            exp = {
-                type: A.GLOBAL_OBJECT
-            };
+            exp = { type: A.GLOBAL_OBJECT };
             next();
         } else if (at('COLOR')) {
             exp = decodeColor(text());
             next();
+        } else if (at('#')) {
+            exp = { type: A.COLOR_CTOR };
+            next();
+            exp.args = parseParenArgs();
         } else if (at('(')) {
             next();
             exp = parseExpression();
@@ -575,6 +577,21 @@ module.exports = function(input) {
         }
 
         return exp;
+    }
+
+    function parseParenArgs() {
+        var args = [];
+        accept('(');
+        while (curr !== ')') {
+            args.push(parseExpression());
+            if (curr === ',') {
+                next();
+            } else {
+                break;
+            }
+        }
+        accept(')');
+        return args;
     }
 
     function parseLambda() {
