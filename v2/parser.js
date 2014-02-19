@@ -48,6 +48,11 @@ module.exports = function(input) {
         );
     }
 
+    function requireident() {
+        if (curr !== 'IDENT')
+            noident();
+    }
+
     function noident() {
         error('expected identifier', 'IDENT');
     }
@@ -172,17 +177,13 @@ module.exports = function(input) {
                     next();
                     node.imports = {};
                     while (true) {
-                        if (curr !== 'IDENT') {
-                            error("expected identifier");
-                        }
+                        requireident();
                         var ident = state.text,
                             alias = ident;
                         next();
                         if (curr === 'AS') {
                             next();
-                            if (curr !== 'IDENT') {
-                                error("expected: identifier");
-                            }
+                            requireident();
                             alias = state.text;
                             next();
                         }
@@ -200,9 +201,7 @@ module.exports = function(input) {
                         error("bang-imported modules cannot be aliased");
                     }
                     next();
-                    if (curr !== 'IDENT') {
-                        error("expected identifier");
-                    }
+                    requireident();
                     node.alias = state.text;
                     next();
                 }
@@ -216,17 +215,13 @@ module.exports = function(input) {
                 };
                 next();
                 while (true) {
-                    if (curr !== 'IDENT') {
-                        error("expected identifier");
-                    }
+                    requireident();
                     var ident = state.text,
                         alias = ident;
                     next();
                     if (curr === 'AS') {
                         next();
-                        if (curr !== 'IDENT') {
-                            error("expected identifier");
-                        }
+                        requireident();
                         alias = state.text;
                         next();
                     }
@@ -246,9 +241,7 @@ module.exports = function(input) {
                     exports : null
                 };
                 next();
-                if (curr !== 'IDENT') {
-                    error("expected identifier");
-                }
+                requireident();
                 node.exports = state.text;
                 next();
                 ports.push(node);
@@ -351,18 +344,14 @@ module.exports = function(input) {
 
         accept('FOREACH');
 
-        if (curr !== 'IDENT') {
-            error("expected identifier", 'IDENT');
-        }
+        requireident();
 
         i1 = state.text;
         next();
 
         if (curr === ',') {
             next();
-            if (curr !== 'IDENT') {
-                error("expected identifier", 'IDENT');
-            }
+            requireident();
             i2 = state.text;
             next();
         }
@@ -423,9 +412,7 @@ module.exports = function(input) {
 
         accept('DEF');
 
-        if (curr !== 'IDENT') {
-            error("expected identifier", 'IDENT');
-        }
+        requireident();
 
         node.name = state.text;
         next();
