@@ -2,7 +2,7 @@
 
 ## Parser
 
-  * Imports/exports
+  * <del>Imports/exports</del>
   * <del>Blocks</del>
   * <del>foreach</del>
   * <del>while</del>
@@ -33,7 +33,8 @@
   * <del>yield</del>
   * <del>eval</del>
   * <del>partial application</del>
-
+  * <del>array literals</del>
+  * <del>dictionary literals</del>
 
 ## Bugs
 
