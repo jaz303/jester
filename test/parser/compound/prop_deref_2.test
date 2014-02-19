@@ -1,0 +1,18 @@
+foo.bar.baz
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.PROP_DEREF,
+		subject: {
+			type: A.PROP_DEREF,
+			subject: {
+				type: A.IDENT,
+				name: 'foo' 
+			},
+			name: 'bar'
+		},
+		name: 'baz'
+	}
+	
+] }
