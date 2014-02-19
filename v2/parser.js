@@ -548,6 +548,11 @@ module.exports = function(input) {
                 name: text().substring(1)
             };
             next();
+        } else if (at('$')) {
+            exp = {
+                type: A.GLOBAL_OBJECT
+            };
+            next();
         } else if (at('COLOR')) {
             exp = decodeColor(text());
             next();
