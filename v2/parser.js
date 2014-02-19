@@ -5,6 +5,38 @@ var L           = require('./lexer'),
     COLORS      = require('./colors'),
     ParseError  = require('./parse_error');
 
+// Issues with the current version of the parser:
+//
+// 1) no-paren function calls are unimplemented
+//
+// 2) no-paren function calls cannot support literal array as first argument;
+// i.e. "foo [1]" is parsed as an indexing operation on 'foo'... to allow this
+// we'd need to distinguish between "[" and " [" in the lexer (like with the
+// COMPOSE operator) and shove a bunch of special cases in the parser. not pretty
+// but it'll work fine.
+
+// exhaustive list of tokens that can follow an identifier
+// to allow a function call without parens.
+var EXP_START_TOKENS = {
+    '!'             : true,
+    '~'             : true,
+    '.{'            : true,
+    '{'             : true,
+    '#'             : true,
+    '$'             : true,
+    'TRUE'          : true,
+    'FALSE'         : true,
+    'INTEGER'       : true,
+    'HEX'           : true,
+    'BINARY'        : true,
+    'FLOAT'         : true,
+    'STRING'        : true,
+    'TRACE'         : true,
+    'IDENT'         : true,
+    'GLOBAL_IDENT'  : true,
+    'COLOR'         : true
+};
+
 module.exports = function(input) {
 
     var lexer   = L(),
