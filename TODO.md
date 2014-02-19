@@ -24,14 +24,14 @@
   * <del>ident</del>
   * <del>global ident</del>
   * <del>color literal</del>
-  * color ctor
-  * global object
-  * function call
+  * <del>color ctor</del>
+  * <del>global object</del>
+  * <del>function call</del>
   * function call - no paren
-  * property lookup
-  * array access
-  * yield
-  * eval
+  * <del>property lookup</del>
+  * <del>array access</del>
+  * <del>yield</del>
+  * <del>eval</del>
 
 
 ## Bugs
