@@ -495,8 +495,19 @@ module.exports = function(input) {
                 curr = curr.exp;
                 next();
             }
-            curr.exp = parseAtom();
+            curr.exp = parseEval();
             return root;
+        } else {
+            return parseEval();
+        }
+    }
+
+    function parseEval() {
+        if (curr === 'EVAL') {
+            var node = { type: A.EVAL, line: state.line };
+            next();
+            node.code = parseExpression();
+            return node;
         } else {
             return parseAtom();
         }

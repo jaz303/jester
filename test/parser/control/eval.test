@@ -1,0 +1,9 @@
+eval "foo bar baz"
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.EVAL,
+		code: { type: A.STRING, value: "foo bar baz" }
+	}
+] }

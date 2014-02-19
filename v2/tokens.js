@@ -60,7 +60,8 @@ addKeywords({
     'IMPORT_BANG'   : 'import!',
     'EXPORT'        : 'export',
     'EXPORT_BANG'   : 'export!',
-    'AS'            : 'as'
+    'AS'            : 'as',
+    'EVAL'          : 'eval'
 });
 
 exports.symbolsToTokens = SYMBOLS_TO_TOKENS;
