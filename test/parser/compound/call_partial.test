@@ -1,0 +1,14 @@
+foo(?, 2, ?)
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.CALL,
+		fn: { type: A.IDENT, name: 'foo' },
+		args: [
+			{type: A.MISSING_ARG},
+			{type: A.INTEGER, value: 2},
+			{type: A.MISSING_ARG}
+		]
+	}
+] }

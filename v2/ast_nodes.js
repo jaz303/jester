@@ -34,6 +34,8 @@ var nextAstNode = 1;
     'ARRAY_DEREF',
     'PROP_DEREF',
 
+    'MISSING_ARG',
+
     'RETURN',
     'YIELD',
     'SPAWN',

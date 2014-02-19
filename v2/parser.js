@@ -682,6 +682,9 @@ module.exports = function(input) {
             exp = { type: A.COLOR_CTOR };
             next();
             exp.args = parseParenArgs();
+        } else if (at('?')) {
+            exp = { type: A.MISSING_ARG, line: line };
+            next();
         } else if (at('(')) {
             next();
             exp = parseExpression();
