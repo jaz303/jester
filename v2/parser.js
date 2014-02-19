@@ -509,8 +509,39 @@ module.exports = function(input) {
             node.code = parseExpression();
             return node;
         } else {
-            return parseAtom();
+            return parseCall();
         }
+    }
+
+    function parseCall() {
+        var lhs = parseAtom();
+        while (curr === '(' || curr === '.' || curr === '[') {
+            if (curr === '(') {
+                lhs = {
+                    type    : A.CALL,
+                    fn      : lhs,
+                    args    : parseParenArgs()
+                };
+            } else if (curr === '.') {
+                next();
+                var name = state.text;
+                accept('IDENT');
+                lhs = {
+                    type    : A.PROP_DEREF,
+                    subject : lhs,
+                    name    : name
+                };
+            } else {
+                next();
+                lhs = {
+                    type    : A.ARRAY_DEREF,
+                    subject : lhs,
+                    index   : parseExpression()
+                };
+                accept(']');
+            }
+        }
+        return lhs;
     }
 
     function parseAtom() {

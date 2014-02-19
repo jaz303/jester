@@ -1,0 +1,10 @@
+foo[1]
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.ARRAY_DEREF,
+		subject: {type: A.IDENT, name: 'foo'},
+		index: {type: A.INTEGER, value: 1}
+	}
+] }
