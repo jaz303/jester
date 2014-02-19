@@ -207,15 +207,25 @@ module.exports = function(input) {
                     type    : A.EXPORT,
                     bang    : false,
                     line    : state.line,
-                    symbols : []
+                    exports : {}
                 };
                 next();
-                if (curr !== 'IDENT') {
-                    error("expected identifier");
-                }
-                while (curr === 'IDENT') {
-                    symbols.push(state.text);
+                while (true) {
+                    if (curr !== 'IDENT') {
+                        error("expected identifier");
+                    }
+                    var ident = state.text,
+                        alias = ident;
                     next();
+                    if (curr === 'AS') {
+                        next();
+                        if (curr !== 'IDENT') {
+                            error("expected identifier");
+                        }
+                        alias = state.text;
+                        next();
+                    }
+                    node.exports[ident] = alias;
                     if (curr === ',') {
                         next();
                     } else {
