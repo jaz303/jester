@@ -1,0 +1,14 @@
+spawn foo(1,2,3)
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.SPAWN,
+		fn: { type: A.IDENT, name: 'foo' },
+		args: [
+			{ type: A.INTEGER, value: 1 },
+			{ type: A.INTEGER, value: 2 },
+			{ type: A.INTEGER, value: 3 }
+		]
+	}
+] }

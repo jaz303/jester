@@ -1,0 +1,27 @@
+spawn a.foo() + spawn b[0]()
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.BIN_OP,
+		op: '+',
+		left: {
+			type: A.SPAWN,
+			fn: {
+				type: A.PROP_DEREF,
+				subject: { type: A.IDENT, name: 'a' },
+				name: 'foo'
+			},
+			args: []
+		},
+		right: {
+			type: A.SPAWN,
+			fn: {
+				type: A.ARRAY_DEREF,
+				subject: { type: A.IDENT, name: 'b' },
+				index: { type: A.INTEGER, value: 0 }
+			},
+			args: []
+		}
+	}
+] }

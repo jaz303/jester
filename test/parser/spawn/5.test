@@ -1,0 +1,27 @@
+a = foo(spawn b(1), spawn b(2), spawn b(3))
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.ASSIGN,
+		left: { type: A.IDENT, name: 'a' },
+		right: {
+			type: A.CALL,
+			fn: { type: A.IDENT, name: 'foo' },
+			args: [
+				{	type: A.SPAWN,
+					fn: { type: A.IDENT, name: 'b' },
+					args: [ { type: A.INTEGER, value: 1 } ]
+				},
+				{	type: A.SPAWN,
+					fn: { type: A.IDENT, name: 'b' },
+					args: [ { type: A.INTEGER, value: 2 } ]
+				},
+				{	type: A.SPAWN,
+					fn: { type: A.IDENT, name: 'b' },
+					args: [ { type: A.INTEGER, value: 3 } ]
+				}
+			]
+		}
+	}
+] }

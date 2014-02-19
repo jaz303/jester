@@ -14,6 +14,11 @@ var L           = require('./lexer'),
 // we'd need to distinguish between "[" and " [" in the lexer (like with the
 // COMPOSE operator) and shove a bunch of special cases in the parser. not pretty
 // but it'll work fine.
+//
+// 3) it is possible to parse eval & wait as normal function calls and then
+// special case them by checking the lhs of each generated CALL node. the
+// obvious bonus is that everything is parsed consistently.
+
 
 // exhaustive list of tokens that can follow an identifier
 // to allow a function call without parens.
@@ -662,6 +667,21 @@ module.exports = function(input) {
             var node = { type: A.EVAL, line: state.line };
             next();
             node.code = parseExpression();
+            return node;
+        } else {
+            return parseSpawn();
+        }
+    }
+
+    function parseSpawn() {
+        if (curr === 'SPAWN') {
+            var line = state.line;
+            next();
+            var node = parseCall();
+            if (node.type !== A.CALL) {
+                error("expected: function call (spawn)");
+            }
+            node.type = A.SPAWN;
             return node;
         } else {
             return parseCall();

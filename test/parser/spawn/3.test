@@ -1,0 +1,19 @@
+spawn (a + b)(1,2,3)
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.SPAWN,
+		fn: {
+			type: A.BIN_OP,
+			op: '+',
+			left: { type: A.IDENT, name: 'a'},
+			right: { type: A.IDENT, name: 'b'}
+		},
+		args: [
+			{ type: A.INTEGER, value: 1 },
+			{ type: A.INTEGER, value: 2 },
+			{ type: A.INTEGER, value: 3 }
+		]
+	}
+] }
