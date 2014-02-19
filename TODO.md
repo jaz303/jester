@@ -32,6 +32,7 @@
   * <del>array access</del>
   * <del>yield</del>
   * <del>eval</del>
+  * <del>partial application</del>
 
 
 ## Bugs
