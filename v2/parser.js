@@ -749,7 +749,7 @@ module.exports = function(input) {
     }
 
     function parseString() {
-        var exp = { type: A.STRING, value: decodeString(state.text); };
+        var exp = { type: A.STRING, value: decodeString(state.text) };
         accept('STRING');
         return exp;
     }
