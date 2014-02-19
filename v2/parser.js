@@ -133,19 +133,17 @@ module.exports = function(input) {
     // import foo
     // import "foo"
     // import foo as f
-    // import foo.{alpha, beta, gamma}
-    // import foo.{alpha as a, beta as b, gamma as c}
-    // import foo.{alpha as a, beta as b, gamma as c} as f
+    // import foo {alpha, beta, gamma}
+    // import foo {alpha as a, beta as b, gamma as c}
+    // import foo {alpha as a, beta as b, gamma as c} as f
     // import! foo
-    // import! foo.{alpha, beta}
-    // import! foo.{alpha as a, beta as b}
+    // import! foo {alpha, beta}
+    // import! foo {alpha as a, beta as b}
     // export foo
     // export foo as f
     // export foo, bar
     // export foo as f, bar as b
     // export! foo
-    // export! foo.bar
-    // export! foo[0]
     function parsePorts() {
         var ports = [];
         while (true) {
@@ -154,6 +152,7 @@ module.exports = function(input) {
                     type    : A.IMPORT,
                     bang    : curr === 'IMPORT!',
                     line    : state.line,
+                    module  : null,
                     alias   : null,
                     imports : null
                 };
@@ -165,9 +164,8 @@ module.exports = function(input) {
                 } else {
                     error("expected module identifier or string");
                 }
-                if (curr === '.') {
+                if (curr === '{') {
                     next();
-                    accept('{');
                     node.imports = {};
                     while (true) {
                         if (curr !== 'IDENT') {
@@ -235,19 +233,21 @@ module.exports = function(input) {
                         break;
                     }
                 }
+                ports.push(node);
             } else if (curr === 'EXPORT!') {
                 var node = {
                     type    : A.EXPORT,
                     bang    : true,
                     line    : state.line,
-                    symbols : []
+                    exports : null
                 };
                 next();
                 if (curr !== 'IDENT') {
                     error("expected identifier");
                 }
-                node.symbols.push(state.text);
+                node.exports = state.text;
                 next();
+                ports.push(node);
             } else {
                 break;
             }

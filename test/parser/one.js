@@ -26,6 +26,7 @@ try {
     eq(zap(result), zap(expect));
 } catch (e) {
     if (e.name === 'AssertionError') {
+        console.log("** Failure in " + process.argv[2] + " **\n");
         console.log("Expected\n---------");
         console.log(inspect(expect, {colors: true, depth: null}));
         console.log('');

@@ -1,0 +1,12 @@
+import! foo { alpha as a , beta as b }
+
+-----
+
+{ type: A.MODULE, body: [], ports: [
+	{ 	type: A.IMPORT,
+		bang: true,
+		module: { type: A.IDENT, name: 'foo' },
+		alias: null,
+		imports: { alpha: "a", beta: "b" }
+	}
+] }

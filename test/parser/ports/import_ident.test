@@ -1,0 +1,12 @@
+import foo
+
+-----
+
+{ type: A.MODULE, body: [], ports: [
+	{ 	type: A.IMPORT,
+		bang: false,
+		module: { type: A.IDENT, name: 'foo' },
+		alias: null,
+		imports: null
+	}
+] }

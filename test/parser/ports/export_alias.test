@@ -1,0 +1,7 @@
+export foo as f
+
+-----
+
+{ type: A.MODULE, body: [], ports: [
+	{ type: A.EXPORT, bang: false, exports: { foo: "f" } }
+] }
