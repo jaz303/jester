@@ -57,9 +57,9 @@ addKeywords({
     'IN'            : 'in',
     'RETURN'        : 'return',
     'IMPORT'        : 'import',
-    'IMPORT_BANG'   : 'import!',
+    'IMPORT!'       : 'import!',
     'EXPORT'        : 'export',
-    'EXPORT_BANG'   : 'export!',
+    'EXPORT!'       : 'export!',
     'AS'            : 'as',
     'EVAL'          : 'eval'
 });

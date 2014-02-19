@@ -22,6 +22,7 @@ function zap(tree) {
 
 try {
     var result = $.jester.parser(chunks[0]).parseModule();
+    if (!('ports' in expect)) expect.ports = []; // to avoid rewriting every test
     eq(zap(result), zap(expect));
 } catch (e) {
     if (e.name === 'AssertionError') {

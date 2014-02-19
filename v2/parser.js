@@ -117,12 +117,86 @@ module.exports = function(input) {
         var program = { type: A.MODULE, body: [] };
 
         next();
+
+        program.ports = parsePorts();
         program.body = parseStatements();
 
         accept('EOF');
 
         return program;
 
+    }
+
+    function parsePorts() {
+        var ports = [];
+        while (true) {
+            if (curr === 'IMPORT' || curr === 'IMPORT!') {
+                var node = {
+                    type    : A.IMPORT,
+                    bang    : curr === 'IMPORT!',
+                    line    : state.line,
+                    alias   : null
+                };
+                next();
+                if (curr !== 'IDENT' && curr !== 'STRING') {
+                    error("expected module identifier or string");
+                }
+                node.module = parseExpression();
+                if (curr === '.') {
+                    // TODO: parse method aliases
+                }
+                if (curr === 'AS') {
+                    if (node.bang) {
+                        error("bang-imported modules cannot be aliased");
+                    }
+                    next();
+                    if (curr !== 'IDENT') {
+                        error("expected identifier");
+                    }
+                    node.alias = state.text;
+                    next();
+                }
+                ports.push(node);
+            } else if (curr === 'EXPORT') {
+                var node = {
+                    type    : A.EXPORT,
+                    bang    : false,
+                    line    : state.line,
+                    symbols : []
+                };
+                next();
+                if (curr !== 'IDENT') {
+                    error("expected identifier");
+                }
+                while (curr === 'IDENT') {
+                    symbols.push(state.text);
+                    next();
+                    if (curr === ',') {
+                        next();
+                    } else {
+                        break;
+                    }
+                }
+                // TODO: newlines etc
+            } else if (curr === 'EXPORT!') {
+                var node = {
+                    type    : A.EXPORT,
+                    bang    : true,
+                    line    : state.line,
+                    symbols : []
+                };
+                next();
+                if (curr !== 'IDENT') {
+                    error("expected identifier");
+                }
+                node.symbols.push(state.text);
+                next();
+                // TODO: newlines etc
+            } else {
+                break;
+            }
+        }
+        return ports;
     }
 
     function parseBlock() {
