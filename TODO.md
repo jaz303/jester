@@ -9,7 +9,7 @@
   * <del>loop</del>
   * <del>if</del>
   * <del>return</del>
-  * spawn
+  * <del>spawn</del>
   * <del>trace</del>
   * <del>lambda</del>
   * <del>binary expressions</del>
