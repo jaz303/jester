@@ -158,10 +158,13 @@ module.exports = function(input) {
                     imports : null
                 };
                 next();
-                if (curr !== 'IDENT' && curr !== 'STRING') {
+                if (curr === 'IDENT') {
+                    node.module = parseIdent();
+                } else if (curr === 'STRING') {
+                    node.module = parseString();
+                } else {
                     error("expected module identifier or string");
                 }
-                node.module = parseExpression();
                 if (curr === '.') {
                     next();
                     accept('{');
@@ -707,20 +710,12 @@ module.exports = function(input) {
             };
             next();
         } else if (at('STRING')) {
-            exp = {
-                type: A.STRING,
-                value: decodeString(text())
-            };
-            next();
+            exp = parseString();
         } else if (at('TRACE')) {
             exp = { type: A.TRACE };
             next();
         } else if (at('IDENT')) {
-            exp = {
-                type: A.IDENT,
-                name: text()
-            };
-            next();
+            exp = parseIdent();
         } else if (at('GLOBAL_IDENT')) {
             exp = {
                 type: A.GLOBAL_IDENT,
@@ -753,6 +748,18 @@ module.exports = function(input) {
         return exp;
     }
 
+    function parseString() {
+        var exp = { type: A.STRING, value: decodeString(state.text); };
+        accept('STRING');
+        return exp;
+    }
+
+    function parseIdent() {
+        var exp = { type: A.IDENT, name: state.text };
+        accept('IDENT');
+        return exp;
+    }
+    
     function parseParenArgs() {
         var args = [];
         accept('(');
