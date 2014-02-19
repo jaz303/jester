@@ -175,6 +175,8 @@ module.exports = function(input) {
     function parseInlineStatement() {
         if (curr === 'RETURN') {
             return parseReturnStatement();
+        } else if (curr === 'YIELD') {
+            return parseYieldStatement();
         } else {
             return parseExpression();
         }
@@ -339,6 +341,12 @@ module.exports = function(input) {
         } else {
             node.exp = parseExpression();
         }
+        return node;
+    }
+
+    function parseYieldStatement() {
+        var node = { type: A.YIELD, line: state.line };
+        accept('YIELD');
         return node;
     }
     

@@ -49,6 +49,8 @@ addKeywords({
     'DEF'           : 'def',
     'TRACE'         : 'trace',
     'SPAWN'         : 'spawn',
+    'YIELD'         : 'yield',
+    'WAIT'          : 'wait',
     'EVAL'          : 'eval',
     'MY'            : 'my',
     'FOREACH'       : 'foreach',

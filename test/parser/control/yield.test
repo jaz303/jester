@@ -1,0 +1,7 @@
+yield
+
+-----
+
+{ type: A.MODULE, body: [
+	{ type: A.YIELD }
+] }
