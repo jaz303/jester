@@ -35,6 +35,7 @@
   * <del>partial application</del>
   * <del>array literals</del>
   * <del>dictionary literals</del>
+  * <del>local variables</del>
 
 ## Bugs
 

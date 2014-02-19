@@ -25,6 +25,8 @@ var nextAstNode = 1;
     'FLOAT',
     'STRING',
 
+    'LOCALS',
+
     'COLOR',
     'COLOR_CTOR',
     'GLOBAL_IDENT',

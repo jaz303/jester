@@ -343,6 +343,8 @@ module.exports = function(input) {
             return parseReturnStatement();
         } else if (curr === 'YIELD') {
             return parseYieldStatement();
+        } else if (curr === 'MY') {
+            return parseLocalVariables();
         } else {
             return parseExpression();
         }
@@ -507,6 +509,28 @@ module.exports = function(input) {
     function parseYieldStatement() {
         var node = { type: A.YIELD, line: state.line };
         accept('YIELD');
+        return node;
+    }
+
+    function parseLocalVariables() {
+        var node = { type: A.LOCALS, line: state.line, names: [], values: [] };
+        next();
+        while (true) {
+            requireident();
+            node.names.push(state.text);
+            next();
+            if (curr === '=') {
+                next();
+                node.values.push(parseExpression());
+            } else {
+                node.values.push(null);
+            }
+            if (curr === ',') {
+                next();
+            } else {
+                break;
+            }
+        }
         return node;
     }
     

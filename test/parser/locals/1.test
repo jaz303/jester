@@ -1,0 +1,10 @@
+my a
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.LOCALS,
+		names: ['a'],
+		values: [null]
+	}
+] }

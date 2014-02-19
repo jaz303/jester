@@ -1,0 +1,10 @@
+my a = 10, b
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.LOCALS,
+		names: ['a', 'b'],
+		values: [{ type: A.INTEGER, value: 10}, null]
+	}
+] }
