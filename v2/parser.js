@@ -117,6 +117,7 @@ module.exports = function(input) {
         var program = { type: A.MODULE, body: [] };
 
         next();
+        skipNewlines();
 
         program.ports = parsePorts();
         program.body = parseStatements();
@@ -127,6 +128,24 @@ module.exports = function(input) {
 
     }
 
+    // Such import! So module! Much wtf!
+    //
+    // import foo
+    // import "foo"
+    // import foo as f
+    // import foo.{alpha, beta, gamma}
+    // import foo.{alpha as a, beta as b, gamma as c}
+    // import foo.{alpha as a, beta as b, gamma as c} as f
+    // import! foo
+    // import! foo.{alpha, beta}
+    // import! foo.{alpha as a, beta as b}
+    // export foo
+    // export foo as f
+    // export foo, bar
+    // export foo as f, bar as b
+    // export! foo
+    // export! foo.bar
+    // export! foo[0]
     function parsePorts() {
         var ports = [];
         while (true) {
@@ -135,7 +154,8 @@ module.exports = function(input) {
                     type    : A.IMPORT,
                     bang    : curr === 'IMPORT!',
                     line    : state.line,
-                    alias   : null
+                    alias   : null,
+                    imports : null
                 };
                 next();
                 if (curr !== 'IDENT' && curr !== 'STRING') {
@@ -143,7 +163,32 @@ module.exports = function(input) {
                 }
                 node.module = parseExpression();
                 if (curr === '.') {
-                    // TODO: parse method aliases
+                    next();
+                    accept('{');
+                    node.imports = {};
+                    while (true) {
+                        if (curr !== 'IDENT') {
+                            error("expected identifier");
+                        }
+                        var ident = state.text,
+                            alias = ident;
+                        next();
+                        if (curr === 'AS') {
+                            next();
+                            if (curr !== 'IDENT') {
+                                error("expected: identifier");
+                            }
+                            alias = state.text;
+                            next();
+                        }
+                        node.imports[ident] = alias;
+                        if (curr === ',') {
+                            next();
+                        } else {
+                            break;
+                        }
+                    }
+                    accept('}');
                 }
                 if (curr === 'AS') {
                     if (node.bang) {
@@ -177,7 +222,6 @@ module.exports = function(input) {
                         break;
                     }
                 }
-                // TODO: newlines etc
             } else if (curr === 'EXPORT!') {
                 var node = {
                     type    : A.EXPORT,
@@ -191,10 +235,11 @@ module.exports = function(input) {
                 }
                 node.symbols.push(state.text);
                 next();
-                // TODO: newlines etc
             } else {
                 break;
             }
+            accept('NL');
+            skipNewlines();
         }
         return ports;
     }
