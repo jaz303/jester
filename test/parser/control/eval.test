@@ -1,9 +1,9 @@
-eval "foo bar baz"
+eval("foo bar baz")
 
 -----
 
 { type: A.MODULE, body: [
 	{	type: A.EVAL,
-		code: { type: A.STRING, value: "foo bar baz" }
+		args: [ { type: A.STRING, value: "foo bar baz" } ]
 	}
 ] }

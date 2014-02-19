@@ -14,11 +14,6 @@ var L           = require('./lexer'),
 // we'd need to distinguish between "[" and " [" in the lexer (like with the
 // COMPOSE operator) and shove a bunch of special cases in the parser. not pretty
 // but it'll work fine.
-//
-// 3) it is possible to parse eval & wait as normal function calls and then
-// special case them by checking the lhs of each generated CALL node. the
-// obvious bonus is that everything is parsed consistently.
-
 
 // exhaustive list of tokens that can follow an identifier
 // to allow a function call without parens.
@@ -679,10 +674,10 @@ module.exports = function(input) {
                 curr = curr.exp;
                 next();
             }
-            curr.exp = parseEval();
+            curr.exp = parseSpawn();
             return root;
         } else {
-            return parseEval();
+            return parseSpawn();
         }
     }
 
@@ -713,14 +708,38 @@ module.exports = function(input) {
     }
 
     function parseCall() {
-        var lhs = parseAtom();
+
+        var lhs, callType;
+
+        // wait/eval are language-level function calls
+        // this is a horrible way to parse them but it makes it trivial to reuse
+        // the no-paren parsing logic
+        if (curr === 'WAIT' || curr === 'EVAL') {
+            callType = (curr === 'WAIT') ? A.WAIT : A.EVAL;
+            next();
+            if (curr !== '(') {
+                error("wait/eval must have function call", '(');
+            }
+        } else {
+            callType = A.CALL;
+            lhs = parseAtom();
+        }
+
         while (curr === '(' || curr === '.' || curr === '[') {
             if (curr === '(') {
-                lhs = {
-                    type    : A.CALL,
-                    fn      : lhs,
-                    args    : parseParenArgs()
-                };
+                if (callType !== A.CALL) {
+                    lhs = {
+                        type    : callType,
+                        args    : parseParenArgs()
+                    };
+                    callType = A.CALL;
+                } else {
+                    lhs = {
+                        type    : A.CALL,
+                        fn      : lhs,
+                        args    : parseParenArgs()
+                    };
+                }
             } else if (curr === '.') {
                 next();
                 var name = state.text;

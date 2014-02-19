@@ -1,0 +1,13 @@
+wait(t1, t2, t3)
+
+-----
+
+{ type: A.MODULE, body: [
+	{	type: A.WAIT,
+		args: [
+			{ type: A.IDENT, name: 't1' },
+			{ type: A.IDENT, name: 't2' },
+			{ type: A.IDENT, name: 't3' }
+		]
+	}
+] }
