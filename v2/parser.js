@@ -932,6 +932,7 @@ module.exports = function(input) {
 
         var exp = {
             type: A.LAMBDA,
+            line: state.line,
             args: hasArgList ? parseLambdaArgs() : [],
             body: parseStatements()
         };

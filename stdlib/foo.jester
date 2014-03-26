@@ -1,0 +1,3 @@
+import baz
+
+print("i am foo")
