@@ -6,9 +6,9 @@ function Precompiler(context) {
 	this._context = context;
 }
 
-Precompiler.prototype._loadModuleTree = function(rootModule, modMap, cb) {
+Precompiler.prototype._loadModuleTree = function(rootModule, cb) {
 
-	modMap[rootModule.path] = rootModule;
+	rootModule.precompiled = true;
 
 	var self 		= this,
 		imports 	= (rootModule.ast.ports || []).filter(function(p) { return p.type === A.IMPORT; }),
@@ -16,7 +16,7 @@ Precompiler.prototype._loadModuleTree = function(rootModule, modMap, cb) {
 		failed 		= false;
 
 	if (remain === 0) {
-		cb(null, modMap);
+		cb(null);
 		return;
 	}
 
@@ -37,7 +37,7 @@ Precompiler.prototype._loadModuleTree = function(rootModule, modMap, cb) {
 		}
 
 		if (--remain == 0) {
-			cb(null, modMap);
+			cb(null);
 		}
 
 	}
@@ -46,23 +46,24 @@ Precompiler.prototype._loadModuleTree = function(rootModule, modMap, cb) {
 		if (!i.path) {
 			i.path = self._context.resolveModule(i.module, rootModule);
 		}
-		if (i.path in modMap) {
-			process.nextTick(complete);
-		} else {
-			self._context.loadModule(i.path, function(err, childModule) {
-				if (err) {
-					fail(err);
-					return;
-				}
-				self._loadModuleTree(childModule, modMap, function(err) {
+		self._context.loadModule(i.path, function(err, childModule) {
+			if (err) {
+				fail(err);
+				return;
+			}
+			rootModule.importedModules.push(childModule);
+			if (childModule.precompiled) {
+				complete();
+			} else {
+				self._loadModuleTree(childModule, function(err) {
 					if (err) {
 						fail(err);
 						return;
 					}
 					complete();
 				});
-			});
-		}
+			}
+		});
 	});
 
 }
@@ -77,7 +78,7 @@ Precompiler.prototype._resolveImports = function(modMap) {
 
 Precompiler.prototype.precompile = function(rootModule, cb) {
 
-	this._loadModuleTree(rootModule, {}, function(err, modMap) {
+	this._loadModuleTree(rootModule, function(err) {
 
 		if (err) {
 			cb(err);
@@ -85,13 +86,13 @@ Precompiler.prototype.precompile = function(rootModule, cb) {
 		}
 
 		try {
-			this._resolveExports(modMap);
-			this._resolveImports(modMap);	
+			// this._resolveExports(modMap);
+			// this._resolveImports(modMap);
 		} catch (e) {
 			cb(e);
 		}
 
-		cb(null, modMap);
+		cb(null);
 
 	}.bind(this));
 

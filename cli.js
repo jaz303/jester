@@ -13,13 +13,14 @@ fs.readFile(args[1], 'utf8', function(err, source) {
 
 	var pre = new jester.Precompiler(ctx);
 
-	pre.precompile(mod, function(err, modMap) {
+	pre.precompile(mod, function(err) {
 		if (err) {
 			console.log("error!");
 			console.log(err);
 			console.log(err.stack);
 		} else {
-			console.log(modMap);	
+			console.log("done!");
+			console.log(mod);	
 		}
 	});
 
