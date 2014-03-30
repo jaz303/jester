@@ -10,6 +10,7 @@ function Module(path) {
 	this.body = null; // filled in by parser
 	this.precompiled = false;
 	this.exportedSymbols = null;
+	this.importedSymbols = null;
 }
 
 Module.prototype.resolveExports = function(ctx) {
@@ -32,7 +33,26 @@ Module.prototype.resolveExports = function(ctx) {
 }
 
 Module.prototype.resolveImports = function(ctx) {
-	this.imports.forEach(function(im) {
+
+	var syms = {};
+
+	this.imports.forEach(function(i) {
+
+		var im = ctx.getModuleByPath(i.path);
+
+		if (i.bang) {
+			if (i.imports) {
+				// listed imports become imported symbols, taking
+				// any aliases into account
+			} else {
+				// all exported symbols 
+			}
+		} else {
+			// listed module name becomes imported symbol + alias
+		}
 
 	}, this);
+
+	this.importedSymbols = syms;
+
 }

@@ -217,7 +217,7 @@ module.exports = function(input) {
                 
                 if (curr === '{') {
                     next();
-                    node.imports = {};
+                    node.imports = [];
                     while (true) {
                         requireident();
                         var ident = state.text,
@@ -229,7 +229,8 @@ module.exports = function(input) {
                             alias = state.text;
                             next();
                         }
-                        node.imports[ident] = alias;
+                        node.imports.push(ident);
+                        node.imports.push(alias);
                         if (curr === ',') {
                             next();
                         } else {
