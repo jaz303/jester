@@ -202,7 +202,7 @@ module.exports = function(input) {
                     line    : state.line,
                     module  : null,
                     alias   : null,
-                    imports : null
+                    symbols : null
                 };
                 
                 next();
@@ -217,7 +217,7 @@ module.exports = function(input) {
                 
                 if (curr === '{') {
                     next();
-                    node.imports = [];
+                    node.symbols = [];
                     while (true) {
                         requireident();
                         var ident = state.text,
@@ -229,8 +229,8 @@ module.exports = function(input) {
                             alias = state.text;
                             next();
                         }
-                        node.imports.push(ident);
-                        node.imports.push(alias);
+                        node.symbols.push(ident);
+                        node.symbols.push(alias);
                         if (curr === ',') {
                             next();
                         } else {
