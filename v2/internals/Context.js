@@ -9,7 +9,7 @@ function Context() {
 	this._loadedModules = {};
 }
 
-Context.prototype.resolveModule = function(moduleName, relativeTo) {
+Context.prototype.resolveModulePath = function(moduleName, relativeTo) {
 	if (moduleName.type === A.IDENT) {
 		// TODO: this should be customisable
 		return __dirname + "/../../stdlib/" + moduleName.name + ".jester";	
@@ -18,7 +18,7 @@ Context.prototype.resolveModule = function(moduleName, relativeTo) {
 	}
 }
 
-Context.prototype.loadModule = function(modulePath, cb) {
+Context.prototype.loadModuleByPath = function(modulePath, cb) {
 
 	var loadedModules = this._loadedModules;
 
@@ -32,8 +32,7 @@ Context.prototype.loadModule = function(modulePath, cb) {
 				cb(err);
 			} else {
 				try {
-					var ast = parser(source).parseModule(),
-						mod = loadedModules[modulePath] = new Module(modulePath, ast);
+					var mod = loadedModules[modulePath] = parser(source).parseModule(modulePath);
 					cb(null, mod);
 				} catch (e) {
 					cb(e);
@@ -42,6 +41,10 @@ Context.prototype.loadModule = function(modulePath, cb) {
 		});
 	}
 
+}
+
+Context.prototype.getModuleByPath = function(modulePath) {
+	return this._loadedModules[modulePath] || null;
 }
 
 Context.prototype._loadModuleSource = function(modulePath, cb) {

@@ -6,18 +6,23 @@ function Precompiler(context) {
 	this._context = context;
 }
 
-Precompiler.prototype._loadModuleTree = function(rootModule, cb) {
+Precompiler.prototype._loadModuleTree = function(rootModule, loadOrder, cb) {
 
 	rootModule.precompiled = true;
 
-	var self 		= this,
-		imports 	= (rootModule.ast.ports || []).filter(function(p) { return p.type === A.IMPORT; }),
-		remain 		= imports.length,
-		failed 		= false;
+	var self 	= this,
+		imports = rootModule.imports,
+		remain 	= imports.length,
+		failed 	= false;
 
 	if (remain === 0) {
-		cb(null);
+		done();
 		return;
+	}
+
+	function done() {
+		loadOrder.push(rootModule);
+		cb(null, loadOrder);
 	}
 
 	function fail(err) {
@@ -30,32 +35,26 @@ Precompiler.prototype._loadModuleTree = function(rootModule, cb) {
 	}
 
 	function complete(err) {
-
 		if (err) {
 			fail(err);
-			return;
+		} else if (--remain == 0) {
+			done();
 		}
-
-		if (--remain == 0) {
-			cb(null);
-		}
-
 	}
 
 	imports.forEach(function(i) {
 		if (!i.path) {
-			i.path = self._context.resolveModule(i.module, rootModule);
+			i.path = self._context.resolveModulePath(i.module, rootModule);
 		}
-		self._context.loadModule(i.path, function(err, childModule) {
+		self._context.loadModuleByPath(i.path, function(err, childModule) {
 			if (err) {
 				fail(err);
 				return;
 			}
-			rootModule.importedModules.push(childModule);
 			if (childModule.precompiled) {
 				complete();
 			} else {
-				self._loadModuleTree(childModule, function(err) {
+				self._loadModuleTree(childModule, loadOrder, function(err) {
 					if (err) {
 						fail(err);
 						return;
@@ -68,17 +67,9 @@ Precompiler.prototype._loadModuleTree = function(rootModule, cb) {
 
 }
 
-Precompiler.prototype._resolveExports = function(modMap) {
-
-}
-
-Precompiler.prototype._resolveImports = function(modMap) {
-
-}
-
 Precompiler.prototype.precompile = function(rootModule, cb) {
 
-	this._loadModuleTree(rootModule, function(err) {
+	this._loadModuleTree(rootModule, [], function(err, loadOrder) {
 
 		if (err) {
 			cb(err);
@@ -86,13 +77,21 @@ Precompiler.prototype.precompile = function(rootModule, cb) {
 		}
 
 		try {
-			// this._resolveExports(modMap);
-			// this._resolveImports(modMap);
+			
+			loadOrder.forEach(function(mod) {
+				mod.resolveExports(this._context);
+			}, this);
+			
+			loadOrder.forEach(function(mod) {
+				mod.resolveImports(this._context);
+			}, this);
+
 		} catch (e) {
 			cb(e);
+			return;
 		}
 
-		cb(null);
+		cb(null, loadOrder);
 
 	}.bind(this));
 

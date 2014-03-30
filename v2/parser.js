@@ -3,7 +3,8 @@
 var L           = require('./lexer'),
     A           = require('./ast_nodes'),
     COLORS      = require('./colors'),
-    ParseError  = require('./parse_error');
+    ParseError  = require('./parse_error'),
+    Module      = require('./internals/Module');
 
 // Issues with the current version of the parser:
 //
@@ -153,19 +154,22 @@ module.exports = function(input) {
     //
     //
 
-    function parseModule() {
+    function parseModule(path) {
 
-        var program = { type: A.MODULE, body: [] };
+        var mod = new Module(path);
 
         next();
         skipNewlines();
 
-        program.ports = parsePorts();
-        program.body = parseStatements();
+        var ports = parsePorts();
+        mod.imports = ports.imports;
+        mod.exports = ports.exports;
+        
+        mod.body = parseStatements();
 
         accept('EOF');
 
-        return program;
+        return mod;
 
     }
 
@@ -186,9 +190,12 @@ module.exports = function(input) {
     // export foo as f, bar as b
     // export! foo
     function parsePorts() {
-        var ports = [];
+
+        var imports = [], exports = [], exportBang;
+        
         while (true) {
             if (curr === 'IMPORT' || curr === 'IMPORT!') {
+                
                 var node = {
                     type    : A.IMPORT,
                     bang    : curr === 'IMPORT!',
@@ -197,7 +204,9 @@ module.exports = function(input) {
                     alias   : null,
                     imports : null
                 };
+                
                 next();
+                
                 if (curr === 'IDENT') {
                     node.module = parseIdent();
                 } else if (curr === 'STRING') {
@@ -205,6 +214,7 @@ module.exports = function(input) {
                 } else {
                     error("expected module identifier or string");
                 }
+                
                 if (curr === '{') {
                     next();
                     node.imports = {};
@@ -228,6 +238,7 @@ module.exports = function(input) {
                     }
                     accept('}');
                 }
+                
                 if (curr === 'AS') {
                     if (node.bang) {
                         error("bang-imported modules cannot be aliased");
@@ -237,15 +248,24 @@ module.exports = function(input) {
                     node.alias = state.text;
                     next();
                 }
-                ports.push(node);
+
+                imports.push(node);
+            
             } else if (curr === 'EXPORT') {
+
+                if (exportBang) {
+                    error("...");
+                }
+                
                 var node = {
                     type    : A.EXPORT,
                     bang    : false,
                     line    : state.line,
-                    exports : {}
+                    symbols : []
                 };
+                
                 next();
+                
                 while (true) {
                     requireident();
                     var ident = state.text,
@@ -257,33 +277,50 @@ module.exports = function(input) {
                         alias = state.text;
                         next();
                     }
-                    node.exports[ident] = alias;
+                    node.symbols.push(ident);
+                    node.symbols.push(alias);
                     if (curr === ',') {
                         next();
                     } else {
                         break;
                     }
                 }
-                ports.push(node);
+
+                exports.push(node);
+            
             } else if (curr === 'EXPORT!') {
+
+                if (exports.length > 0) {
+                    error("export! ")
+                } else {
+                    exportBang = true;
+                }
+
                 var node = {
                     type    : A.EXPORT,
                     bang    : true,
                     line    : state.line,
-                    exports : null
+                    symbols : null
                 };
+
                 next();
                 requireident();
-                node.exports = state.text;
+                node.symbols = state.text;
                 next();
-                ports.push(node);
+                exports.push(node);
+
             } else {
                 break;
             }
             accept('NL');
             skipNewlines();
         }
-        return ports;
+        
+        return {
+            imports : imports,
+            exports : exports
+        };
+    
     }
 
     function parseBlock() {
