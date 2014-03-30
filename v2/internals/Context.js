@@ -33,10 +33,11 @@ Context.prototype.loadModuleByPath = function(modulePath, cb) {
 			} else {
 				try {
 					var mod = loadedModules[modulePath] = parser(source).parseModule(modulePath);
-					cb(null, mod);
 				} catch (e) {
 					cb(e);
+					return;
 				}
+				cb(null, mod);
 			}
 		});
 	}
