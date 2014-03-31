@@ -9,6 +9,7 @@ function Module(path) {
 	this.exports = null; // filled in by parser
 	this.body = null; // filled in by parser
 	this.precompiled = false;
+	this.compiled = false;
 	this.exportedSymbols = null;
 	this.importedSymbols = null;
 }

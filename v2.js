@@ -10,5 +10,6 @@ module.exports = {
 	ast 		: require('./v2/ast_nodes'),
 	Module 		: require('./v2/internals/Module'),
 	Context 	: require('./v2/internals/Context'),
+    Compiler    : require('./v2/Compiler'),
 	Precompiler	: require('./v2/Precompiler')
 };

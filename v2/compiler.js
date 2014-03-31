@@ -1,4 +1,8 @@
-var Module = require('./internals/Module');
+module.exports = Compiler;
+
+var Module 		= require('./internals/Module'),
+	Precompiler	= require('./Precompiler'),
+	A 			= require('./ast_nodes');
 
 function expectNodeType(ast, type) {
 	if (ast.type !== type) {
@@ -10,67 +14,29 @@ function Compiler(context) {
 	this._context = context;
 }
 
-Compiler.prototype.compileModule = function(ast, cb) {
+Compiler.prototype._compileModule = function(mod) {
+	console.log("compiling: ", mod);
+}
 
-	expectNodeType(ast, A.MODULE);
+Compiler.prototype.compileModule = function(mod, cb) {
 
-	var mod = new Module();
+	expectNodeType(mod, A.MODULE);
 
-	function processImport(import) {
-		
-	}
+	var self = this;
 
-
-
-
-
-
-
-
-	/*
-
-	need a module loader and some example source, preferably with some
-	circular imports...
-
-	process for getting module exports:
-	- load module source
-	- parse source
-	- module needs a flag stating whether or not exports have been compiled
-
-	for each import
-		look up imported module
-		if module is not present
-			load module source
-			parse module source
-			compile module stub
-		load module exports into module variables
-	end
-
-	for each export
-		set exported symbols
-	end
-
-	set depth to zero
-
-	compile statements
-
-	*/
-
-	var mod = new Module();
-
-	var ports = ast.ports || [];
-
-	ports.filter(function(p) { p.type === A.IMPORT; }).forEach(function(i) {
-
-	});
-	
-	(ast.ports || []).forEach(function(port) {
-		if (port.type === A.EXPORT) {
-
-			var bang = false, count = 0;
-
-		} else if (port.type === A.IMPORT) {
-
+	var pre = new Precompiler(this._context);
+	pre.precompile(mod, function(err, loadOrder) {
+		if (err) {
+			cb(err);
+		} else {
+			try {
+				for (var i = 0; i < loadOrder.length; ++i) {
+					self._compileModule(loadOrder[i]);
+				}
+				cb(null, loadOrder);
+			} catch (e) {
+				cb(err);
+			}
 		}
 	});
 
