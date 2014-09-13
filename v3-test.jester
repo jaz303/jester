@@ -1,0 +1,52 @@
+def foo? {
+	
+}
+
+def destroy! {
+	
+}
+
+def baz(a ,  b   , c = 10) {
+	
+}
+
+def bar() {
+	return 10; loop { true }	
+}
+
+while 1 {
+
+	;;;;;;
+
+	;;;
+
+
+
+	loop {
+
+	}
+
+	;;
+
+
+	loop while true { a; b; c; 123
+
+
+	}
+
+	;;
+
+	if false {
+		1; 2; 3
+	} else if 10 {
+
+	} else if 9 {
+
+	} else {
+		boom; bang; bling
+	}
+
+	foreach a, b in $foo {
+
+	}
+}

@@ -1,0 +1,375 @@
+//
+//
+
+{
+	var A = require('./ast');
+}
+
+Start
+	= Module
+
+//
+// Tokens
+
+NL 				= '\n' / '\r' '\n'?
+
+LE				= '<='
+GE				= '>='
+LSHIFT			= '<<'
+RSHIFT			= '>>'
+EQ				= '=='
+NEQ 			= '!='
+MISSING_ARG		= '?'
+POW 			= '**'
+LOGICAL_OR		= '||'
+LOGICAL_AND		= '&&'
+BITWISE_OR		= '|' !'|'
+BITWISE_AND		= '&' !'&'
+BITWISE_NOT		= '~'
+LAMBDA_START	= '.{'
+DOT 			= '.' !'{'
+COMMA			= ','
+SEMI			= ';'
+EQUALS			= '='
+MINUS			= '-'
+PLUS			= '+'
+TIMES			= '*'
+DIVIDE			= '/'
+MOD				= '%'
+BANG			= '!'
+LT 				= '<' !'='
+GT				= '>' !'='
+LBRACE			= '{'
+RBRACE			= '}'
+LBRACKET		= '['
+RBRACKET		= ']'
+LPAREN			= '('
+RPAREN			= ')'
+GLOBAL 			= '$' !ident_start
+
+//
+// Keywords
+
+AS				= 'as'			!ident_rest
+DEF				= 'def'			!ident_rest
+ELSE			= 'else' 		!ident_rest
+EVAL			= 'eval'		!ident_rest
+EXPORT			= 'export'		!ident_rest
+EXPORT_B		= 'export!'
+FALSE			= 'false'		!ident_rest
+FOREACH			= 'foreach'		!ident_rest
+IF				= 'if' 			!ident_rest
+IMPORT			= 'import'		!ident_rest
+IMPORT_B		= 'import!'
+IN 				= 'in'			!ident_rest
+LOOP			= 'loop'		!ident_rest
+MY				= 'my'			!ident_rest
+NULL			= 'null'		!ident_rest
+RETURN			= 'return' 		!ident_rest
+SPAWN			= 'spawn' 		!ident_rest
+TRACE			= 'trace'		!ident_rest
+TRUE			= 'true'		!ident_rest
+WAIT			= 'wait'		!ident_rest
+WHILE			= 'while'		!ident_rest
+YIELD			= 'yield'		!ident_rest
+
+Keyword
+	= AS
+	/ DEF
+	/ ELSE
+	/ EVAL
+	/ EXPORT
+	/ EXPORT_B
+	/ FALSE
+	/ FOREACH
+	/ IF
+	/ IMPORT
+	/ IMPORT_B
+	/ IN
+	/ LOOP
+	/ MY
+	/ NULL
+	/ RETURN
+	/ SPAWN
+	/ TRACE
+	/ TRUE
+	/ WAIT
+	/ WHILE
+	/ YIELD
+
+//
+// Helpers
+
+_
+	= [ \t]*
+
+__
+	= [ \t\r\n]*
+
+// this denotes the whitespace permitted between a block statement's
+// expression and subsequent brace
+_b
+	= __
+
+// any characters that can be skipped including empty statements
+_s
+	= [ \t\r\n;]*
+
+ident_start
+	= [a-zA-Z]
+
+ident_rest
+	= [a-z0-9_]
+
+ident
+	= $( ident_start ident_rest* )
+
+method_name
+	= $( ident method_name_modifier? )
+
+method_name_modifier
+	= '!'
+	/ '?'
+
+non_zero_digit
+	= [1-9]
+
+digit
+	= [0-9]
+
+integer
+	= $( non_zero_digit digit* )
+	/ $( '0' ) !digit !'x' !'b'
+
+float
+	= $( integer '.' digit+ )
+
+hex
+	= $( '0x' [0-9a-f]i+ )
+
+binary
+	= $( '0b' [01]+ )
+
+//
+// Expressions
+
+Expression
+	= Atom
+
+//
+// Atoms
+
+Atom
+	= Constant _
+	/ Ident _
+	/ GlobalIdent _
+
+Constant
+	= FloatLiteral _
+	/ IntegerLiteral _
+	/ HexLiteral _
+	/ BinaryLiteral _
+	/ StringLiteral _
+	/ ColorLiteral _
+	/ BooleanLiteral _
+
+IntegerLiteral
+	= v:integer {
+		return parseInt(v, 10);
+	}
+
+HexLiteral
+	= v:hex {
+		return parseInt(v.substr(2), 16);
+	}
+
+BinaryLiteral
+	= v:binary {
+		return parseInt(v.substr(2), 2);
+	}
+
+FloatLiteral
+	= v:float {
+		return parseFloat(v.substr(2));
+	}
+
+StringLiteral
+	= '""' {
+		return "";
+	}
+
+ColorLiteral
+	= HexColorLiteral
+	/ NamedColorLiteral
+
+HexColorLiteral
+	= '#' v:$( [0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f] ) {
+		return A.hexColor('FF' + v);
+	}
+	/ '#' v:$( [0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f] ) {
+		return A.hexColor(v);
+	}
+
+NamedColorLiteral
+	= '#' name:$( [a-z]i+ ) {
+		return A.namedColor(name);
+	}
+
+BooleanLiteral
+	= TRUE { return true; }
+	/ FALSE { return false; }
+
+Ident
+	= ident:$( ident ) {
+		return A.ident(ident);
+	}
+
+GlobalIdent
+	= '$' ident:ident {
+		return A.globalIdent(ident);
+	}
+
+//
+// Productions
+
+Module
+	= Statements
+
+Statements
+	= _s Statement*
+
+Statement
+	= BlockStatement
+	/ InlineStatement InlineStatementTerminator
+
+Block
+	= '{' Statements '}' _s
+
+BlockStatement
+	= WhileStatement
+	/ LoopWhileStatement
+	/ LoopStatement
+	/ ForeachStatement
+	/ IfStatement
+	/ FunctionDefinition
+
+WhileStatement
+	= WHILE _ Expression _b Block
+
+LoopWhileStatement
+	= LOOP _ WHILE _ Expression _b Block
+
+LoopStatement
+	= LOOP _b Block
+
+ForeachStatement
+	= FOREACH _ Ident _ (',' _ Ident _)? IN _ Expression _b Block
+
+IfStatement
+	= IF _ Expression _b Block ElseIfBlock* ElseBlock?
+
+ElseIfBlock
+	= _b ELSE _ IF _ Expression _b Block
+
+ElseBlock
+	= _b ELSE _b Block
+
+FunctionDefinition
+	= DEF _ method_name _ FunctionParameters? _b Block
+
+FunctionParameters
+	= '(' _ FunctionParameterList? ')'
+
+FunctionParameterList
+	= FunctionRequiredParameters (',' _ FunctionOptionalParameters)?
+	/ FunctionOptionalParameters
+
+FunctionRequiredParameters	= FRP (',' _ FRP)*
+FunctionOptionalParameters	= FOP (',' _ FOP)*
+					FRP 	= Ident _ !'='
+					FOP 	= Ident _ '=' _ FOPExpr
+
+FOPExpr
+	= Constant
+
+InlineStatement
+	= ReturnStatement
+	/ YieldStatement
+	/ LocalVariables
+	/ ExpressionStatement
+
+// Inline statement ends with either a newline,
+// semicolon, or if the end of the enclosing
+// block is encountered.
+InlineStatementTerminator
+	= NL __
+	/ SEMI __
+	/ &'}'
+
+ReturnStatement
+	= RETURN _ Expression _
+	/ RETURN _
+
+YieldStatement
+	= YIELD _
+
+LocalVariables
+	= MY LocalVariable (',' _ LocalVariable)*
+
+LocalVariable
+	= Ident _ '=' _ Expression _
+	/ Ident _
+
+ExpressionStatement
+	= Expression _
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//NoParenFunctionCall
+//	= Ident &NoParenFunctionCallStartToken
+//
+//NoParenFunctionCallStartToken
+//	= BANG
+//	/ BITWISE_NOT
+//	/ LAMBDA_START
+//	/ LBRACE
+//	/ GLOBAL
+//	/ TRUE
+//	/ FALSE
+//	/ TRACE
+//	/ IntegerLiteral
+//	/ HexLiteral
+//	/ BinaryLiteral
+//	/ FloatLiteral
+//	/ StringLiteral
+//	/ ColorLiteral
+//	/ Ident
+//	/ GlobalIdent
