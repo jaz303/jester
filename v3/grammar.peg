@@ -155,6 +155,7 @@ binary
 
 Expression
 	= Atom
+	/ Lambda
 
 //
 // Atoms
@@ -228,6 +229,15 @@ GlobalIdent
 	= '$' ident:ident {
 		return A.globalIdent(ident);
 	}
+
+//
+//
+
+Lambda
+	= LAMBDA_START _ LambdaArgs? Statements RBRACE
+
+LambdaArgs
+	= Ident _ (',' _ Ident _)* '|'
 
 //
 // Productions

@@ -6,6 +6,8 @@ def destroy! {
 	
 }
 
+.{ a,b | return 10 }
+
 def baz(a ,  b   , c = 10) {
 	
 }
