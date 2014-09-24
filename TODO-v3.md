@@ -1,9 +1,38 @@
 ## Parser
 
-[x] top-level statements
-[ ] imports/exports
-[ ] expressions
-[ ] AST generation
-[ ] pre-lexer - compose, array disambiguation
-[ ] parse no-paren function calls
-[ ] parse compose
+  - [ ] imports/exports
+  - block-level statements
+    - [x] while
+    - [x] loop while
+    - [x] loop
+    - [x] foreach
+    - [x] if
+    - [x] function definition
+  - inline statements
+    - [x] return
+    - [x] yield
+    - [x] local variables
+    - [x] expression
+  - expressions
+    - [x] float
+    - [x] integer
+    - [x] hex
+    - [x] binary
+    - [ ] string
+    - [x] color (named)
+    - [x] color (hex)
+    - [x] boolean
+    - [x] identifier
+    - [x] global identifier
+    - [x] lambdas
+    - [ ] global object
+    - [ ] array literal
+    - [ ] object literal
+    - [ ] spawn
+    - [ ] binary operators
+    - [ ] unary operators
+  - [x] pre-lexer - compose, array disambiguation
+  - [ ] parse no-paren function calls
+  - [ ] parse compose
+  - [ ] AST generation
+  
