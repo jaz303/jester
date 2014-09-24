@@ -56,3 +56,16 @@ test("standalone array is identified", function(assert) {
 	assert.end();
 
 });
+
+test("multiple", function(assert) {
+
+	var PRE = "foo $. bar 'this is . [ string' here $[ \"another string [ foo .\"";
+	var SRC = PRE.replace(/\$/g, '');
+	
+	var expect = PRE.replace(/\$/g, NBSP);
+	var res = prelexer(SRC);
+
+	assert.equal(res, expect);
+	assert.end();
+
+});
