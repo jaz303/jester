@@ -4,6 +4,17 @@ var S_OUT               = 1,
 
 var NBSP                = String.fromCharCode(160);
 
+/*
+ * There are two situations where the Jester grammar is whitespace-
+ * sensitive: (1) in the case of function composition, e.g. "f . g",
+ * and (2) a no-paren call whose first argument is a literal array,
+ * e.g. "foo [1,2,3]". The parser ignores whitespace so these forms
+ * will degrade to property lookup ("f.g") and indexing ("foo[1,2,3]").
+ *
+ * Rather than complicate the grammar with significant whitespace it's
+ * easier to pre-scan the input text for these forms and inject a
+ * sentinel character whenever one is encountered.
+ */
 module.exports = exports = function(source) {
 
     var out     = [];
