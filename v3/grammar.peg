@@ -3,6 +3,29 @@
 
 {
 	var A = require('./ast');
+
+	var npStack = [];
+
+	function pushNP() {
+		npStack.push(true);
+	}
+
+	function popNP() {
+		npStack.pop();
+	}
+
+	function canNP() {
+		return npStack[npStack.length-1];
+	}
+
+	function enterNP() {
+		if (!canNP()) throw new Error("no-paren function call not possible here");
+		npStack[npStack.length-1] = false;
+	}
+
+	function exitNP() {
+		npStack[npStack.length-1] = true;
+	}
 }
 
 Start
@@ -154,6 +177,13 @@ binary
 // Expressions
 
 Expression
+	= CallExpression
+
+CallExpression
+	= Primary _ LPAREN _ RPAREN _
+	/ Primary
+
+Primary
 	= Atom
 	/ Lambda
 
@@ -163,7 +193,10 @@ Expression
 Atom
 	= Constant _
 	/ Ident _
+	/ GlobalObject _
 	/ GlobalIdent _
+	/ ArrayLiteral _
+	/ DictionaryLiteral _
 
 Constant
 	= FloatLiteral _
@@ -195,9 +228,21 @@ FloatLiteral
 	}
 
 StringLiteral
-	= '""' {
-		return "";
+	= DoubleQuotedString
+
+DoubleQuotedString
+	= '"' str:(DoubleQuotedStringChar*) '"' {
+		console.log(str.join(''));
 	}
+
+DoubleQuotedStringChar
+	= "\\n"     { return "\n"; }
+	/ "\\r"     { return "\r"; }
+	/ "\\t"     { return "\t"; }
+	/ "\\'"     { return "'"; }
+	/ '\\"'     { return '"'; }
+	/ '\\\\'    { return "\\"; }
+	/ $ ( !["\\] . )
 
 ColorLiteral
 	= HexColorLiteral
@@ -225,10 +270,42 @@ Ident
 		return A.ident(ident);
 	}
 
+GlobalObject
+	= GLOBAL
+
 GlobalIdent
 	= '$' ident:ident {
 		return A.globalIdent(ident);
 	}
+
+ArrayLiteral
+	= '[' _ items:ArrayLiteralInner? ']' _ {
+
+	}
+
+ArrayLiteralInner
+	= head:Expression _ tail:(',' _ Expression)* {
+		return [head].concat(tail.map(function(i) {
+			return i[2];
+		}));
+	}
+
+DictionaryLiteral
+	= '{' _ items:DictionaryLiteralInner? '}' _ {
+
+	}
+
+DictionaryLiteralInner
+	= head:DictionaryPair _ tail:(',' _ DictionaryPair)* {
+
+	}
+
+DictionaryPair
+	= DictionaryKey _ ':' _ Expression
+
+DictionaryKey
+	= Ident
+	/ StringLiteral
 
 //
 //
@@ -243,7 +320,40 @@ LambdaArgs
 // Productions
 
 Module
-	= Statements
+	= __ Ports Statements
+
+Ports
+	= (Port NL)*
+
+Port
+	= Import
+	/ ImportBang
+	/ Export
+	/ ExportBang
+
+Import
+	= IMPORT _ ident _ ImportSpecifics? PortAlias?
+
+ImportBang
+	= IMPORT_B _ ident _ ImportSpecifics?
+
+ImportSpecifics
+	= LAMBDA_START _ PortList RBRACE _
+
+Export
+	= EXPORT _ PortList
+
+ExportBang
+	= EXPORT_B _ ident
+
+PortList
+	= head:(PortItem) tail:(',' _ PortItem)*
+
+PortItem
+	= ident _ PortAlias?
+
+PortAlias
+	= AS _ ident _
 
 Statements
 	= _s Statement*

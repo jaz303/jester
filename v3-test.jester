@@ -1,3 +1,17 @@
+import foo
+import foo as f
+import foo.{ alpha, beta, gamma }
+import foo.{ alpha as a, beta as b, gamma as c }
+import foo.{ alpha as a, beta as b, gamma as c } as f
+import! foo
+import! foo.{ alpha, beta }
+import! foo.{ alpha as a, beta as b }
+export foo
+export foo as f
+export foo, bar
+export foo as f, bar as b
+export! foo
+
 def foo? {
 	
 }
@@ -22,7 +36,10 @@ while 1 {
 
 	;;;
 
+	{ a: 1 }
 
+
+	foo()
 
 	loop {
 
