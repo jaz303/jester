@@ -4,14 +4,16 @@
 {
 	var A = require('./ast');
 
-	var npStack = [];
+	var npStack = [true];
 
 	function pushNP() {
 		npStack.push(true);
+		return true;
 	}
 
 	function popNP() {
 		npStack.pop();
+		return true;
 	}
 
 	function canNP() {
@@ -19,12 +21,14 @@
 	}
 
 	function enterNP() {
-		if (!canNP()) throw new Error("no-paren function call not possible here");
+		if (!canNP()) return false;
 		npStack[npStack.length-1] = false;
+		return true;
 	}
 
 	function exitNP() {
 		npStack[npStack.length-1] = true;
+		return true;
 	}
 }
 
@@ -40,7 +44,7 @@ LE				= '<='
 GE				= '>='
 LSHIFT			= '<<'
 RSHIFT			= '>>'
-EQ				= '=='
+EQ				= '='
 NEQ 			= '!='
 MISSING_ARG		= '?'
 POW 			= '**'
@@ -48,20 +52,22 @@ LOGICAL_OR		= '||'
 LOGICAL_AND		= '&&'
 BITWISE_OR		= '|' !'|'
 BITWISE_AND		= '&' !'&'
+NO_CALL 		= BITWISE_AND
 BITWISE_NOT		= '~'
-LAMBDA_START	= '.{'
-DOT 			= '.' !'{'
+BITWISE_XOR 	= '^'
+LAMBDA_START	= '.['
+DOT 			= '.' !'['
 COMMA			= ','
 SEMI			= ';'
-EQUALS			= '='
+ASSIGN 			= ':='
 MINUS			= '-'
 PLUS			= '+'
-TIMES			= '*'
+TIMES			= '*' !'*'
 DIVIDE			= '/'
 MOD				= '%'
-BANG			= '!'
-LT 				= '<' !'='
-GT				= '>' !'='
+BANG			= '!' ![=]
+LT 				= '<' ![=<]
+GT				= '>' ![=>]
 LBRACE			= '{'
 RBRACE			= '}'
 LBRACKET		= '['
@@ -73,14 +79,13 @@ GLOBAL 			= '$' !ident_start
 //
 // Keywords
 
-AS				= 'as'			!ident_rest
 DEF				= 'def'			!ident_rest
 ELSE			= 'else' 		!ident_rest
 EVAL			= 'eval'		!ident_rest
 EXPORT			= 'export'		!ident_rest
 EXPORT_B		= 'export!'
 FALSE			= 'false'		!ident_rest
-FOREACH			= 'foreach'		!ident_rest
+FOR				= 'for'			!ident_rest
 IF				= 'if' 			!ident_rest
 IMPORT			= 'import'		!ident_rest
 IMPORT_B		= 'import!'
@@ -97,14 +102,13 @@ WHILE			= 'while'		!ident_rest
 YIELD			= 'yield'		!ident_rest
 
 Keyword
-	= AS
-	/ DEF
+	= DEF
 	/ ELSE
 	/ EVAL
 	/ EXPORT
 	/ EXPORT_B
 	/ FALSE
-	/ FOREACH
+	/ FOR
 	/ IF
 	/ IMPORT
 	/ IMPORT_B
@@ -176,19 +180,224 @@ binary
 //
 // Expressions
 
+UnaryOperator
+    = PLUS
+    / MINUS
+    / BITWISE_NOT
+    / BANG
+    / NO_CALL
+
+MultiplicativeOperator
+    = TIMES
+    / DIVIDE
+    / MOD
+    / POW
+
+AdditiveOperator
+    = PLUS
+    / MINUS
+
+ShiftOperator
+    = LSHIFT
+    / RSHIFT
+
+RelationalOperator
+    = LE
+    / GE
+    / LT
+    / GT
+
+EqualityOperator
+    = EQ
+    / NEQ
+
+BitwiseAndOperator
+    = BITWISE_AND
+
+BitwiseXorOperator
+    = BITWISE_XOR
+
+BitwiseOrOperator
+    = BITWISE_OR
+
+LogicalAndOperator
+    = LOGICAL_AND
+
+LogicalOrOperator
+    = LOGICAL_OR
+
+/* Expression */
+
 Expression
-	= CallExpression
+    = AssignmentExpression
+
+AssignmentExpression
+    = l:LeftHandSideExpression _ ASSIGN _ r:AssignmentExpression {
+        //var exp = new A.AssignExp();
+        //exp.setLeft(l);
+        //exp.setRight(r);
+        //return exp;
+    }
+    / LogicalOrExpression
+
+LogicalOrExpression
+    = head:LogicalAndExpression rest:( LogicalOrOperator _ LogicalAndExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+LogicalAndExpression
+    = head:BitwiseOrExpression rest:( LogicalAndOperator _ BitwiseOrExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+BitwiseOrExpression
+    = head:BitwiseXorExpression rest: ( BitwiseOrOperator _ BitwiseXorExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+BitwiseXorExpression
+    = head:BitwiseAndExpression rest: ( BitwiseXorOperator _ BitwiseAndExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+BitwiseAndExpression
+    = head:EqualityExpression rest: ( BitwiseAndOperator _ EqualityExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+EqualityExpression
+    = head:RelationalExpression rest: ( EqualityOperator _ RelationalExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+RelationalExpression
+    = head:ShiftExpression rest: ( RelationalOperator _ ShiftExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+ShiftExpression
+    = head:AdditiveExpression rest: ( ShiftOperator _ AdditiveExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+AdditiveExpression
+    = head:MultiplicativeExpression rest: ( AdditiveOperator _ MultiplicativeExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+MultiplicativeExpression
+    = head:UnaryExpression rest: ( MultiplicativeOperator _ UnaryExpression )* {
+        //return makeBinaryOperator(head, rest);
+    }
+
+UnaryExpression
+    = LeftHandSideExpression
+    / op:UnaryOperator _ exp:UnaryExpression {
+        //return new A.UnaryOpExp(op, exp);
+    }
+
+LeftHandSideExpression
+    = CallExpression
+    / CallNoParenExpression
+    / MemberExpression
 
 CallExpression
-	= Primary _ LPAREN _ RPAREN _
-	/ Primary
+    = callee:MemberExpression args:Arguments rest:(CallCons)* {
+        //var result = new A.CallExp(callee, args);
+        //rest.forEach(function(r) {
+        //    if (Array.isArray(r)) {
+        //        result = new A.CallExp(result, r);
+        //    } else if (r.computed) {
+        //        result = new A.ComputedMemberExp(result, r.property);
+        //    } else {
+        //        result = new A.StaticMemberExp(result, r.property);
+        //    }
+        //});
+        //return result;
+    }
+
+CallNoParenExpression
+	= 	callee:MemberExpression
+		&CNPStartToken
+		&{ return enterNP(); }
+		args:ArgumentList
+		&{ return exitNP(); } {
+
+	}
+
+// An exhaustive list of valid tokens that can appear at the start
+// of a function call with no parens
+CNPStartToken
+	= MISSING_ARG
+	/ BITWISE_NOT
+	/ LAMBDA_START
+	/ BANG
+	/ LBRACE
+	/ GLOBAL
+	/ TRUE
+	/ FALSE
+	/ TRACE
+	/ NumericLiteral
+	/ StringLiteral
+	/ ColorLiteral
+	/ Ident
+	/ GlobalIdent
+
+Arguments
+	= '(' _ ')' _ {
+        //return [];
+    }
+    / '(' &{ return pushNP(); } _ args:ArgumentList ')' &{ return popNP(); } _ {
+        //return args;
+    }
+    
+
+ArgumentList
+    = head:Argument rest:( ',' _ Argument )* {
+        //return [head].concat(rest.map(function(r) { return r[2]; }));
+    }
+
+Argument
+	= Expression
+	/ MISSING_ARG _
+
+CallCons
+    = Arguments
+    / Member
+
+MemberExpression
+    = first:Primary rest:Member* {
+        //var result = first;
+        //rest.forEach(function(r) {
+        //    if (r.computed) {
+        //        result = new A.ComputedMemberExp(result, r.property);
+        //    } else {
+        //        result = new A.StaticMemberExp(result, r.property);
+        //    }
+        //});
+        //return result;
+    }
+
+Member
+    = ComputedMember
+    / StaticMember
+
+ComputedMember
+    = '[' _ property:Expression ']' _ {
+        return { computed: true, property: property };
+    }
+
+StaticMember
+    = '.' _ property:ident _ {
+        return { computed: false, property: property };
+    }
+
+//
+// Atoms
 
 Primary
 	= Atom
 	/ Lambda
-
-//
-// Atoms
 
 Atom
 	= Constant _
@@ -197,15 +406,19 @@ Atom
 	/ GlobalIdent _
 	/ ArrayLiteral _
 	/ DictionaryLiteral _
+	/ '(' &{ return pushNP(); } _ exp:Expression _ ')' &{ return popNP(); } _
 
 Constant
+	= NumericLiteral
+	/ StringLiteral _
+	/ ColorLiteral _
+	/ BooleanLiteral _
+
+NumericLiteral
 	= FloatLiteral _
 	/ IntegerLiteral _
 	/ HexLiteral _
 	/ BinaryLiteral _
-	/ StringLiteral _
-	/ ColorLiteral _
-	/ BooleanLiteral _
 
 IntegerLiteral
 	= v:integer {
@@ -311,7 +524,7 @@ DictionaryKey
 //
 
 Lambda
-	= LAMBDA_START _ LambdaArgs? Statements RBRACE
+	= LAMBDA_START _ LambdaArgs? &{ return pushNP(); } Statements RBRACKET &{ return popNP(); }
 
 LambdaArgs
 	= Ident _ (',' _ Ident _)* '|'
@@ -338,7 +551,7 @@ ImportBang
 	= IMPORT_B _ ident _ ImportSpecifics?
 
 ImportSpecifics
-	= LAMBDA_START _ PortList RBRACE _
+	= DOT _ LBRACE _ PortList RBRACE _
 
 Export
 	= EXPORT _ PortList
@@ -353,7 +566,7 @@ PortItem
 	= ident _ PortAlias?
 
 PortAlias
-	= AS _ ident _
+	= 'as' _ ident _
 
 Statements
 	= _s Statement*
@@ -369,6 +582,7 @@ BlockStatement
 	= WhileStatement
 	/ LoopWhileStatement
 	/ LoopStatement
+	/ ForStatement
 	/ ForeachStatement
 	/ IfStatement
 	/ FunctionDefinition
@@ -382,8 +596,11 @@ LoopWhileStatement
 LoopStatement
 	= LOOP _b Block
 
+ForStatement
+	= FOR _ Ident _ IN _ Expression _ 'to' _ Expression _ ('step' _ Expression)? _b Block
+
 ForeachStatement
-	= FOREACH _ Ident _ (',' _ Ident _)? IN _ Expression _b Block
+	= FOR _ Ident _ (',' _ Ident _)? IN _ Expression _b Block
 
 IfStatement
 	= IF _ Expression _b Block ElseIfBlock* ElseBlock?
@@ -420,11 +637,12 @@ InlineStatement
 
 // Inline statement ends with either a newline,
 // semicolon, or if the end of the enclosing
-// block is encountered.
+// block/lambda is encountered.
 InlineStatementTerminator
 	= NL __
 	/ SEMI __
 	/ &'}'
+	/ &']'
 
 ReturnStatement
 	= RETURN _ Expression _
@@ -442,54 +660,3 @@ LocalVariable
 
 ExpressionStatement
 	= Expression _
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//NoParenFunctionCall
-//	= Ident &NoParenFunctionCallStartToken
-//
-//NoParenFunctionCallStartToken
-//	= BANG
-//	/ BITWISE_NOT
-//	/ LAMBDA_START
-//	/ LBRACE
-//	/ GLOBAL
-//	/ TRUE
-//	/ FALSE
-//	/ TRACE
-//	/ IntegerLiteral
-//	/ HexLiteral
-//	/ BinaryLiteral
-//	/ FloatLiteral
-//	/ StringLiteral
-//	/ ColorLiteral
-//	/ Ident
-//	/ GlobalIdent

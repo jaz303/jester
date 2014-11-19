@@ -20,7 +20,7 @@ def destroy! {
 	
 }
 
-.{ a,b | return 10 }
+.[ a,b | return 10 ]
 
 def baz(a ,  b   , c = 10) {
 	
@@ -29,6 +29,39 @@ def baz(a ,  b   , c = 10) {
 def bar() {
 	return 10; loop { true }	
 }
+
+a := 10
+a := 1 + 2
+a[10] := fooobar
+
+z := foo 1, 2, 3, .[ a,b| bar 10, 20 ], 50, 60
+
+foo(1, 2, 3)
+
+foo 1, 2, 3
+
+z := foo 1, 2, 3
+
+b := foo 1, (foo 2, 3), 3
+
+b := 5 ** 10
+
+b := !b
+
+c := (1 + 2 + (3 / foo(1,2,3)))
+
+test := foo(1, 2, ?)
+
+results = sort(.[l,r| l-r], [5, 6, 10, 1, 2])
+
+def foo(l,r) {
+	l - r
+}
+
+comparator = &foo
+
+
+a[10] := b[5] + 10
 
 while 1 {
 
@@ -65,7 +98,15 @@ while 1 {
 		boom; bang; bling
 	}
 
-	foreach a, b in $foo {
+	for a, b in $foo {
+
+	}
+
+	for a in 1 to 10 {
+
+	}
+
+	for b in 3 to 30 step 3 {
 
 	}
 }
