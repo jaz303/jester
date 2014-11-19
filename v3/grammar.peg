@@ -302,7 +302,7 @@ LeftHandSideExpression
     / MemberExpression
 
 CallExpression
-    = callee:MemberExpression args:Arguments rest:(CallCons)* {
+    = SPAWN? _ callee:MemberExpression args:Arguments rest:(CallCons)* {
         //var result = new A.CallExp(callee, args);
         //rest.forEach(function(r) {
         //    if (Array.isArray(r)) {
@@ -317,7 +317,7 @@ CallExpression
     }
 
 CallNoParenExpression
-	= 	callee:MemberExpression
+	= SPAWN? _ callee:MemberExpression
 		&CNPStartToken
 		&{ return enterNP(); }
 		args:ArgumentList

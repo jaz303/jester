@@ -20,6 +20,14 @@ def destroy! {
 	
 }
 
+spawn foo 10, 20
+
+spawn foo[0].bar 100, 200
+
+task := spawn foo(1, 2, 3)
+
+bleem := spawn my_task a, b, c
+
 .[ a,b | return 10 ]
 
 def baz(a ,  b   , c = 10) {
