@@ -4,6 +4,24 @@
 {
 	var A = require('./ast');
 
+	function hat(head, tail, ix) {
+		return [head].concat(tail.map(function(t) { return t[ix]; }));
+	}
+
+	function makeBinaryOperator(head, rest) {
+        var result = head;
+        rest.forEach(function(i) {
+            if (i[0] === '||') {
+            	result = A.logicalOrExp(result, i[2]);
+            } else if (i[0] === '&&') {
+                result = A.logicalAndExp(result, i[2]);
+            } else {
+                result = A.binOpExp(result, i[0], i[2]);
+            }
+        });
+        return result;
+    }
+
 	var npStack = [true];
 
 	function pushNP() {
@@ -233,67 +251,64 @@ Expression
 
 AssignmentExpression
     = l:LeftHandSideExpression _ ASSIGN _ r:AssignmentExpression {
-        //var exp = new A.AssignExp();
-        //exp.setLeft(l);
-        //exp.setRight(r);
-        //return exp;
+    	return A.assignmentExp(l, r);
     }
     / LogicalOrExpression
 
 LogicalOrExpression
     = head:LogicalAndExpression rest:( LogicalOrOperator _ LogicalAndExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 LogicalAndExpression
     = head:BitwiseOrExpression rest:( LogicalAndOperator _ BitwiseOrExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 BitwiseOrExpression
     = head:BitwiseXorExpression rest: ( BitwiseOrOperator _ BitwiseXorExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 BitwiseXorExpression
     = head:BitwiseAndExpression rest: ( BitwiseXorOperator _ BitwiseAndExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 BitwiseAndExpression
     = head:EqualityExpression rest: ( BitwiseAndOperator _ EqualityExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 EqualityExpression
     = head:RelationalExpression rest: ( EqualityOperator _ RelationalExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 RelationalExpression
     = head:ShiftExpression rest: ( RelationalOperator _ ShiftExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 ShiftExpression
     = head:AdditiveExpression rest: ( ShiftOperator _ AdditiveExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 AdditiveExpression
     = head:MultiplicativeExpression rest: ( AdditiveOperator _ MultiplicativeExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 MultiplicativeExpression
     = head:UnaryExpression rest: ( MultiplicativeOperator _ UnaryExpression )* {
-        //return makeBinaryOperator(head, rest);
+        return makeBinaryOperator(head, rest);
     }
 
 UnaryExpression
     = LeftHandSideExpression
     / op:UnaryOperator _ exp:UnaryExpression {
-        //return new A.UnaryOpExp(op, exp);
+        return A.unaryOpExp(op, exp);
     }
 
 LeftHandSideExpression
@@ -302,18 +317,21 @@ LeftHandSideExpression
     / MemberExpression
 
 CallExpression
-    = SPAWN? _ callee:MemberExpression args:Arguments rest:(CallCons)* {
-        //var result = new A.CallExp(callee, args);
-        //rest.forEach(function(r) {
-        //    if (Array.isArray(r)) {
-        //        result = new A.CallExp(result, r);
-        //    } else if (r.computed) {
-        //        result = new A.ComputedMemberExp(result, r.property);
-        //    } else {
-        //        result = new A.StaticMemberExp(result, r.property);
-        //    }
-        //});
-        //return result;
+    = spawn:SPAWN? _ callee:MemberExpression args:Arguments rest:(CallCons)* {
+    	var res = A.call(callee, args);
+    	rest.forEach(function(r) {
+    		if (Array.isArray(r)) {
+    			res = A.call(res, r);
+    		} else if (r.computed) {
+    			res = A.computedMemberExp(res, r.property);
+    		} else {
+    			res = A.staticMemberExp(res, r.property);
+    		}
+    	});
+    	if (spawn) {
+    		res = A.spawn(res);
+    	}
+    	return res;
     }
 
 CallNoParenExpression
@@ -322,7 +340,7 @@ CallNoParenExpression
 		&{ return enterNP(); }
 		args:ArgumentList
 		&{ return exitNP(); } {
-
+		return A.call(callee, args);
 	}
 
 // An exhaustive list of valid tokens that can appear at the start
@@ -344,22 +362,15 @@ CNPStartToken
 	/ GlobalIdent
 
 Arguments
-	= '(' _ ')' _ {
-        //return [];
-    }
-    / '(' &{ return pushNP(); } _ args:ArgumentList ')' &{ return popNP(); } _ {
-        //return args;
-    }
+	= '(' _ ')' _ { return []; }
+    / '(' &{ return pushNP(); } _ args:ArgumentList ')' &{ return popNP(); } _ { return args; }
     
-
 ArgumentList
-    = head:Argument rest:( ',' _ Argument )* {
-        //return [head].concat(rest.map(function(r) { return r[2]; }));
-    }
+    = head:Argument rest:( ',' _ Argument )* { return hat(head, rest, 2); }
 
 Argument
 	= Expression
-	/ MISSING_ARG _
+	/ MISSING_ARG _ { return A.missingArgument(); }
 
 CallCons
     = Arguments
@@ -367,15 +378,15 @@ CallCons
 
 MemberExpression
     = first:Primary rest:Member* {
-        //var result = first;
-        //rest.forEach(function(r) {
-        //    if (r.computed) {
-        //        result = new A.ComputedMemberExp(result, r.property);
-        //    } else {
-        //        result = new A.StaticMemberExp(result, r.property);
-        //    }
-        //});
-        //return result;
+        var result = first;
+        rest.forEach(function(r) {
+            if (r.computed) {
+                result = A.computedMemberExp(result, r.property);
+            } else {
+                result = A.staticMemberExp(result, r.property);
+            }
+        });
+        return result;
     }
 
 Member
@@ -384,7 +395,7 @@ Member
 
 ComputedMember
     = '[' _ property:Expression ']' _ {
-        return { computed: true, property: property };
+    	return { computed: true, property: property };
     }
 
 StaticMember
@@ -445,7 +456,7 @@ StringLiteral
 
 DoubleQuotedString
 	= '"' str:(DoubleQuotedStringChar*) '"' {
-		console.log(str.join(''));
+		return str.join('');
 	}
 
 DoubleQuotedStringChar
@@ -484,7 +495,9 @@ Ident
 	}
 
 GlobalObject
-	= GLOBAL
+	= GLOBAL {
+		return A.globalObject;
+	}
 
 GlobalIdent
 	= '$' ident:ident {
@@ -493,28 +506,24 @@ GlobalIdent
 
 ArrayLiteral
 	= '[' _ items:ArrayLiteralInner? ']' _ {
-
+		return A.arrayLiteral(items);
 	}
 
 ArrayLiteralInner
-	= head:Expression _ tail:(',' _ Expression)* {
-		return [head].concat(tail.map(function(i) {
-			return i[2];
-		}));
-	}
+	= head:Expression _ tail:(',' _ Expression)* { return hat(head, tail, 2); }
 
 DictionaryLiteral
-	= '{' _ items:DictionaryLiteralInner? '}' _ {
-
+	= '{' _ pairs:DictionaryLiteralInner? '}' _ {
+		return A.dictionaryLiteral(pairs);
 	}
 
 DictionaryLiteralInner
-	= head:DictionaryPair _ tail:(',' _ DictionaryPair)* {
-
-	}
+	= head:DictionaryPair _ tail:(',' _ DictionaryPair)* { return hat(head, tail, 2); }
 
 DictionaryPair
-	= DictionaryKey _ ':' _ Expression
+	= key:DictionaryKey _ ':' _ exp:Expression {
+		return A.dictionaryPair(key, exp);
+	}
 
 DictionaryKey
 	= Ident
@@ -524,19 +533,29 @@ DictionaryKey
 //
 
 Lambda
-	= LAMBDA_START _ LambdaArgs? &{ return pushNP(); } Statements RBRACKET &{ return popNP(); }
+	= LAMBDA_START _ args:LambdaArgs? &{ return pushNP(); } body:Statements RBRACKET &{ return popNP(); } {
+		return A.lambda(args || [], body);
+	}
 
 LambdaArgs
-	= Ident _ (',' _ Ident _)* '|'
+	= head:ident _ (',' _ tail:ident _)* '|' {
+		return [head].concat(tail.map(function(i) {
+			return i[2];
+		}));
+	}
 
 //
 // Productions
 
 Module
-	= __ Ports Statements
+	= __ ports:Ports stmts:Statements {
+		return A.module(ports, stmts);
+	}
 
 Ports
-	= (Port NL)*
+	= ports:(Port NL)* {
+		return ports.map(function(p) { return p[0]; });
+	}
 
 Port
 	= Import
@@ -545,38 +564,54 @@ Port
 	/ ExportBang
 
 Import
-	= IMPORT _ ident _ ImportSpecifics? PortAlias?
+	= IMPORT _ ident _ ImportSpecifics? PortAlias? {
+
+	}
 
 ImportBang
-	= IMPORT_B _ ident _ ImportSpecifics?
+	= IMPORT_B _ ident _ ImportSpecifics? {
+
+	}
 
 ImportSpecifics
-	= DOT _ LBRACE _ PortList RBRACE _
+	= DOT _ LBRACE _ PortList RBRACE _ {
+
+	}
 
 Export
-	= EXPORT _ PortList
+	= EXPORT _ PortList {
+
+	}
 
 ExportBang
-	= EXPORT_B _ ident
+	= EXPORT_B _ ident {
+
+	}
 
 PortList
-	= head:(PortItem) tail:(',' _ PortItem)*
+	= head:(PortItem) tail:(',' _ PortItem)* {
+
+	}
 
 PortItem
-	= ident _ PortAlias?
+	= ident _ PortAlias? {
+
+	}
 
 PortAlias
-	= 'as' _ ident _
+	= 'as' _ ident _ {
+
+	}
 
 Statements
-	= _s Statement*
+	= _s stmts:Statement* { return stmts; }
 
 Statement
-	= BlockStatement
-	/ InlineStatement InlineStatementTerminator
+	= stmt:BlockStatement								{ return stmt; }
+	/ stmt:InlineStatement InlineStatementTerminator 	{ return stmt; }
 
 Block
-	= '{' Statements '}' _s
+	= '{' stmts:Statements '}' _s 						{ return stmts; }
 
 BlockStatement
 	= WhileStatement
@@ -588,43 +623,72 @@ BlockStatement
 	/ FunctionDefinition
 
 WhileStatement
-	= WHILE _ Expression _b Block
+	= WHILE _ exp:Expression _b body:Block {
+		return A.whileStatement(exp, body);
+	}
 
 LoopWhileStatement
-	= LOOP _ WHILE _ Expression _b Block
+	= LOOP _ WHILE _ exp:Expression _b body:Block {
+		return A.loopWhileStatement(exp, body);
+	}
 
 LoopStatement
-	= LOOP _b Block
+	= LOOP _b body:Block {
+		return A.loopStatement(body);
+	}
 
 ForStatement
-	= FOR _ Ident _ IN _ Expression _ 'to' _ Expression _ ('step' _ Expression)? _b Block
+	= FOR _ subject:ident _ IN _ start:Expression _ 'to' _ end:Expression _ step:('step' _ Expression)? _b body:Block {
+		return A.forStatement(subject, start, end, step ? step[2] : null, body);
+	}
 
 ForeachStatement
-	= FOR _ Ident _ (',' _ Ident _)? IN _ Expression _b Block
+	= FOR _ subject1:Ident _ subject2:(',' _ Ident _)? IN _ exp:Expression _b body:Block {
+		return A.foreachStatement(subject1, subject2 ? subject2[2], exp, body);
+	}
 
 IfStatement
-	= IF _ Expression _b Block ElseIfBlock* ElseBlock?
+	= IF _ exp:Expression _b body:Block clauses:ElseIfBlock* elseClause:ElseBlock? {
+		var initialClause = A.ifClause(exp, body);
+		var clauses [initialClause].concat(clauses);
+		if (elseClause) {
+			clauses.push(elseClause);
+		}
+		return A.ifStatement(clauses);
+	}
 
 ElseIfBlock
-	= _b ELSE _ IF _ Expression _b Block
+	= _b ELSE _ IF _ exp:Expression _b body:Block {
+		return A.ifClause(exp, body);
+	}
 
 ElseBlock
-	= _b ELSE _b Block
+	= _b ELSE _b body:Block {
+		return A.ifClause(null, body);
+	}
 
 FunctionDefinition
-	= DEF _ method_name _ FunctionParameters? _b Block
+	= DEF _ name:method_name _ params:FunctionParameters? _b body:Block {
+		return A.functionDefinition(name, params || [], body);
+	}
 
 FunctionParameters
-	= '(' _ FunctionParameterList? ')'
+	= '(' _ params:FunctionParameterList? ')' {
+		return params || [];
+	}
 
 FunctionParameterList
-	= FunctionRequiredParameters (',' _ FunctionOptionalParameters)?
-	/ FunctionOptionalParameters
+	= p1:FunctionRequiredParameters p2:(',' _ FunctionOptionalParameters)? {
+		return p2 ? p1.concat(p2[2]) : p1;
+	}
+	/ p1:FunctionOptionalParameters {
+		return p1;
+	}
 
-FunctionRequiredParameters	= FRP (',' _ FRP)*
-FunctionOptionalParameters	= FOP (',' _ FOP)*
-					FRP 	= Ident _ !'='
-					FOP 	= Ident _ '=' _ FOPExpr
+FunctionRequiredParameters	= h:FRP (',' _ t:FRP)* 				{ return hat(h, t, 2); }
+FunctionOptionalParameters	= h:FOP (',' _ t:FOP)* 				{ return hat(h, t, 2); }
+					FRP 	= name:ident _ !'='					{ return A.requiredParameter(name); }
+					FOP 	= name:ident _ '=' _ value:FOPExpr	{ return A.optionalParameter(name, value); }
 
 FOPExpr
 	= Constant
@@ -645,18 +709,22 @@ InlineStatementTerminator
 	/ &']'
 
 ReturnStatement
-	= RETURN _ Expression _
-	/ RETURN _
+	= RETURN _ exp:Expression _ 	{ return A.returnStatement(exp); }
+	/ RETURN _ 						{ return A.returnStatement(null); }
 
 YieldStatement
-	= YIELD _
+	= YIELD _ 						{ return A.yieldStatement(); }
 
 LocalVariables
-	= MY LocalVariable (',' _ LocalVariable)*
+	= MY head:LocalVariable tail:(',' _ LocalVariable)* {
+		return A.localVariables(head.concat(tail.map(function(t) {
+			return t[2];
+		})));
+	}
 
 LocalVariable
-	= Ident _ '=' _ Expression _
-	/ Ident _
+	= name:Ident _ '=' _ exp:Expression _ 	{ return A.localVariable(name, exp); }
+	/ name:Ident _ 							{ return A.localVariable(name, null); }
 
 ExpressionStatement
-	= Expression _
+	= exp:Expression _ 						{ return exp; }
