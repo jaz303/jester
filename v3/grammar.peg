@@ -411,25 +411,27 @@ Primary
 	/ Lambda
 
 Atom
-	= Constant _
-	/ Ident _
-	/ GlobalObject _
-	/ GlobalIdent _
-	/ ArrayLiteral _
-	/ DictionaryLiteral _
-	/ '(' &{ return pushNP(); } _ exp:Expression _ ')' &{ return popNP(); } _
+	= v:Constant _ { return v; }
+	/ v:Ident _ { return v; }
+	/ v:GlobalObject _ { return v; }
+	/ v:GlobalIdent _ { return v; }
+	/ v:ArrayLiteral _ { return v; }
+	/ v:DictionaryLiteral _ { return v; }
+	/ '(' &{ return pushNP(); } _ exp:Expression _ ')' &{ return popNP(); } _ {
+		return exp;
+	}
 
 Constant
 	= NumericLiteral
-	/ StringLiteral _
-	/ ColorLiteral _
-	/ BooleanLiteral _
+	/ v:StringLiteral _ { return v; }
+	/ v:ColorLiteral _ { return v; }
+	/ v:BooleanLiteral _ { return v; }
 
 NumericLiteral
-	= FloatLiteral _
-	/ IntegerLiteral _
-	/ HexLiteral _
-	/ BinaryLiteral _
+	= v:FloatLiteral _ { return v; }
+	/ v:IntegerLiteral _ { return v; }
+	/ v:HexLiteral _ { return v; }
+	/ v:BinaryLiteral _ { return v; }
 
 IntegerLiteral
 	= v:integer {
@@ -644,13 +646,13 @@ ForStatement
 
 ForeachStatement
 	= FOR _ subject1:Ident _ subject2:(',' _ Ident _)? IN _ exp:Expression _b body:Block {
-		return A.foreachStatement(subject1, subject2 ? subject2[2], exp, body);
+		return A.foreachStatement(subject1, subject2 ? subject2[2] : null, exp, body);
 	}
 
 IfStatement
 	= IF _ exp:Expression _b body:Block clauses:ElseIfBlock* elseClause:ElseBlock? {
 		var initialClause = A.ifClause(exp, body);
-		var clauses [initialClause].concat(clauses);
+		var clauses = [initialClause].concat(clauses);
 		if (elseClause) {
 			clauses.push(elseClause);
 		}
