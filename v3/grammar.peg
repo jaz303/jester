@@ -450,7 +450,7 @@ BinaryLiteral
 
 FloatLiteral
 	= v:float {
-		return parseFloat(v.substr(2));
+		return parseFloat(v);
 	}
 
 StringLiteral
@@ -475,12 +475,15 @@ ColorLiteral
 	/ NamedColorLiteral
 
 HexColorLiteral
-	= '#' v:$( [0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f] ) {
-		return A.hexColor('FF' + v);
-	}
-	/ '#' v:$( [0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f][0-9A-Fa-f] ) {
+	= '#' v:$( HCD HCD HCD HCD HCD HCD HCD HCD ) {
 		return A.hexColor(v);
 	}
+	/ '#' v:$( HCD HCD HCD HCD HCD HCD ) {
+		return A.hexColor('FF' + v);
+	}
+	
+HCD
+	= [0-9A-Fa-f]
 
 NamedColorLiteral
 	= '#' name:$( [a-z]i+ ) {

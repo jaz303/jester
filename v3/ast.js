@@ -12,6 +12,8 @@ var T_LOOP_WHILE_STATEMENT 	= exports.T_LOOP_WHILE_STATEMENT 	= iota();
 var T_LOOP_STATEMENT 		= exports.T_LOOP_STATEMENT 			= iota();
 var T_FOR_STATEMENT 		= exports.T_FOR_STATEMENT 			= iota();
 var T_FOREACH_STATEMENT 	= exports.T_FOREACH_STATEMENT 		= iota();
+var T_HEX_COLOR 			= exports.T_HEX_COLOR 				= iota();
+var T_NAMED_COLOR 			= exports.T_NAMED_COLOR 			= iota();
 
 exports.module = module;
 function module(ports, stmts) {
@@ -74,13 +76,23 @@ function ident(name) {
 }
 
 exports.hexColor = hexColor;
-function hexColor(name) {
-
+function hexColor(hex) {
+	var val = parseInt(hex, 16);
+	return {
+		type 	: T_HEX_COLOR,
+		a 		: (val >> 24) & 0xFF,
+		r 		: (val >> 16) & 0xFF,
+		g 		: (val >>  8) & 0xFF,
+		b 		: (val >>  0) & 0xFF
+	};
 }
 
 exports.namedColor = namedColor;
 function namedColor(name) {
-	
+	return {
+		type 	: T_NAMED_COLOR,
+		name 	: name
+	};
 }
 
 exports.whileStatement = whileStatement;

@@ -1,0 +1,31 @@
+1
+5
+0xff0f
+0b1101
+true
+false
+1.23
+#ff0000
+#7f123456
+#red
+"this is a double quoted string"
+"here's a string with new\nlines"
+"\r\n\t\'\"\\"
+
+---
+
+{ type: A.T_MODULE, body: [
+	1,
+	5,
+	0xff0f,
+	13,
+	true,
+	false,
+	1.23,
+	{ type: A.T_HEX_COLOR, a: 0xff, r: 0xff, g: 0x00, b: 0x00 },
+	{ type: A.T_HEX_COLOR, a: 0x7f, r: 0x12, g: 0x34, b: 0x56 },
+	{ type: A.T_NAMED_COLOR, name: 'red' },
+	"this is a double quoted string",
+	"here's a string with new\nlines",
+	"\r\n\t\'\"\\"
+] }
