@@ -1,0 +1,27 @@
+for a in foo {
+	true
+}
+
+for a, b in bar {
+	true
+}
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{ 	type: A.T_FOREACH_STATEMENT,
+	  	key: null,
+	  	value: "a",
+	  	exp: { type: A.T_IDENT, name: "foo" },
+	  	body: [ true ]
+	},
+
+	{ 	type: A.T_FOREACH_STATEMENT,
+	  	key: "a",
+	  	value: "b",
+	  	exp: { type: A.T_IDENT, name: "bar" },
+	  	body: [ true ]
+	}
+
+] }

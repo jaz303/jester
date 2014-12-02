@@ -353,8 +353,8 @@ module.exports = (function() {
         peg$c233 = function(body) {
         		return A.loopStatement(body);
         	},
-        peg$c234 = "to",
-        peg$c235 = { type: "literal", value: "to", description: "\"to\"" },
+        peg$c234 = "..",
+        peg$c235 = { type: "literal", value: "..", description: "\"..\"" },
         peg$c236 = "step",
         peg$c237 = { type: "literal", value: "step", description: "\"step\"" },
         peg$c238 = function(subject, start, end, step, body) {
@@ -6146,7 +6146,13 @@ module.exports = (function() {
           if (s3 !== peg$FAILED) {
             s4 = peg$parse_();
             if (s4 !== peg$FAILED) {
-              s5 = peg$parseIN();
+              if (input.substr(peg$currPos, 2) === peg$c101) {
+                s5 = peg$c101;
+                peg$currPos += 2;
+              } else {
+                s5 = peg$FAILED;
+                if (peg$silentFails === 0) { peg$fail(peg$c102); }
+              }
               if (s5 !== peg$FAILED) {
                 s6 = peg$parse_();
                 if (s6 !== peg$FAILED) {
@@ -6278,7 +6284,7 @@ module.exports = (function() {
       if (s1 !== peg$FAILED) {
         s2 = peg$parse_();
         if (s2 !== peg$FAILED) {
-          s3 = peg$parseIdent();
+          s3 = peg$parseident();
           if (s3 !== peg$FAILED) {
             s4 = peg$parse_();
             if (s4 !== peg$FAILED) {
@@ -6293,7 +6299,7 @@ module.exports = (function() {
               if (s6 !== peg$FAILED) {
                 s7 = peg$parse_();
                 if (s7 !== peg$FAILED) {
-                  s8 = peg$parseIdent();
+                  s8 = peg$parseident();
                   if (s8 !== peg$FAILED) {
                     s9 = peg$parse_();
                     if (s9 !== peg$FAILED) {
@@ -6319,7 +6325,13 @@ module.exports = (function() {
                 s5 = peg$c5;
               }
               if (s5 !== peg$FAILED) {
-                s6 = peg$parseIN();
+                if (input.substr(peg$currPos, 2) === peg$c101) {
+                  s6 = peg$c101;
+                  peg$currPos += 2;
+                } else {
+                  s6 = peg$FAILED;
+                  if (peg$silentFails === 0) { peg$fail(peg$c102); }
+                }
                 if (s6 !== peg$FAILED) {
                   s7 = peg$parse_();
                   if (s7 !== peg$FAILED) {

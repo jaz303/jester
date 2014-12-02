@@ -1,0 +1,29 @@
+for a in 1..5 {
+	true
+}
+
+for a in 10..20 step 2 {
+	true
+}
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{ 	type: A.T_FOR_STATEMENT,
+	  	subject: "a",
+	  	start: 1,
+	  	end: 5,
+	  	step: null,
+	  	body: [ true ]
+	},
+
+	{ 	type: A.T_FOR_STATEMENT,
+	  	subject: "a",
+	  	start: 10,
+	  	end: 20,
+	  	step: 2,
+	  	body: [ true ]
+	}
+
+] }

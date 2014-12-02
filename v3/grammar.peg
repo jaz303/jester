@@ -643,12 +643,12 @@ LoopStatement
 	}
 
 ForStatement
-	= FOR _ subject:ident _ IN _ start:Expression _ 'to' _ end:Expression _ step:('step' _ Expression)? _b body:Block {
+	= FOR _ subject:ident _ 'in' _ start:Expression _ '..' _ end:Expression _ step:('step' _ Expression)? _b body:Block {
 		return A.forStatement(subject, start, end, step ? step[2] : null, body);
 	}
 
 ForeachStatement
-	= FOR _ subject1:Ident _ subject2:(',' _ Ident _)? IN _ exp:Expression _b body:Block {
+	= FOR _ subject1:ident _ subject2:(',' _ ident _)? 'in' _ exp:Expression _b body:Block {
 		return A.foreachStatement(subject1, subject2 ? subject2[2] : null, exp, body);
 	}
 
