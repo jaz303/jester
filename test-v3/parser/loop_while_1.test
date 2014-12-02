@@ -1,0 +1,14 @@
+loop while true {
+	1
+}
+
+---
+
+{ type: A.T_MODULE, body: [
+	{ 	type: A.T_LOOP_WHILE_STATEMENT,
+		cond: true,
+		body: [
+			1
+		]
+	}
+] }

@@ -1,0 +1,36 @@
+.[ 1; 2; 3 ]
+
+.[
+	true; false
+	true
+	false
+]
+
+.[ a , b ,c | 10; 20;
+	30
+]
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{ 	type: A.T_LAMBDA,
+	  	params: [],
+	  	body: [ 1, 2, 3 ]
+	},
+
+	{ 	type: A.T_LAMBDA,
+	  	params: [],
+	  	body: [ true, false, true, false ]
+	},
+
+	{ 	type: A.T_LAMBDA,
+	  	params: [
+	  		{ name: "a", required: true, defaultValue: null },
+	  		{ name: "b", required: true, defaultValue: null },
+	  		{ name: "c", required: true, defaultValue: null }
+	  	],
+	  	body: [ 10, 20, 30 ]
+	},	
+
+] }

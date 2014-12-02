@@ -307,11 +307,11 @@ module.exports = (function() {
         		return A.globalIdent(ident);
         	},
         peg$c213 = function(items) {
-        		return A.arrayLiteral(items);
+        		return A.arrayLiteral(items || []);
         	},
         peg$c214 = function(head, tail) { return hat(head, tail, 2); },
         peg$c215 = function(pairs) {
-        		return A.dictionaryLiteral(pairs);
+        		return A.dictionaryLiteral(pairs || []);
         	},
         peg$c216 = ":",
         peg$c217 = { type: "literal", value: ":", description: "\":\"" },
@@ -323,9 +323,9 @@ module.exports = (function() {
         peg$c221 = function(args, body) {
         		return A.lambda(args || [], body);
         	},
-        peg$c222 = function(head) {
-        		return [head].concat(tail.map(function(i) {
-        			return i[2];
+        peg$c222 = function(head, tail) {
+        		return [ A.requiredParameter(head) ].concat(tail.map(function(i) {
+        			return A.requiredParameter(i[2]);
         		}));
         	},
         peg$c223 = function(ports, stmts) {
@@ -389,7 +389,7 @@ module.exports = (function() {
         peg$c246 = function(p1) {
         		return p1;
         	},
-        peg$c247 = function(h) { return hat(h, t, 2); },
+        peg$c247 = function(h, t) { return hat(h, t, 2); },
         peg$c248 = function(name) { return A.requiredParameter(name); },
         peg$c249 = function(name, value) { return A.optionalParameter(name, value); },
         peg$c250 = function(exp) { return A.returnStatement(exp); },
@@ -5402,7 +5402,7 @@ module.exports = (function() {
             }
             if (s4 !== peg$FAILED) {
               peg$reportedPos = s0;
-              s1 = peg$c222(s1);
+              s1 = peg$c222(s1, s3);
               s0 = s1;
             } else {
               peg$currPos = s0;
@@ -6764,7 +6764,7 @@ module.exports = (function() {
         }
         if (s2 !== peg$FAILED) {
           peg$reportedPos = s0;
-          s1 = peg$c247(s1);
+          s1 = peg$c247(s1, s2);
           s0 = s1;
         } else {
           peg$currPos = s0;
@@ -6844,7 +6844,7 @@ module.exports = (function() {
         }
         if (s2 !== peg$FAILED) {
           peg$reportedPos = s0;
-          s1 = peg$c247(s1);
+          s1 = peg$c247(s1, s2);
           s0 = s1;
         } else {
           peg$currPos = s0;

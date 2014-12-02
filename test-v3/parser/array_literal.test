@@ -1,0 +1,24 @@
+[]
+
+[ 1, 2, 3, false, true ]
+
+[ [ 1, 2], 3 ]
+
+---
+
+{ type: A.T_MODULE, body: [
+	{ 	type 	: A.T_ARRAY_LITERAL,
+		items 	: []
+	},
+	{ 	type 	: A.T_ARRAY_LITERAL,
+		items 	: [ 1, 2, 3, false, true ]
+	},
+	{ 	type 	: A.T_ARRAY_LITERAL,
+		items 	: [
+			{ 	type: A.T_ARRAY_LITERAL,
+				items: [ 1, 2 ]
+			},
+			3
+		]
+	}
+] }

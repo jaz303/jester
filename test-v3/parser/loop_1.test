@@ -1,0 +1,13 @@
+loop {
+	1
+}
+
+---
+
+{ type: A.T_MODULE, body: [
+	{ 	type: A.T_LOOP_STATEMENT,
+		body: [
+			1
+		]
+	}
+] }

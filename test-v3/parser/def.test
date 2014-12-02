@@ -1,0 +1,71 @@
+def baz {
+	true
+}
+
+def foo() {
+	false
+}
+
+def bleem( a , b , c ) {
+	1
+}
+
+def raa( x = 1, y = 2, z = 3) {
+	1
+}
+
+def foof( a, b, x = 1, y = 2, z = 3) {
+	1
+	2
+	3
+}
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{ 	type: A.T_FUNCTION_DEF,
+	  	name: "baz",
+	  	params: [],
+	  	body: [ true ]
+	},
+
+	{ 	type: A.T_FUNCTION_DEF,
+	  	name: "foo",
+	  	params: [],
+	  	body: [ false ]
+	},
+
+	{ 	type: A.T_FUNCTION_DEF,
+	  	name: "bleem",
+	  	params: [
+	  		{ name: "a", required: true, defaultValue: null },
+	  		{ name: "b", required: true, defaultValue: null },
+	  		{ name: "c", required: true, defaultValue: null }
+	  	],
+	  	body: [ 1 ]
+	},
+
+	{ 	type: A.T_FUNCTION_DEF,
+	  	name: "raa",
+	  	params: [
+	  		{ name: "x", required: false, defaultValue: 1 },
+	  		{ name: "y", required: false, defaultValue: 2 },
+	  		{ name: "z", required: false, defaultValue: 3 }
+	  	],
+	  	body: [ 1 ]
+	},
+
+	{ 	type: A.T_FUNCTION_DEF,
+	  	name: "foof",
+	  	params: [
+	  		{ name: "a", required: true, defaultValue: null },
+	  		{ name: "b", required: true, defaultValue: null },
+	  		{ name: "x", required: false, defaultValue: 1 },
+	  		{ name: "y", required: false, defaultValue: 2 },
+	  		{ name: "z", required: false, defaultValue: 3 }
+	  	],
+	  	body: [ 1, 2, 3 ]
+	}
+
+] }

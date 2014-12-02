@@ -14,6 +14,9 @@ var T_FOR_STATEMENT 		= exports.T_FOR_STATEMENT 			= iota();
 var T_FOREACH_STATEMENT 	= exports.T_FOREACH_STATEMENT 		= iota();
 var T_HEX_COLOR 			= exports.T_HEX_COLOR 				= iota();
 var T_NAMED_COLOR 			= exports.T_NAMED_COLOR 			= iota();
+var T_RETURN_STATEMENT 		= exports.T_RETURN_STATEMENT 		= iota();
+var T_ASSIGN 				= exports.T_ASSIGN 					= iota();
+var T_FUNCTION_DEF 			= exports.T_FUNCTION_DEF 			= iota();
 
 exports.module = module;
 function module(ports, stmts) {
@@ -59,10 +62,10 @@ function globalIdent(name) {
 }
 
 exports.lambda = lambda;
-function lambda(args, body) {
+function lambda(params, body) {
 	return {
 		type 	: T_LAMBDA,
-		args 	: args,
+		params 	: params,
 		body  	: body
 	};
 }
@@ -156,22 +159,38 @@ function ifClause(exp, body) {
 
 exports.functionDefinition = functionDefinition;
 function functionDefinition(name, params, body) {
-
+	return {
+		type 	: T_FUNCTION_DEF,
+		name 	: name,
+		params 	: params,
+		body 	: body
+	};
 }
 
 exports.requiredParameter = requiredParameter;
 function requiredParameter(name) {
-
+	return {
+		name 			: name,
+		required 		: true,
+		defaultValue	: null
+	};
 }
 
 exports.optionalParameter = optionalParameter;
 function optionalParameter(name, defaultValue) {
-
+	return {
+		name 			: name,
+		required 		: false,
+		defaultValue 	: defaultValue
+	};
 }
 
 exports.returnStatement = returnStatement;
 function returnStatement(exp) {
-
+	return {
+		type 	: T_RETURN_STATEMENT,
+		exp 	: exp
+	};
 }
 
 exports.yieldStatement = yieldStatement;
@@ -181,7 +200,11 @@ function yieldStatement() {
 
 exports.assignmentExp = assignmentExp;
 function assignmentExp(lhs, rhs) {
-
+	return {
+		type 	: T_ASSIGN,
+		left 	: lhs,
+		right	: rhs
+	};
 }
 
 exports.unaryOpExp = unaryOpExp;

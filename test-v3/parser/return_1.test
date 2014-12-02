@@ -1,0 +1,14 @@
+return
+
+return true
+
+---
+
+{ type: A.T_MODULE, body: [
+	{ 	type: A.T_RETURN_STATEMENT,
+		exp: null
+	},
+	{ 	type: A.T_RETURN_STATEMENT,
+		exp: true
+	}
+] }

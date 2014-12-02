@@ -1,0 +1,32 @@
+{}
+
+{ "foo": 1, bar: 2 }
+
+{ "a": 1, "b": { "c": 2, "d": 3 } }
+
+---
+
+{ type: A.T_MODULE, body: [
+	{ 	type 	: A.T_DICTIONARY_LITERAL,
+		pairs 	: []
+	},
+	{ 	type 	: A.T_DICTIONARY_LITERAL,
+		pairs 	: [
+			{ key: "foo", value: 1 },
+			{ key: { type: A.T_IDENT, name: "bar" }, value: 2 }
+		]
+	},
+	{	type 	: A.T_DICTIONARY_LITERAL,
+		pairs 	: [
+			{ key: "a", value: 1 },
+			{ key: "b", value: 
+				{ type	: A.T_DICTIONARY_LITERAL,
+				  pairs: [
+						{ key: "c", value: 2 },
+						{ key: "d", value: 3 }
+					]
+				}
+			}
+		]
+	}
+] }

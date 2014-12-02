@@ -511,7 +511,7 @@ GlobalIdent
 
 ArrayLiteral
 	= '[' _ items:ArrayLiteralInner? ']' _ {
-		return A.arrayLiteral(items);
+		return A.arrayLiteral(items || []);
 	}
 
 ArrayLiteralInner
@@ -519,7 +519,7 @@ ArrayLiteralInner
 
 DictionaryLiteral
 	= '{' _ pairs:DictionaryLiteralInner? '}' _ {
-		return A.dictionaryLiteral(pairs);
+		return A.dictionaryLiteral(pairs || []);
 	}
 
 DictionaryLiteralInner
@@ -543,9 +543,9 @@ Lambda
 	}
 
 LambdaArgs
-	= head:ident _ (',' _ tail:ident _)* '|' {
-		return [head].concat(tail.map(function(i) {
-			return i[2];
+	= head:ident _ tail:(',' _ ident _)* '|' {
+		return [ A.requiredParameter(head) ].concat(tail.map(function(i) {
+			return A.requiredParameter(i[2]);
 		}));
 	}
 
@@ -690,8 +690,8 @@ FunctionParameterList
 		return p1;
 	}
 
-FunctionRequiredParameters	= h:FRP (',' _ t:FRP)* 				{ return hat(h, t, 2); }
-FunctionOptionalParameters	= h:FOP (',' _ t:FOP)* 				{ return hat(h, t, 2); }
+FunctionRequiredParameters	= h:FRP t:(',' _ FRP)* 				{ return hat(h, t, 2); }
+FunctionOptionalParameters	= h:FOP t:(',' _ FOP)* 				{ return hat(h, t, 2); }
 					FRP 	= name:ident _ !'='					{ return A.requiredParameter(name); }
 					FOP 	= name:ident _ '=' _ value:FOPExpr	{ return A.optionalParameter(name, value); }
 
