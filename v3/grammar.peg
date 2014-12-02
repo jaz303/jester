@@ -501,7 +501,7 @@ Ident
 
 GlobalObject
 	= GLOBAL {
-		return A.globalObject;
+		return A.globalObject();
 	}
 
 GlobalIdent

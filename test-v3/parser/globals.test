@@ -1,0 +1,14 @@
+$
+
+$foo
+
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{ 	type: A.T_GLOBAL_OBJECT },
+
+	{ 	type: A.T_GLOBAL_IDENT, name: "foo" }
+
+] }

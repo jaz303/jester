@@ -301,7 +301,7 @@ module.exports = (function() {
         		return A.ident(ident);
         	},
         peg$c211 = function() {
-        		return A.globalObject;
+        		return A.globalObject();
         	},
         peg$c212 = function(ident) {
         		return A.globalIdent(ident);
