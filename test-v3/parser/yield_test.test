@@ -1,0 +1,9 @@
+yield
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{ 	type: A.T_YIELD_STATEMENT }
+
+] }

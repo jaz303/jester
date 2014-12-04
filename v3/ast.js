@@ -17,6 +17,13 @@ var T_NAMED_COLOR 			= exports.T_NAMED_COLOR 			= iota();
 var T_RETURN_STATEMENT 		= exports.T_RETURN_STATEMENT 		= iota();
 var T_ASSIGN 				= exports.T_ASSIGN 					= iota();
 var T_FUNCTION_DEF 			= exports.T_FUNCTION_DEF 			= iota();
+var T_CALL 					= exports.T_CALL 					= iota();
+var T_SPAWN 				= exports.T_SPAWN 					= iota();
+var T_MISSING_ARGUMENT 		= exports.T_MISSING_ARGUMENT 		= iota();
+var T_YIELD_STATEMENT 		= exports.T_YIELD_STATEMENT 		= iota();
+var T_COMPUTED_MEMBER_EXP 	= exports.T_COMPUTED_MEMBER_EXP 	= iota();
+var T_STATIC_MEMBER_EXP 	= exports.T_STATIC_MEMBER_EXP 		= iota();
+var T_IF_STATEMENT 			= exports.T_IF_STATEMENT 			= iota();
 
 exports.module = module;
 function module(ports, stmts) {
@@ -149,12 +156,18 @@ function foreachStatement(subject1, subject2, exp, body) {
 
 exports.ifStatement = ifStatement;
 function ifStatement(clauses) {
-
+	return {
+		type 	: T_IF_STATEMENT,
+		clauses : clauses
+	}
 }
 
 exports.ifClause = ifClause;
 function ifClause(exp, body) {
-
+	return {
+		cond 	: exp,
+		body 	: body
+	};
 }
 
 exports.functionDefinition = functionDefinition;
@@ -195,7 +208,7 @@ function returnStatement(exp) {
 
 exports.yieldStatement = yieldStatement;
 function yieldStatement() {
-
+	return { type: T_YIELD_STATEMENT };
 }
 
 exports.assignmentExp = assignmentExp;
@@ -229,25 +242,40 @@ function logicalAndExp(left, right) {
 
 exports.missingArgument = missingArgument;
 function missingArgument() {
-
+	return { type: T_MISSING_ARGUMENT };
 }
 
 exports.call = call;
 function call(callee, args) {
-
+	return {
+		type	: T_CALL,
+		callee	: callee,
+		args 	: args
+	};
 }
 
 exports.spawn = spawn;
 function spawn(call) {
-
+	return {
+		type 	: T_SPAWN,
+		call 	: call
+	};
 }
 
 exports.computedMemberExp = computedMemberExp;
 function computedMemberExp(subject, property) {
-
+	return {
+		type 		: T_COMPUTED_MEMBER_EXP,
+		subject 	: subject,
+		property 	: property
+	};
 }
 
 exports.staticMemberExp = staticMemberExp;
 function staticMemberExp(subject, name) {
-	
+	return {
+		type 		: T_STATIC_MEMBER_EXP,
+		subject 	: subject,
+		property 	: name
+	};	
 }

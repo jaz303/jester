@@ -1,0 +1,69 @@
+bar()
+foo(1, 2, 3)
+baz true, false, 10
+alpha(foo(), bar(1), baz(3,4,5))
+
+add ?, 1, ?
+
+foo[1].bar(true)
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{	type: A.T_CALL,
+		callee: { type: A.T_IDENT, name: 'bar' },
+		args: []
+	},
+
+	{	type: A.T_CALL,
+		callee: { type: A.T_IDENT, name: 'foo' },
+		args: [ 1, 2, 3 ]
+	},
+
+	{	type: A.T_CALL,
+		callee: { type: A.T_IDENT, name: 'baz' },
+		args: [ true, false, 10 ]
+	},
+
+	{	type: A.T_CALL,
+		callee: { type: A.T_IDENT, name: 'alpha' },
+		args: [
+			{	type: A.T_CALL,
+				callee: { type: A.T_IDENT, name: 'foo' },
+				args: []
+			},
+			{	type: A.T_CALL,
+				callee: { type: A.T_IDENT, name: 'bar' },
+				args: [1]
+			},
+			{	type: A.T_CALL,
+				callee: { type: A.T_IDENT, name: 'baz' },
+				args: [3, 4, 5]
+			}
+		]
+	},
+
+	{	type: A.T_CALL,
+		callee: { type: A.T_IDENT, name: 'add' },
+		args: [
+			{ type: A.T_MISSING_ARGUMENT },
+			1,
+			{ type: A.T_MISSING_ARGUMENT }
+		]
+	},
+
+	{	type: A.T_CALL,
+		callee: {
+			type: A.T_STATIC_MEMBER_EXP,
+			property: 'bar',
+			subject: {
+				type: A.T_COMPUTED_MEMBER_EXP,
+				property: 1,
+				subject: { type: A.T_IDENT, name: 'foo' }
+			}
+		},
+		args: [ true ]
+	}
+
+] }

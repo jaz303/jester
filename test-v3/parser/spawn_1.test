@@ -1,0 +1,64 @@
+spawn baz()
+spawn foo(1, 2, 3)
+spawn foo(1, 2, 3)(4, 5, 6)
+
+spawn foo.bar(1, 2, 3)
+spawn foo[1](4, 5, 6)
+
+---
+
+{ type: A.T_MODULE, body: [
+
+	{	type: A.T_SPAWN,
+		call: {
+			type: A.T_CALL,
+			callee: { type: A.T_IDENT, name: 'baz' },
+			args: []
+		}
+	},
+	
+	{	type: A.T_SPAWN,
+		call: {
+			type: A.T_CALL,
+			callee: { type: A.T_IDENT, name: 'foo' },
+			args: [1, 2, 3]
+		}
+	},
+
+	{	type: A.T_SPAWN,
+		call: {
+			type: A.T_CALL,
+			callee: {
+				type: A.T_CALL,
+				callee: { type: A.T_IDENT, name: 'foo' },
+				args: [1, 2, 3]
+			},
+			args: [4, 5, 6]
+		}
+	},
+
+	{	type: A.T_SPAWN,
+		call: {
+			type: A.T_CALL,
+			callee: {
+				type: A.T_STATIC_MEMBER_EXP,
+				property: "bar",
+				subject: { type: A.T_IDENT, name: 'foo' }
+			},
+			args: [1, 2, 3]
+		}
+	},
+
+	{	type: A.T_SPAWN,
+		call: {
+			type: A.T_CALL,
+			callee: {
+				type: A.T_COMPUTED_MEMBER_EXP,
+				property: 1,
+				subject: { type: A.T_IDENT, name: 'foo' }
+			},
+			args: [4, 5, 6]
+		}
+	}
+
+] }

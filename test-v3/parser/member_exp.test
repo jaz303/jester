@@ -1,0 +1,62 @@
+a.foo
+a.foo.bar
+a[b]
+a[true]
+a[2][c]
+a.b[c][d].e
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{ 	type: A.T_STATIC_MEMBER_EXP,
+	  	subject: { type: A.T_IDENT, name: "a" },
+	  	property: "foo"
+	},
+
+	{ 	type: A.T_STATIC_MEMBER_EXP,
+	  	subject: {
+	  		type: A.T_STATIC_MEMBER_EXP,
+		  	subject: { type: A.T_IDENT, name: "a" },
+		  	property: "foo"
+	  	},
+	  	property: "bar"
+	},
+
+	{ 	type: A.T_COMPUTED_MEMBER_EXP,
+	  	subject: { type: A.T_IDENT, name: "a" },
+	  	property: { type: A.T_IDENT, name: "b" }
+	},
+
+	{ 	type: A.T_COMPUTED_MEMBER_EXP,
+	  	subject: { type: A.T_IDENT, name: "a" },
+	  	property: true
+	},
+
+	{ 	type: A.T_COMPUTED_MEMBER_EXP,
+	  	subject: {
+	  		type: A.T_COMPUTED_MEMBER_EXP,
+		  	subject: { type: A.T_IDENT, name: "a" },
+		  	property: 2
+	  	},
+	  	property: { type: A.T_IDENT, name: "c" }
+	},
+
+	{	type: A.T_STATIC_MEMBER_EXP,
+		property: "e",
+		subject: {
+	  		type: A.T_COMPUTED_MEMBER_EXP,
+	  		property: { type: A.T_IDENT, name: "d" },
+		  	subject: {
+  		  		type: A.T_COMPUTED_MEMBER_EXP,
+  		  		property: { type: A.T_IDENT, name: "c" },
+  			  	subject: {
+  			  		type: A.T_STATIC_MEMBER_EXP,
+  			  		property: "b",
+	  			  	subject: { type: A.T_IDENT, name: "a" },
+	  			}
+		  	}
+		}
+	}
+
+] }
