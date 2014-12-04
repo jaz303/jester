@@ -25,6 +25,10 @@ var T_COMPUTED_MEMBER_EXP 	= exports.T_COMPUTED_MEMBER_EXP 	= iota();
 var T_STATIC_MEMBER_EXP 	= exports.T_STATIC_MEMBER_EXP 		= iota();
 var T_IF_STATEMENT 			= exports.T_IF_STATEMENT 			= iota();
 
+var N_GLOBAL_OBJECT 		= { type: T_GLOBAL_OBJECT };
+var N_MISSING_ARGUMENT 		= { type: T_MISSING_ARGUMENT };
+var N_YIELD_STATEMENT 		= { type: T_YIELD_STATEMENT };
+
 exports.module = module;
 function module(ports, stmts) {
 	return {
@@ -57,7 +61,7 @@ function dictionaryPair(key, value) {
 
 exports.globalObject = globalObject;
 function globalObject() {
-	return { type: T_GLOBAL_OBJECT };
+	return N_GLOBAL_OBJECT;
 }
 
 exports.globalIdent = globalIdent;
@@ -208,7 +212,7 @@ function returnStatement(exp) {
 
 exports.yieldStatement = yieldStatement;
 function yieldStatement() {
-	return { type: T_YIELD_STATEMENT };
+	return N_YIELD_STATEMENT;
 }
 
 exports.assignmentExp = assignmentExp;
@@ -242,7 +246,7 @@ function logicalAndExp(left, right) {
 
 exports.missingArgument = missingArgument;
 function missingArgument() {
-	return { type: T_MISSING_ARGUMENT };
+	return N_MISSING_ARGUMENT;
 }
 
 exports.call = call;
