@@ -80,8 +80,9 @@ SEMI			= ';'
 ASSIGN 			= ':='
 MINUS			= '-'
 PLUS			= '+'
-TIMES			= '*' !'*'
+TIMES			= '*' !'*' 		{ return '*'; }
 DIVIDE			= '/'
+INT_DIVIDE 		= '\\'
 MOD				= '%'
 BANG			= '!' ![=]		{ return '!'; }
 LT 				= '<' ![=<]		{ return '<'; }
@@ -210,6 +211,7 @@ UnaryOperator
 MultiplicativeOperator
     = TIMES
     / DIVIDE
+    / INT_DIVIDE
     / MOD
     / POW
 

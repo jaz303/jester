@@ -5,8 +5,20 @@
 &foo
 !+-~&100
 
+1 = 2
+6 != 4
+1 < 5
+5 > 10
+3 <= 6
+10 >= 4
+
 1 + 2
 3 - 1
+10 * 2
+5 / 6
+10 \ 3
+3 % 4
+4 ** 10
 
 true && true
 false || true
@@ -60,6 +72,42 @@ false || true
 			}		
 		}
 	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '=',
+		left: 1,
+		right: 2
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '!=',
+		left: 6,
+		right: 4
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '<',
+		left: 1,
+		right: 5
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '>',
+		left: 5,
+		right: 10
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '<=',
+		left: 3,
+		right: 6
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '>=',
+		left: 10,
+		right: 4
+	},
 	
 	{ 	type: A.T_BINARY_OP,
 		op: '+',
@@ -71,6 +119,36 @@ false || true
 		op: '-',
 		left: 3,
 		right: 1
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '*',
+		left: 10,
+		right: 2
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '/',
+		left: 5,
+		right: 6
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '\\',
+		left: 10,
+		right: 3
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '%',
+		left: 3,
+		right: 4
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '**',
+		left: 4,
+		right: 10
 	},
 
 	{ 	type: A.T_LOGICAL_AND,
