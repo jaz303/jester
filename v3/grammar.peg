@@ -723,15 +723,15 @@ YieldStatement
 	= YIELD _ 						{ return A.yieldStatement(); }
 
 LocalVariables
-	= MY head:LocalVariable tail:(',' _ LocalVariable)* {
-		return A.localVariables(head.concat(tail.map(function(t) {
+	= MY _ head:LocalVariable tail:(',' _ LocalVariable)* {
+		return A.localVariables([head].concat(tail.map(function(t) {
 			return t[2];
 		})));
 	}
 
 LocalVariable
-	= name:Ident _ '=' _ exp:Expression _ 	{ return A.localVariable(name, exp); }
-	/ name:Ident _ 							{ return A.localVariable(name, null); }
+	= name:ident _ '=' _ exp:Expression _ 	{ return A.localVariable(name, exp); }
+	/ name:ident _ 							{ return A.localVariable(name, null); }
 
 ExpressionStatement
 	= exp:Expression _ 						{ return exp; }

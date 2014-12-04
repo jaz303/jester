@@ -24,6 +24,7 @@ var T_YIELD_STATEMENT 		= exports.T_YIELD_STATEMENT 		= iota();
 var T_COMPUTED_MEMBER_EXP 	= exports.T_COMPUTED_MEMBER_EXP 	= iota();
 var T_STATIC_MEMBER_EXP 	= exports.T_STATIC_MEMBER_EXP 		= iota();
 var T_IF_STATEMENT 			= exports.T_IF_STATEMENT 			= iota();
+var T_LOCAL_VARIABLES 		= exports.T_LOCAL_VARIABLES	 		= iota();
 
 var N_GLOBAL_OBJECT 		= { type: T_GLOBAL_OBJECT };
 var N_MISSING_ARGUMENT 		= { type: T_MISSING_ARGUMENT };
@@ -242,6 +243,19 @@ function logicalOrExp(left, right) {
 exports.logicalAndExp = logicalAndExp;
 function logicalAndExp(left, right) {
 	
+}
+
+exports.localVariables = localVariables;
+function localVariables(locals) {
+	return {
+		type	: T_LOCAL_VARIABLES,
+		vars 	: locals
+	};
+}
+
+exports.localVariable = localVariable;
+function localVariable(name, defaultValue) {
+	return { name: name, defaultValue: defaultValue };
 }
 
 exports.missingArgument = missingArgument;

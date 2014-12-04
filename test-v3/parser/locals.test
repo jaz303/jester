@@ -1,0 +1,45 @@
+my a
+my b = 10
+my a, b
+my a = 1, b
+my a = 1, b = 2, c = 3
+
+---
+
+{ type: A.T_MODULE, body: [
+	
+	{ 	type: A.T_LOCAL_VARIABLES,
+		vars: [
+			{ name: "a", defaultValue: null }
+		]
+	},
+
+	{ 	type: A.T_LOCAL_VARIABLES,
+		vars: [
+			{ name: "b", defaultValue: 10 }
+		]
+	},
+
+	{ 	type: A.T_LOCAL_VARIABLES,
+		vars: [
+			{ name: "a", defaultValue: null },
+			{ name: "b", defaultValue: null }
+		]
+	},
+
+	{ 	type: A.T_LOCAL_VARIABLES,
+		vars: [
+			{ name: "a", defaultValue: 1 },
+			{ name: "b", defaultValue: null }
+		]
+	},
+
+	{ 	type: A.T_LOCAL_VARIABLES,
+		vars: [
+			{ name: "a", defaultValue: 1 },
+			{ name: "b", defaultValue: 2 },
+			{ name: "c", defaultValue: 3 }
+		]
+	}
+
+] }
