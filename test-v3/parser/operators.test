@@ -1,0 +1,86 @@
++5
+-10
+~20
+!true
+&foo
+!+-~&100
+
+1 + 2
+3 - 1
+
+true && true
+false || true
+
+---
+
+{ type: A.T_MODULE, body: [
+
+	{	type: A.T_UNARY_OP,
+		op: '+',
+		exp: 5
+	},
+
+	{	type: A.T_UNARY_OP,
+		op: '-',
+		exp: 10
+	},
+
+	{	type: A.T_UNARY_OP,
+		op: '~',
+		exp: 20
+	},
+
+	{	type: A.T_UNARY_OP,
+		op: '!',
+		exp: true
+	},
+
+	{	type: A.T_UNARY_OP,
+		op: '&',
+		exp: { type: A.T_IDENT, name: 'foo' }
+	},
+
+	{	type: A.T_UNARY_OP,
+		op: '!',
+		exp: {
+			type: A.T_UNARY_OP,
+			op: '+',
+			exp: {
+				type: A.T_UNARY_OP,
+				op: '-',
+				exp: {
+					type: A.T_UNARY_OP,
+					op: '~',
+					exp: {
+						type: A.T_UNARY_OP,
+						op: '&',
+						exp: 100	
+					}		
+				}			
+			}		
+		}
+	},
+	
+	{ 	type: A.T_BINARY_OP,
+		op: '+',
+		left: 1,
+		right: 2
+	},
+
+	{ 	type: A.T_BINARY_OP,
+		op: '-',
+		left: 3,
+		right: 1
+	},
+
+	{ 	type: A.T_LOGICAL_AND,
+		left: true,
+		right: true
+	},
+
+	{ 	type: A.T_LOGICAL_OR,
+		left: false,
+		right: true
+	}
+
+] }

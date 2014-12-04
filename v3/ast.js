@@ -25,6 +25,10 @@ var T_COMPUTED_MEMBER_EXP 	= exports.T_COMPUTED_MEMBER_EXP 	= iota();
 var T_STATIC_MEMBER_EXP 	= exports.T_STATIC_MEMBER_EXP 		= iota();
 var T_IF_STATEMENT 			= exports.T_IF_STATEMENT 			= iota();
 var T_LOCAL_VARIABLES 		= exports.T_LOCAL_VARIABLES	 		= iota();
+var T_BINARY_OP 			= exports.T_BINARY_OP 				= iota();
+var T_UNARY_OP 				= exports.T_UNARY_OP 				= iota();
+var T_LOGICAL_AND 			= exports.T_LOGICAL_AND 			= iota();
+var T_LOGICAL_OR 			= exports.T_LOGICAL_OR 				= iota();
 
 var N_GLOBAL_OBJECT 		= { type: T_GLOBAL_OBJECT };
 var N_MISSING_ARGUMENT 		= { type: T_MISSING_ARGUMENT };
@@ -227,22 +231,39 @@ function assignmentExp(lhs, rhs) {
 
 exports.unaryOpExp = unaryOpExp;
 function unaryOpExp(op, exp) {
-
+	return {
+		type 	: T_UNARY_OP,
+		op 		: op,
+		exp 	: exp
+	};
 }
 
 exports.binaryOpExp = binaryOpExp;
 function binaryOpExp(left, op, right) {
-
+	return {
+		type 	: T_BINARY_OP,
+		left 	: left,
+		op 		: op,
+		right 	: right
+	};
 }
 
 exports.logicalOrExp = logicalOrExp;
 function logicalOrExp(left, right) {
-
+	return {
+		type 	: T_LOGICAL_OR,
+		left 	: left,
+		right 	: right
+	};
 }
 
 exports.logicalAndExp = logicalAndExp;
 function logicalAndExp(left, right) {
-	
+	return {
+		type 	: T_LOGICAL_AND,
+		left 	: left,
+		right 	: right
+	};
 }
 
 exports.localVariables = localVariables;

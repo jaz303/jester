@@ -16,7 +16,7 @@
             } else if (i[0] === '&&') {
                 result = A.logicalAndExp(result, i[2]);
             } else {
-                result = A.binOpExp(result, i[0], i[2]);
+                result = A.binaryOpExp(result, i[0], i[2]);
             }
         });
         return result;
@@ -68,13 +68,13 @@ MISSING_ARG		= '?'
 POW 			= '**'
 LOGICAL_OR		= '||'
 LOGICAL_AND		= '&&'
-BITWISE_OR		= '|' !'|'
-BITWISE_AND		= '&' !'&'
+BITWISE_OR		= '|' !'|'		{ return '|'; }
+BITWISE_AND		= '&' !'&'		{ return '&'; }
 NO_CALL 		= BITWISE_AND
 BITWISE_NOT		= '~'
 BITWISE_XOR 	= '^'
 LAMBDA_START	= '.['
-DOT 			= '.' !'['
+DOT 			= '.' !'[' 		{ return '.'; }
 COMMA			= ','
 SEMI			= ';'
 ASSIGN 			= ':='
@@ -83,9 +83,9 @@ PLUS			= '+'
 TIMES			= '*' !'*'
 DIVIDE			= '/'
 MOD				= '%'
-BANG			= '!' ![=]
-LT 				= '<' ![=<]
-GT				= '>' ![=>]
+BANG			= '!' ![=]		{ return '!'; }
+LT 				= '<' ![=<]		{ return '<'; }
+GT				= '>' ![=>]		{ return '>'; }
 LBRACE			= '{'
 RBRACE			= '}'
 LBRACKET		= '['
