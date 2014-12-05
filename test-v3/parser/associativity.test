@@ -1,0 +1,30 @@
+a := b := c
+
+5 - 4 - 3
+
+---
+
+{ type: A.T_MODULE, body: [
+
+	{	type: A.T_ASSIGN,
+		left: { type: A.T_IDENT, name: 'a' },
+		right: {
+			type: A.T_ASSIGN,
+			left: { type: A.T_IDENT, name: 'b' },
+			right: { type: A.T_IDENT, name: 'c' }
+		}
+	},
+
+	{	type: A.T_BINARY_OP,
+		left: {
+			type: A.T_BINARY_OP,
+			left: 5,
+			op: '-',
+			right: 4
+		},
+		op: '-',
+		right: 3
+
+	}
+
+] }
