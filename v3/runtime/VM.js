@@ -12,6 +12,10 @@ var OP_NOP 			= op('NOP', 		0);
 var OP_JMP 			= op('JMP', 		1);
 var OP_LOADK 		= op('LOADK', 		2);
 var OP_PRINT 		= op('PRINT', 		3);
+var OP_YIELD 		= op('YIELD',		4);
+var OP_TERM 		= op('TERM',		5);
+var OP_MKFUN 		= op('MKFUN', 		6);
+var OP_SPAWN 		= op('SPAWN', 		7);
 
 // var OP_HALT 		= op('HALT', 		2);
 
@@ -23,30 +27,38 @@ var OP_PRINT 		= op('PRINT', 		3);
 // var OP_MSET 		= op('MSET', 		9);
 // var OP_MKFUN 		= op('MKFUN',	 	10);
 
-function Task(stackSize) {
+function Task(stackSize, co) {
+	this.__jtype = 'task';
 	this.stack 	= new Array(stackSize);
-	this.frames	= [];
+	this.fp = 0;
+	this.frames	= [{
+		code 	: co,
+		ip 		: 0,
+		sp 		: 0
+	}];
 }
 
 exports.create = create;
 function create() {
 
-	var activeTask 	= null;
+	var state = 'stopped';
+	var runnableTasks = [];
 
-	function initTask(co) {
-		var task = new Task(DEFAULT_STACK_SIZE);
-		task.fp = 0;
-		task.frames.push({
-			code 	: co,
-			ip 		: 0,
-			sp 		: 0
-		});
-		return task;
+	function tick() {
+		run();
+		if (state !== 'stopped') {
+			setTimeout(tick, 0);
+		}
 	}
 
 	function run() {
 
-		var task 	= activeTask;
+		if (runnableTasks.length === 0) {
+			state = 'stopped'
+			return;
+		}
+
+		var task 	= runnableTasks.shift();
 		var stack 	= task.stack;
 		var frame 	= task.frames[task.fp];
 		var co 		= frame.code;
@@ -70,6 +82,22 @@ function create() {
 				case OP_PRINT:
 					console.log(stack[sp + (ins & 0xFF)]);
 					break;
+				case OP_YIELD:
+					runnableTasks.push(task);
+					return;
+				case OP_TERM:
+					return;
+				case OP_MKFUN:
+					stack[sp + (ins >> 16) & 0xFF] = {
+						__jtype: 'function',
+						code: mod.code[ins & 0xFFFF]
+					};
+					break;
+				case OP_SPAWN:
+					var co = stack[sp + (ins >> 16) & 0xFF];
+					var newTask = stack[sp + (ins & 0xFF)] = new Task(DEFAULT_STACK_SIZE, co.code);
+					runnableTasks.push(newTask);
+					break;
 				default:
 					throw new Error("unknown opcode: " + (ins & 0xFC000000));
 			}
@@ -79,19 +107,11 @@ function create() {
 
 	return {
 		start: function(co) {
-			activeTask = initTask(co);
-			run();
+			state = 'running';
+			runnableTasks.push(new Task(DEFAULT_STACK_SIZE, co));
+			tick();
 		}
 	};
-
-
-
-
-
-
-
-
-
 
 	// var stack = new Array(DEFAULT_STACK_SIZE);
 	// var mvars = [];
