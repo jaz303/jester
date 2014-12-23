@@ -1,6 +1,6 @@
 module.exports = CodeObject;
 
 function CodeObject() {
-	this.stackSize = null;
-	this.code = null;
+    this.stackSize = null;
+    this.code = null;
 }
