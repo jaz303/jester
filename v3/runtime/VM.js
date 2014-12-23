@@ -16,6 +16,9 @@ var OP_YIELD 		= op('YIELD',		4);
 var OP_TERM 		= op('TERM',		5);
 var OP_MKFUN 		= op('MKFUN', 		6);
 var OP_SPAWN 		= op('SPAWN', 		7);
+var OP_CALL 		= op('CALL', 		8);
+var OP_RETURN 		= op('RETURN', 		9);
+var OP_ADD 			= op('ADD', 		10);
 
 // var OP_HALT 		= op('HALT', 		2);
 
@@ -27,15 +30,17 @@ var OP_SPAWN 		= op('SPAWN', 		7);
 // var OP_MSET 		= op('MSET', 		9);
 // var OP_MKFUN 		= op('MKFUN',	 	10);
 
+function mkframe() {
+	return { code: null, ip: 0, sp: 0, returnRegister: 0 };
+}
+
 function Task(stackSize, co) {
 	this.__jtype = 'task';
-	this.stack 	= new Array(stackSize);
+	this.stack = new Array(stackSize);
+	this.state = 'runnable';
 	this.fp = 0;
-	this.frames	= [{
-		code 	: co,
-		ip 		: 0,
-		sp 		: 0
-	}];
+	this.frames	= [ mkframe() ];
+	this.frames[0].code = co;
 }
 
 exports.create = create;
@@ -71,7 +76,6 @@ function create() {
 			var ins = ops[ip++];
 			switch (ins & 0xFC000000) {
 				case OP_NOP:
-					// do nothing
 					break;
 				case OP_JMP:
 					ip = ins & 0x00FFFFFF;
@@ -86,6 +90,7 @@ function create() {
 					runnableTasks.push(task);
 					return;
 				case OP_TERM:
+					task.state = 'dead';
 					return;
 				case OP_MKFUN:
 					stack[sp + (ins >> 16) & 0xFF] = {
@@ -97,6 +102,35 @@ function create() {
 					var co = stack[sp + (ins >> 16) & 0xFF];
 					var newTask = stack[sp + (ins & 0xFF)] = new Task(DEFAULT_STACK_SIZE, co.code);
 					runnableTasks.push(newTask);
+					break;
+				case OP_CALL:
+					frame.ip = ip;
+					var fnreg = (ins >> 16) & 0xFF;
+					var fn = stack[sp + fnreg];
+					var nargs = (ins >> 8) & 0xFF;
+					++task.fp;
+					if (task.fp === task.frames.length) {
+						task.frames.push(mkframe());
+					}
+					frame = task.frames[task.fp];
+					frame.returnRegister = sp + (ins & 0xFF);
+					co = frame.code = fn.code;
+					ops = co.code;
+					mod = co.module;
+					ip = frame.ip = 0;
+					sp = frame.sp = (sp + fnreg + 1);
+					break;
+				case OP_RETURN:
+					stack[frame.returnRegister] = stack[sp + (ins & 0xFF)];
+					frame = task.frames[--task.fp];
+					co = frame.code;
+					ops = co.code;
+					mod = co.module;
+					ip = frame.ip;
+					sp = frame.sp;
+					break;
+				case OP_ADD:
+					stack[sp + (ins >> 16) & 0xFF] = stack[sp + (ins >> 8) & 0xFF] + stack[sp + (ins & 0xFF)];
 					break;
 				default:
 					throw new Error("unknown opcode: " + (ins & 0xFC000000));

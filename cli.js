@@ -4,7 +4,7 @@ var vm = require('./v3/runtime/VM').create();
 var O = require('./v3/runtime/opcodes');
 
 var mod = {
-	k 		: [ 42, 50, 1337, 303 ],
+	k 		: [ 42, 50, 1337, 303, 606 ],
 	vars 	: [],
 	code 	: []
 };
@@ -49,15 +49,29 @@ mod.code.push(co2);
 
 var co3 = {
 	code: [
-		O.LOADK | (0x0 << 16) | 0x03,
+		O.MKFUN | (0x1 << 16) | 0x03,
+		O.LOADK | (0x2 << 16) | 0x03,
+		O.LOADK | (0x3 << 16) | 0x04,
+		O.CALL | (0x01 << 16) | (0x02 << 8) | 0x00,
 		O.PRINT | 0x00,
 		O.YIELD,
-		O.JMP | 0x01
+		O.JMP | 0x03
 	],
 	module: mod
 };
 
 mod.code.push(co3);
+
+var co4 = {
+	code: [
+		O.ADD | (0x02 << 16) | (0x00 << 8) | (0x01 << 0),
+		O.RETURN | 0x02
+	],
+	module: mod,
+	stackSize: 3
+}
+
+mod.code.push(co4);
 
 vm.start(co1);
 
