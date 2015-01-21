@@ -34,13 +34,12 @@ function mkframe() {
     return { code: null, ip: 0, sp: 0, returnRegister: 0 };
 }
 
-function Task(stackSize, co) {
+function Task(stackSize) {
     this.__jtype = 'task';
     this.stack = new Array(stackSize);
     this.state = 'runnable';
     this.fp = 0;
     this.frames = [ mkframe() ];
-    this.frames[0].code = co;
 }
 
 exports.create = create;
@@ -99,15 +98,25 @@ function create() {
                     };
                     break;
                 case OP_SPAWN:
-                    var co = stack[sp + (ins >> 16) & 0xFF];
-                    var newTask = stack[sp + (ins & 0xFF)] = new Task(DEFAULT_STACK_SIZE, co.code);
+                    // TODO(jwf): when we have closures we'll need to close any upvals referenced
+                    // by the spawned function and put them in our stack. Not sure how compatible
+                    // this is with what we're doing... :/
+                    var fnreg = (ins >> 16) & 0xFF;
+                    var nargs = (ins >> 8) & 0xFF;
+                    var target = ins & 0xFF;
+                    var fn = stack[sp + fnreg];
+                    var newTask = stack[sp + target] = new Task(DEFAULT_STACK_SIZE);
+                    newTask.frames[0].code = fn.code;
+                    for (var i = 0; i < nargs; ++i) {
+                        newTask.stack[i] = stack[fnreg + 1 + i];
+                    }
                     runnableTasks.push(newTask);
                     break;
                 case OP_CALL:
                     frame.ip = ip;
                     var fnreg = (ins >> 16) & 0xFF;
-                    var fn = stack[sp + fnreg];
                     var nargs = (ins >> 8) & 0xFF;
+                    var fn = stack[sp + fnreg];
                     ++task.fp;
                     if (task.fp === task.frames.length) {
                         task.frames.push(mkframe());
@@ -142,7 +151,9 @@ function create() {
     return {
         start: function(co) {
             state = 'running';
-            runnableTasks.push(new Task(DEFAULT_STACK_SIZE, co));
+            var initialTask = new Task(DEFAULT_STACK_SIZE);
+            initialTask.frames[0].code = co;
+            runnableTasks.push(initialTask);
             tick();
         }
     };
