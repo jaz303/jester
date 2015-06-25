@@ -7,11 +7,13 @@ function Spawn(callee, args) {
 
 Spawn.prototype.evaluate = function(ctx, env, cont, err) {
 	var callee = this.callee;
-	this.evaluateArgs(ctx, env, this.args, function(err, args) {
-		if (err) return cb(err);
-		callee.evaluate(ctx, env, function(err, fn) {
-			if (err) return cb(err);
-			cb(null, ctx.spawn(fn, args));
-		});
-	});
+	return this.evaluateArgs(ctx, env, this.args, function(args) {
+		return callee.evaluate(ctx, env, function(fn) {
+			try {
+				return ctx.thunk(cont, ctx.spawn(fn, args));
+			} catch (error) {
+				return ctx.thunk(err, error);
+			}
+		}, err);
+	}, err);
 }
