@@ -12,6 +12,19 @@ function create(initial) {
 	return env;
 }
 
+exports.beget = beget;
+function beget(env) {
+	return Object.create(env);
+}
+
+exports.define = define;
+function define(env, key, value) {
+	if (hasOwnProperty.call(env, key)) {
+		throw new Error("already defined: " + key);
+	}
+	env[key] = value;
+}
+
 exports.find = find;
 function find(env, key) {
 	while (env) {
