@@ -60,7 +60,7 @@ var env = require('./v4/env').create({
 	},
 	sleep: function(ctx, delay) {
 		return new Promise(function(resolve) {
-			setTimeout(resolve, delay * 1000);
+			setTimeout(resolve, delay[0] * 1000);
 		});
 	},
 	ops: 0,
