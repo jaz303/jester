@@ -8,6 +8,7 @@ function create() {
 	var CONTINUE		= 1;
 	var WAIT 			= 2;
 	var EXIT 			= 3;
+	var YIELD			= 4;
 
 	var state 			= 'idle';
 	var nextTaskId 		= 1;
@@ -54,6 +55,8 @@ function create() {
 			}
 			if (res === WAIT) {
 				waitingTasks.push(activeTask);
+			} else if (res === YIELD) {
+				runnableTasks.push(activeTask);
 			} else if (res === EXIT) {
 				// do nothing
 			}
@@ -104,6 +107,12 @@ function create() {
 					go();
 				}
 			}
+		},
+
+		yield: function(cont) {
+			activeTask.thunk = cont;
+			activeTask.thunkArg = null;
+			return YIELD;
 		},
 
 		thunk: function(fn, arg) {
