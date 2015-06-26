@@ -58,6 +58,15 @@ var env = require('./v4/env').create({
 			]
 		])
 	},
+	wait: function(ctx, args) {
+		var task = args[0];
+		if (!task || task.__jtype !== 'task') {
+			throw new Error("expected: task");
+		}
+		return new Promise(function(resolve) {
+			task.waiters.push(resolve);
+		});
+	},
 	sleep: function(ctx, delay) {
 		return new Promise(function(resolve) {
 			setTimeout(resolve, delay[0] * 1000);

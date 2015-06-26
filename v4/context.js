@@ -25,6 +25,7 @@ function create() {
 			id: nextTaskId++,
 			block: block,
 			env: env,
+			waiters: [],
 			thunk: function() {
 				return block.evaluate(
 					ctx,
@@ -58,7 +59,7 @@ function create() {
 			} else if (res === YIELD) {
 				runnableTasks.push(activeTask);
 			} else if (res === EXIT) {
-				// do nothing
+				activeTask.waiters.forEach(function(cb) { cb(); });
 			}
 		} while (runnableTasks.length);
 		activeTask = null;
