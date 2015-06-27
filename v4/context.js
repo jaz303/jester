@@ -119,7 +119,7 @@ function create() {
 		thunk: function(fn, arg) {
 			nextCall = fn;
 			nextArg = arg;
-			return 1;
+			return CONTINUE;
 		},
 
 		isTruthy: function(val) {
