@@ -1,8 +1,10 @@
 var A = module.exports = {
+	Assign		: require('./Assign'),
 	Block		: require('./Block'),
 	Call		: require('./Call'),
 	Fn 			: require('./Fn'),
 	Ident 		: require('./Ident'),
+	If 			: require('./If'),
 	Literal		: require('./Literal'),
 	Loop		: require('./Loop'),
 	Module 		: require('./Module'),
