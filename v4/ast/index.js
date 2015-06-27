@@ -15,6 +15,11 @@ var A = module.exports = {
 	build 		: build
 };
 
+var ops = require('./ops');
+for (var k in ops) {
+	module.exports[k] = ops[k];
+}
+
 function build(thing) {
 	if (!Array.isArray(thing)) {
 		return thing;
