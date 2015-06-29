@@ -165,7 +165,7 @@ module.exports = function() {
             }
         }
 
-        s.error = "unexpected character in input: '" + ch + "'";
+        s.error = "unexpected character in input: '" + src[s.p] + "'";
         return T.ERROR;
 
     }

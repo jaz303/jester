@@ -1,13 +1,21 @@
 var A = require('./v4/ast');
 var lexer = require('./v4/lexer')();
 
-var state = lexer.start('\r\n\n&& "this is a string" 0b1101return 0xff0 ==foo if while 2 + 5 <= 100 ** 20.123 { [] } yield 20');
+var state = lexer.start('\r\n\n&& "this is a string" .{x,y|0b1101return 0xff0 ==foo if while 2 + 5 <= 100 ** 20.123 { [] } yield 20');
 var token;
 
 var T = require('./v4/tokens');
 
-while ((token = lexer.lex(state)) !== T.EOF) {
+function cont(t) {
+	return t !== T.EOF && t !== T.ERROR;
+}
+
+while (cont(token = lexer.lex(state))) {
 	console.log(token);
+}
+
+if (state.error) {
+	console.log(state.error);
 }
 
 // require('es6-promise').polyfill();
