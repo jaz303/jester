@@ -7,7 +7,7 @@ module.exports = function() {
 
     var TOKENS = [
         // symbols
-        {   pattern: /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|\||&|[=\-\+\*\/\\%\!<>~^\{\}\[\]\(\)])/,
+        {   pattern: /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|\||&|\.\{|[,=\-\+\*\/\\%\!<>~^\{\}\[\]\(\)])/,
             cb: function(match) {
                 var tok = T.symbols[match[0]];
                 if (!tok) {

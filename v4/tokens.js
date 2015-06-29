@@ -21,7 +21,9 @@ makeSymbols({
     POW         : '**',
     OR          : '||',
     AND         : '&&',
+    DOTBRACE    : '.{',
 
+    COMMA       : ',',
     PIPE        : '|',
     AMP         : '&',
     EQUALS      : '=',
