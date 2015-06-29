@@ -7,7 +7,7 @@ module.exports = function() {
 
     var TOKENS = [
         // symbols
-        {   pattern: /^(<=|>=|<<|>>|==|\!=|\*\*|\|\||&&|\||&|\.\{|[,=\-\+\*\/\\%\!<>~^\{\}\[\]\(\)])/,
+        {   pattern: /^(<=|>=|<<|>>|==|\?|\!=|\*\*|\|\||&&|\||&|\.\{|[\.,;=\-\+\*\/\\%\!<>~^\{\}\[\]\(\)])/,
             cb: function(match) {
                 var tok = T.symbols[match[0]];
                 if (!tok) {
@@ -16,12 +16,6 @@ module.exports = function() {
                 return tok;
             }
         },
-        // // symbols
-        // {   pattern: /^(<=|>=|<<|>>|==|\?|\!=|\*\*|\|\||&&|\||&|\.\{|[\.,;=\-\+\*\/%\!<>~^\|\&\{\}\[\]\(\)])/,
-        //     cb: function(match) {
-        //         return match[0];
-        //     }
-        // },
         // foo, bar, return
         {   pattern: /^[a-zA-Z_][a-zA-Z0-9_]*[\!\?]?/,
             cb: function(match) {

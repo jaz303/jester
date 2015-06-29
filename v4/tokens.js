@@ -23,6 +23,9 @@ makeSymbols({
     AND         : '&&',
     DOTBRACE    : '.{',
 
+    QUESTION    : '?',
+    DOT         : '.',
+    SEMICOLON   : ';',
     COMMA       : ',',
     PIPE        : '|',
     AMP         : '&',
