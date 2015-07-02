@@ -5,20 +5,23 @@ exports.EOF = { name: 'eof' };
 exports.ERROR = { name: 'error' };
 exports.NL = { name: 'newline' };
 exports.IDENT = { name: 'ident' };
+exports.GLOBAL_IDENT = { name: 'global-ident' };
 exports.HEX = { name: 'hex-literal' };
 exports.BINARY = { name: 'binary-literal' };
 exports.FLOAT = { name: 'float-literal' };
 exports.INTEGER = { name: 'integer-literal' };
 exports.STRING = { name: 'string-literal' };
 
+var A = require('./ast');
+
 makeSymbols({
-    LE          : '<=',
-    GE          : '>=',
-    LSHIFT      : '<<',
-    RSHIFT      : '>>',
-    EQ          : '==',
-    NEQ         : '!=',
-    POW         : '**',
+    LE          : { text: '<=', binOp: A.BinOpCmpLE },
+    GE          : { text: '>=', binOp: A.BinOpCmpGE },
+    LSHIFT      : { text: '<<', binOp: A.BinOpShiftLeft },
+    RSHIFT      : { text: '>>', binOp: A.BinOpShiftRight },
+    EQ          : { text: '==', binOp: A.BinOpCmpEQ },
+    NEQ         : { text: '!=', binOp: A.BinOpCmpNEQ },
+    POW         : { text: '**', binOp: A.BinOpPow },
     OR          : '||',
     AND         : '&&',
     DOTBRACE    : '.{',
@@ -27,20 +30,20 @@ makeSymbols({
     DOT         : '.',
     SEMICOLON   : ';',
     COMMA       : ',',
-    PIPE        : '|',
-    AMP         : '&',
+    PIPE        : { text: '|', binOp: A.BinOpBitwiseOr },
+    AMP         : { text: '&', binOp: A.BinOpBitwiseAnd },
     EQUALS      : '=',
-    MINUS       : '-',
-    PLUS        : '+',
-    STAR        : '*',
-    SLASH       : '/',
-    BACKSLASH   : '\\',
-    PERCENT     : '%',
+    MINUS       : { text: '-', binOp: A.BinOpSub },
+    PLUS        : { text: '+', binOp: A.BinOpAdd },
+    STAR        : { text: '*', binOp: A.BinOpMul },
+    SLASH       : { text: '/', binOp: A.BinOpDiv },
+    BACKSLASH   : { text: '\\', binOp: A.BinOpIntDiv },
+    PERCENT     : { text: '%', binOp: A.BinOpMod },
     BANG        : '!',
-    LT          : '<',
-    GT          : '>',
+    LT          : { text: '<', binOp: A.BinOpCmpLT },
+    GT          : { text: '>', binOp: A.BinOpCmpGT },
     TILDE       : '~',
-    HAT         : '^',
+    HAT         : { text: '^', binOp: A.BinOpBitwiseXor },
     LBRACE      : '{',
     RBRACE      : '}',
     LBRACKET    : '[',
@@ -50,20 +53,26 @@ makeSymbols({
 });
 
 makeKeywords({
+    FOREACH     : 'foreach',
     WHILE       : 'while',
     LOOP        : 'loop',
     IF          : 'if',
     ELSE        : 'else',
     RETURN      : 'return',
     SPAWN       : 'spawn',
-    YIELD       : 'yield'
+    YIELD       : 'yield',
+    TRUE        : 'true',
+    FALSE       : 'false'
 });
 
 function makeSymbols(toks) {
     for (var k in toks) {
-        var tok = { text: toks[k] };
+        var tok = toks[k];
+        if (typeof tok === 'string') {
+            tok = { text: toks[k] };    
+        }
         exports[k] = tok;
-        exports.symbols[toks[k]] = tok;
+        exports.symbols[tok.text] = tok;
     }
 }
 

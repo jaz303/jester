@@ -14,10 +14,12 @@ Assign.prototype.evaluate = function(ctx, env, cont, err) {
 	return this.value.evaluate(ctx, env, function(value) {
 		var targetEnv = find(env, assignee.name);
 		if (!targetEnv) {
-			return ctx.thunk(err, new Error("undefined variable: " + assignee.name));
-		} else {
+			targetEnv = env;
+		}
+		// /	return ctx.thunk(err, new Error("undefined variable: " + assignee.name));
+		// } else {
 			targetEnv[assignee.name] = value;
 			return ctx.thunk(cont, value);
-		}
+		// }
 	}, err);
 }

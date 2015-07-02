@@ -1,0 +1,6 @@
+a = b = 20
+b = b + 11
+
+print(a + b)
+print(1 + 2)
+print(10 + 4 - 4)

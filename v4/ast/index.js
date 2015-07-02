@@ -7,6 +7,7 @@ var A = module.exports = {
 	If 			: require('./If'),
 	Literal		: require('./Literal'),
 	Loop		: require('./Loop'),
+	MissingArg	: require('./MissingArg'),
 	Module 		: require('./Module'),
 	Spawn		: require('./Spawn'),
 	While 		: require('./While'),
