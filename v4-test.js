@@ -1,3 +1,5 @@
+require('es6-promise').polyfill();
+
 var A = require('./v4/ast');
 
 var source = require('fs').readFileSync('v4-test.jester', 'utf8');

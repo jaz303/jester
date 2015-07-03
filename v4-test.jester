@@ -8,8 +8,17 @@ print(10 + 4 - 4)
 x = 0
 while x < 10 {
 	print(x)
+	sleep(0.5)
 	x = x + 1
 }
+
+def count_to(x, d) {
+	i = 0
+	while i < x {
+		print(i); sleep(d)
+	}
+}
+
 
 -- def count_to(x, d) {
 -- 	i = 0

@@ -53,16 +53,17 @@ makeSymbols({
 });
 
 makeKeywords({
-    FOREACH     : 'foreach',
-    WHILE       : 'while',
-    LOOP        : 'loop',
-    IF          : 'if',
+    DEF         : 'def',
     ELSE        : 'else',
+    FALSE       : 'false',
+    FOREACH     : 'foreach',
+    IF          : 'if',
+    LOOP        : 'loop',
     RETURN      : 'return',
     SPAWN       : 'spawn',
-    YIELD       : 'yield',
     TRUE        : 'true',
-    FALSE       : 'false'
+    WHILE       : 'while',
+    YIELD       : 'yield',
 });
 
 function makeSymbols(toks) {

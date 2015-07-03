@@ -51,8 +51,11 @@ function create(source) {
 	}
 
 	function requireident() {
-	    if (curr !== T.IDENT)
+		if (curr !== T.IDENT)
 	        noident();
+	    var text = state.text;
+	    next();
+	    return text;
 	}
 
 	function noident() {
@@ -60,7 +63,8 @@ function create(source) {
 	}
 
 	function atBlockStatementStart() {
-		return curr === T.WHILE;
+		return curr === T.WHILE
+				|| curr === T.DEF;
 		// return curr === T.IF
 	    //         || curr === T.WHILE
 	    //         || curr === T.LOOP
@@ -130,6 +134,8 @@ function create(source) {
 	function parseBlockStatement() {
 		if (curr === T.WHILE) {
 			return parseWhileStatement();
+		} else if (curr === T.DEF) {
+			return parseFunctionDefinition();
 		} else {
 			error("expected 'while'");
 		}
@@ -142,6 +148,46 @@ function create(source) {
 	    skipNewlines();
 	    var body = parseBlock();
 	    return new A.While(condition, body);
+	}
+
+	function parseFunctionDefinition() {
+		accept(T.DEF);
+		var name = requireident();
+		var params;
+		if (curr === T.LPAREN) {
+	        next();
+	        params = parseFunctionParameters();
+	        accept(T.RPAREN);
+	    } else {
+	        params = [];
+	    }
+		skipNewlines();
+		var body = parseBlock();
+		return new A.Fn(name, params, body);
+	}
+
+	function parseFunctionParameters() {
+	    var params = [], optional = false;
+	    while (curr === T.IDENT) {
+	        var param = { name: state.text, optional: false, defaultValue: void 0 };
+	        next();
+	        if (curr === T.EQUALS) {
+	            next();
+	            param.optional = true;
+	            // FIXME: shouldn't be allowing full expressions in here
+	            param.defaultValue = parseExpression();
+	            optional = true;
+	        } else if (optional) {
+	            error("required parameters cannot follow optional parameters");
+	        }
+	        params.push(param);
+	        if (curr === T.COMMA) {
+	            next();
+	        } else {
+	            break;
+	        }
+	    }
+	    return params;
 	}
 
 	function parseInlineStatement() {
