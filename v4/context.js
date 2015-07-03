@@ -89,14 +89,13 @@ function create() {
 
 		wait: function(promise, cont, err) {
 			var thisTask = activeTask;
-			waitingTasks.push(thisTask);
 			promise.then(function(res) {
-				thisTask.nextCall = cont;
-				thisTask.nextArg = res;
+				thisTask.thunk = cont;
+				thisTask.thunkArg = res;
 				_requeue();
 			}, function(error) {
-				thisTask.nextCall = err;
-				thisTask.nextArg = error;
+				thisTask.thunk = err;
+				thisTask.thunkArg = error;
 				_requeue();
 			});
 			return WAIT;
