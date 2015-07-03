@@ -1,6 +1,30 @@
-a = b = 20
-b = b + 11
+a = b = 0xff
+b = b + 0b1100101
 
 print(a + b)
 print(1 + 2)
 print(10 + 4 - 4)
+
+x = 0
+while x < 10 {
+	print(x)
+	x = x + 1
+}
+
+-- def count_to(x, d) {
+-- 	i = 0
+-- 	while i < x {
+-- 		print(i)
+-- 		sleep(d)
+-- 	}
+-- }
+-- 
+-- t1 = spawn count_to(10, 1)
+-- t2 = spawn count_to(100, 0.1)
+-- t3 = spawn count_to(5, 2)
+-- 
+-- wait t1
+-- wait t2
+-- wait t3
+-- 
+-- print "all done!"-- 

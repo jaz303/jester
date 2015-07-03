@@ -60,8 +60,8 @@ function create(source) {
 	}
 
 	function atBlockStatementStart() {
-		return false;
-	    // return curr === T.IF
+		return curr === T.WHILE;
+		// return curr === T.IF
 	    //         || curr === T.WHILE
 	    //         || curr === T.LOOP
 	    //         || curr === T.FOREACH
@@ -128,7 +128,20 @@ function create(source) {
 	}
 
 	function parseBlockStatement() {
-		// nothing to do
+		if (curr === T.WHILE) {
+			return parseWhileStatement();
+		} else {
+			error("expected 'while'");
+		}
+	}
+
+	function parseWhileStatement() {
+	    var line = state.line;
+	    accept(T.WHILE);
+	    var condition = parseExpression();
+	    skipNewlines();
+	    var body = parseBlock();
+	    return new A.While(condition, body);
 	}
 
 	function parseInlineStatement() {
@@ -152,19 +165,9 @@ function create(source) {
 	    		next();
 	    		curr.value = new A.Assign(curr.value, parseLogicalOrExpression());
 	    		curr = curr.value;
+	    		// TODO: line
 	    	}
 	    	return root;
-	    	// throw new Error("impl");
-	     //    // var line = state.line;
-	     //    // next();
-	     //    // var root = { type: A.ASSIGN, line: line, left: exp, right:  }, curr = root;
-	     //    // while (at('=')) {
-	     //    //     line = state.line;
-	     //    //     next();
-	     //    //     curr.right = { type: A.ASSIGN, line: line, left: curr.right, right:  };
-	     //    //     curr = curr.right;
-	     //    // }
-	     //    // return root;
 	    } else {
 	        return exp;
 	    }
@@ -245,13 +248,13 @@ function create(source) {
 	// a < b, a > b, a <= b, a >= b
 	function parseCmpExpression() {
 	    var exp = parseShiftExpression();
-	    while (at('<') || at('>') || at('<=') || at('>=')) {
-	    	throw new Error("impl");
-	        // var line = state.line, op = curr;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseShiftExpression() };
+	    while (at(T.LT) || at(T.GT) || at(T.LE) || at(T.GE)) {
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseShiftExpression());
+	    	// TODO: line
 	    }
-	    return exp;
+		return exp;
 	}
 	
 	// a << b, a >> b
