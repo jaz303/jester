@@ -102,12 +102,12 @@ function create(source) {
 		skipNewlines();
 		var stmts = parseStatements();
 		accept(T.EOF);
-		return new A.Module(new A.Block(stmts));
+		return new A.Module(stmts);
 	}
 
 	function parseBlock() {
 		accept(T.LBRACE);
-		var block = new A.Block(parseStatements());
+		var block = parseStatements();
 		accept(T.RBRACE);
 		return block;
 	}
@@ -128,7 +128,7 @@ function create(source) {
 				}
 			}
 		}
-		return stmts;
+		return new A.Statements(stmts);
 	}
 
 	function parseBlockStatement() {

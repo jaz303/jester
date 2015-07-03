@@ -1,6 +1,5 @@
 var A = module.exports = {
 	Assign		: require('./Assign'),
-	Block		: require('./Block'),
 	Call		: require('./Call'),
 	Fn 			: require('./Fn'),
 	Ident 		: require('./Ident'),
@@ -10,6 +9,7 @@ var A = module.exports = {
 	MissingArg	: require('./MissingArg'),
 	Module 		: require('./Module'),
 	Spawn		: require('./Spawn'),
+	Statements	: require('./Statements'),
 	While 		: require('./While'),
 	Yield		: require('./Yield'),
 

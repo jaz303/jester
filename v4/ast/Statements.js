@@ -1,10 +1,10 @@
-module.exports = Block;
+module.exports = Statements;
 
-function Block(statements) {
+function Statements(statements) {
 	this.statements = statements;
 }
 
-Block.prototype.evaluate = function(ctx, env, cont, err) {
+Statements.prototype.evaluate = function(ctx, env, cont, err) {
 	var stmts = this.statements;
 	var length = stmts.length;
 	return (function _next(ix) {
