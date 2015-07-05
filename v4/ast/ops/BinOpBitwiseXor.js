@@ -7,6 +7,8 @@ function BinOpBitwiseXor(left, right) {
     this.right = right;
 }
 
+BinOpBitwiseXor.prototype.type = require('../type')('BIN_OP_BITWISE_XOR', {binOp: true});
+
 BinOpBitwiseXor.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

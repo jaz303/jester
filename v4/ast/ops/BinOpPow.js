@@ -7,6 +7,8 @@ function BinOpPow(left, right) {
     this.right = right;
 }
 
+BinOpPow.prototype.type = require('../type')('BIN_OP_POW', {binOp: true});
+
 BinOpPow.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

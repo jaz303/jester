@@ -7,6 +7,8 @@ function BinOpCmpNEQ(left, right) {
     this.right = right;
 }
 
+BinOpCmpNEQ.prototype.type = require('../type')('BIN_OP_CMP_NEQ', {binOp: true});
+
 BinOpCmpNEQ.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

@@ -1,11 +1,11 @@
 module.exports = BinOpBitwiseAnd
 
-
-
 function BinOpBitwiseAnd(left, right) {
     this.left = left;
     this.right = right;
 }
+
+BinOpBitwiseAnd.prototype.type = require('../type')('BIN_OP_BITWISE_AND', {binOp: true});
 
 BinOpBitwiseAnd.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;

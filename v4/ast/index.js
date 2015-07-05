@@ -8,6 +8,7 @@ var A = module.exports = {
 	Loop		: require('./Loop'),
 	MissingArg	: require('./MissingArg'),
 	Module 		: require('./Module'),
+	Return 		: require('./Return'),
 	Spawn		: require('./Spawn'),
 	Statements	: require('./Statements'),
 	While 		: require('./While'),
@@ -19,6 +20,11 @@ var A = module.exports = {
 var ops = require('./ops');
 for (var k in ops) {
 	module.exports[k] = ops[k];
+}
+
+var types = require('./type').types;
+for (var k in types) {
+	module.exports[k] = types[k];
 }
 
 function build(thing) {

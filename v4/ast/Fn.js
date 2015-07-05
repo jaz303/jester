@@ -6,6 +6,8 @@ function Fn(name, params, body) {
 	this.body = body;
 }
 
+Fn.prototype.type = require('./type')('FN');
+
 // FIXME: this is a total hack, Fns should really be removed from
 // the AST by a post-processing step (or just return a null in the
 // parser)

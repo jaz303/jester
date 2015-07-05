@@ -9,9 +9,14 @@ var ParseError 	= require('./ParseError');
 
 function create(source) {
 
-	var lexer	= L();
-	var state	= lexer.start(source);
-	var curr	= null;
+	var lexer, state, curr, functions;
+
+	function reset(source) {
+		lexer = L();
+		state = lexer.start(source);
+		curr = null;
+		functions = [null];
+	}
 
 	//
 	// helpers
@@ -191,7 +196,20 @@ function create(source) {
 	}
 
 	function parseInlineStatement() {
-		return parseExpression();
+		if (curr === T.RETURN) {
+			return parseReturnStatement();
+		} else {
+			return parseExpression();	
+		}
+	}
+
+	function parseReturnStatement() {
+	    accept(T.RETURN);
+	    if (eof() || atBlockTerminator() || atStatementTerminator()) {
+	        return new A.Return(void 0)
+	    } else {
+	    	return new A.Return(parseExpression());
+	    }
 	}
 
 	function parseExpression() {
@@ -534,7 +552,10 @@ function create(source) {
 
 
 	return {
-		parseModule: parseModule
+		parseModule: function(source) {
+			reset(source);
+			return parseModule();
+		}
 	};
 
 }

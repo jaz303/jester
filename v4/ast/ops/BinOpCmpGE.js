@@ -7,6 +7,8 @@ function BinOpCmpGE(left, right) {
     this.right = right;
 }
 
+BinOpCmpGE.prototype.type = require('../type')('BIN_OP_CMP_GE', {binOp: true});
+
 BinOpCmpGE.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

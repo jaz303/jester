@@ -5,6 +5,8 @@ function BinOpAdd(left, right) {
     this.right = right;
 }
 
+BinOpAdd.prototype.type = require('../type')('BIN_OP_ADD', {binOp: true});
+
 BinOpAdd.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

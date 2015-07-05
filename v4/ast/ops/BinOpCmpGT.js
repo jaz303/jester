@@ -7,6 +7,8 @@ function BinOpCmpGT(left, right) {
     this.right = right;
 }
 
+BinOpCmpGT.prototype.type = require('../type')('BIN_OP_CMP_GT', {binOp: true});
+
 BinOpCmpGT.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

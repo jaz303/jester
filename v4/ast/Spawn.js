@@ -5,6 +5,8 @@ function Spawn(callee, args) {
 	this.args = args;
 }
 
+Spawn.prototype.type = require('./type')('SPAWN');
+
 Spawn.prototype.evaluate = function(ctx, env, cont, err) {
 	var callee = this.callee;
 	return this.evaluateList(ctx, env, this.args, function(args) {

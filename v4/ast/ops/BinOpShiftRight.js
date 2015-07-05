@@ -7,6 +7,8 @@ function BinOpShiftRight(left, right) {
     this.right = right;
 }
 
+BinOpShiftRight.prototype.type = require('../type')('BIN_OP_SHIFT_RIGHT', {binOp: true});
+
 BinOpShiftRight.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

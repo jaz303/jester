@@ -6,6 +6,8 @@ function Ident(name) {
 	this.name = name;
 }
 
+Ident.prototype.type = require('./type')('IDENT');
+
 Ident.prototype.evaluate = function(ctx, env, cont, err) {
 	try {
 		return ctx.thunk(cont, get(env, this.name));

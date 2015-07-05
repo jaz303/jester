@@ -7,6 +7,8 @@ function BinOpBitwiseOr(left, right) {
     this.right = right;
 }
 
+BinOpBitwiseOr.prototype.type = require('../type')('BIN_OP_BITWISE_OR', {binOp: true});
+
 BinOpBitwiseOr.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

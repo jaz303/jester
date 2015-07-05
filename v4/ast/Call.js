@@ -5,6 +5,8 @@ function Call(callee, args) {
 	this.args = args;
 }
 
+Call.prototype.type = require('./type')('CALL');
+
 Call.prototype.evaluate = function(ctx, env, cont, err) {
 	var callee = this.callee;
 	return this.evaluateList(ctx, env, this.args, function(args) {

@@ -8,6 +8,8 @@ function BinOpMod(left, right) {
     this.right = right;
 }
 
+BinOpMod.prototype.type = require('../type')('BIN_OP_MOD', {binOp: true});
+
 BinOpMod.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

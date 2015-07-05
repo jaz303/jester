@@ -7,6 +7,8 @@ function Assign(assignee, value) {
 	this.value = value;
 }
 
+Assign.prototype.type = require('./type')('ASSIGN');
+
 // TODO: doesn't support lvalues other than identifiers
 // needs work to support arrays, properties...
 Assign.prototype.evaluate = function(ctx, env, cont, err) {

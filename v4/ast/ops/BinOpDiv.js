@@ -7,6 +7,8 @@ function BinOpDiv(left, right) {
     this.right = right;
 }
 
+BinOpDiv.prototype.type = require('../type')('BIN_OP_DIV', {binOp: true});
+
 BinOpDiv.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

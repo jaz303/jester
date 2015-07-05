@@ -7,6 +7,8 @@ function BinOpCmpLT(left, right) {
     this.right = right;
 }
 
+BinOpCmpLT.prototype.type = require('../type')('BIN_OP_CMP_LT', {binOp: true});
+
 BinOpCmpLT.prototype.evaluate = function(ctx, env, cont, err) {
     var right = this.right;
     return this.left.evaluate(ctx, env, function(l) {

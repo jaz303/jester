@@ -130,7 +130,7 @@ function create() {
 				throw new Error("state error: start() can only be called when machine is idle");
 			}
 			state = 'starting';
-			spawnTask(mainModule.block, rootEnv);
+			spawnTask(mainModule.statements, rootEnv);
 			setTimeout(function() {
 				state = 'running';
 				go();

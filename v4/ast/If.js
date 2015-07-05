@@ -1,10 +1,14 @@
 module.exports = If;
 
+var VOID = require('../runtime/void');
+
 function If(condition, consequent, alternate) {
 	this.condition = condition;
 	this.consequent = consequent;
 	this.alternate = alternate;
 }
+
+If.prototype.type = require('./type')('IF');
 
 If.prototype.evaluate = function(ctx, env, cont, err) {
 	var consequent = this.consequent;
@@ -15,7 +19,7 @@ If.prototype.evaluate = function(ctx, env, cont, err) {
 		} else if (alternate) {
 			return alternate.evaluate(ctx, env, cont, err);
 		} else {
-			return ctx.thunk(cont, null);
+			return ctx.thunk(cont, VOID);
 		}
 	}, err);
 }

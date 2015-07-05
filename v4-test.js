@@ -3,7 +3,7 @@ require('es6-promise').polyfill();
 var A = require('./v4/ast');
 
 var source = require('fs').readFileSync('v4-test.jester', 'utf8');
-var parser = require('./v4/parser')(source);
+var parser = require('./v4/parser')();
 
 
 
@@ -87,7 +87,7 @@ var env = require('./v4/env').create({
 });
 
 try {
-	var mainModule = parser.parseModule();
+	var mainModule = parser.parseModule(source);
 } catch (e) {
 	console.log(require('util').inspect(e));
 }
