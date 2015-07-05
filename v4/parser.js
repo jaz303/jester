@@ -390,14 +390,14 @@ function create(source) {
 
 	function parseSpawn() {
 	    if (curr === T.SPAWN) {
-	        // var line = state.line;
-	        // next();
-	        // var node = parseCall();
-	        // if (node.type !== A.CALL) {
-	        //     error("expected: function call (spawn)");
-	        // }
-	        // node.type = A.SPAWN;
-	        // return node;
+	        var line = state.line;
+	        next();
+	        var node = parseCall();
+	        if (node.type !== A.CALL) {
+	        	error("expected: function call (spawn)");
+	        }
+	        // just throw away the initial call
+	        return new A.Spawn(node.callee, node.args);
 	    } else {
 	        return parseCall();
 	    }

@@ -19,20 +19,12 @@ def count_to(x, d) {
 	}
 }
 
--- def count_to(x, d) {
--- 	i = 0
--- 	while i < x {
--- 		print(i)
--- 		sleep(d)
--- 	}
--- }
--- 
--- t1 = spawn count_to(10, 1)
--- t2 = spawn count_to(100, 0.1)
--- t3 = spawn count_to(5, 2)
--- 
--- wait t1
--- wait t2
--- wait t3
--- 
--- print "all done!"-- 
+t1 = spawn count_to(10, 1)
+t2 = spawn count_to(100, 0.1)
+t3 = spawn count_to(5, 2)
+
+wait(t1)
+wait(t2)
+wait(t3)
+
+-- print "all done!"
