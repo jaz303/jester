@@ -71,13 +71,17 @@ var env = require('./v4/env').create({
 		if (!task || task.__jtype !== 'task') {
 			throw new Error("expected: task");
 		}
-		return new Promise(function(resolve) {
-			if (task.waiters === null) {
-				resolve();
-			} else {
-				task.waiters.push(resolve);	
-			}
-		});
+		if (!task.waiters) {
+			return;
+		} else {
+			return new Promise(function(resolve) {
+				if (!task.waiters) {
+					resolve();
+				} else {
+					task.waiters.push(resolve);	
+				}
+			});	
+		}
 	},
 	sleep: function(ctx, delay) {
 		return new Promise(function(resolve) {
