@@ -4,6 +4,7 @@ function Fn(name, params, body) {
 	this.name = name;
 	this.params = params;
 	this.body = body;
+	this.scope = null;
 }
 
 Fn.prototype.type = require('./type')('FN');
@@ -13,4 +14,11 @@ Fn.prototype.type = require('./type')('FN');
 // parser)
 Fn.prototype.evaluate = function(ctx, env, cont, err) {
 	return ctx.thunk(cont);
+}
+
+Fn.prototype.createCodeObject = function() {
+	return {
+		params: this.params,
+		body: this.body
+	};
 }

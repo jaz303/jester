@@ -72,7 +72,11 @@ var env = require('./v4/env').create({
 			throw new Error("expected: task");
 		}
 		return new Promise(function(resolve) {
-			task.waiters.push(resolve);
+			if (task.waiters === null) {
+				resolve();
+			} else {
+				task.waiters.push(resolve);	
+			}
 		});
 	},
 	sleep: function(ctx, delay) {
@@ -91,6 +95,9 @@ try {
 } catch (e) {
 	console.log(require('util').inspect(e));
 }
+
+var analyzer = require('./v4/analyzer')();
+analyzer.analyze(mainModule);
 
 var ctx = require('./v4/context')();
 ctx.start(mainModule, env);

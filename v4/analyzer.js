@@ -6,14 +6,16 @@ var A = require('./ast');
 function create() {
 
 	var codeObjects = [null];
-	var scopes = [new Scope()];
+	var scopes = [];
 
 	function scope() {
 		return scopes[scopes.length-1];
 	}
 
 	function pushScope() {
-		scopes.push(new Scope(scope()));
+		var newScope = new Scope(scope());
+		scopes.push(newScope);
+		return newScope;
 	}
 
 	function popScope() {
@@ -21,16 +23,16 @@ function create() {
 	}
 
 	function addImplicitReturn(functionBody) {
-		if (functionBody.length === 0) {
-			// TODO: 
-			throw new Error("need to decide wtf a void value is!");
-		} else if {
-			var lastStatement = functionBody[functionBody.length-1];
-			if (lastStatement.type !== A.RETURN) {
-				lastStatement = new A.Return(lastStatement);
-				functionBody[functionBody.length-1] = lastStatement;
-			}
-		}
+		// if (functionBody.length === 0) {
+		// 	// TODO: 
+		// 	throw new Error("need to decide wtf a void value is!");
+		// } else {
+		// 	var lastStatement = functionBody[functionBody.length-1];
+		// 	if (lastStatement.type !== A.RETURN) {
+		// 		lastStatement = new A.Return(lastStatement);
+		// 		functionBody[functionBody.length-1] = lastStatement;
+		// 	}
+		// }
 	}
 
 	//
@@ -56,11 +58,10 @@ function create() {
 				if (node.type & A.BIN_OP) {
 					walkBinOp(node);
 				} else {
-					throw new Error("unknown type: " + node.type);	
+					var err = new Error("unknown type: " + node.type);	
+					throw err;
 				}
 		}
-
-		
 	}
 
 	function walkAll(ary) {
@@ -82,20 +83,20 @@ function create() {
 		walkAll(node.args);
 	}
 
-	function walkFnDef(node) {
+	function walkFn(node) {
 		// when we see a named function definition we need to:
-		
+
 		// 1. create its code object
-		var codeObjectIndex = codeObjects.length;
-		codeObjects.push(node.createCodeObject());
+		// var codeObjectIndex = codeObjects.length;
+		// codeObjects.push(node.createCodeObject());
 		
 		// 2. insert an instance into the active scope
-		scope().addNamedFunction(node.name, codeObjectIndex);
+		scope().addNamedFunction(node.name, node.createCodeObject());
 
 		// 3. add implicit return if necessary
 		addImplicitReturn(node.body.statements);
 
-		pushScope();
+		node.scope = pushScope();
 		walk(node.body);
 		popScope();
 	}
@@ -130,7 +131,7 @@ function create() {
 
 	function walkSpawn(node) {
 		walk(node.callee);
-		walk(node.args);
+		walkAll(node.args);
 	}
 
 	function walkStatements(node) {
@@ -149,16 +150,21 @@ function create() {
 	//
 	//
 
-	function analyze(module) {
-		walkStatements(module.statements);
-	}
+	return {
+		analyze: function(module) {
+			module.scope = pushScope();
+			walkStatements(module.statements);
+			popScope();
+		}
+	};
 
 }
 
 function Scope(parent) {
 	this.parent = parent;
+	this.symbols = {};
 }
 
 Scope.prototype.addNamedFunction = function(name, codeObject) {
-
+	this.symbols[name] = codeObject;
 }

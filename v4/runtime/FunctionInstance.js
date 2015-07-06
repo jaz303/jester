@@ -1,12 +1,7 @@
 module.exports = FunctionInstance;
 
-function FunctionInstance(fn, env) {
-	this.fn = fn;
+function FunctionInstance(co, env) {
+	this.__jtype = 'function';
+	this.co = co;
 	this.env = env;
-}
-
-FunctionInstance.prototype.call = function(ctx, env, args, cont, err) {
-	// create a new env
-	// add in arguments
-	// evaluate body
 }

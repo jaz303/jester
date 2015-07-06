@@ -396,7 +396,7 @@ function create(source) {
 	        if (node.type !== A.CALL) {
 	        	error("expected: function call (spawn)");
 	        }
-	        // just throw away the initial call
+	        // just throw away the call
 	        return new A.Spawn(node.callee, node.args);
 	    } else {
 	        return parseCall();

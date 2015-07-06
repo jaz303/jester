@@ -2,6 +2,7 @@ module.exports = create;
 
 var beget = require('./env').beget;
 var define = require('./env').define;
+var FunctionInstance = require('./runtime/FunctionInstance');
 
 function create() {
 
@@ -60,6 +61,7 @@ function create() {
 				runnableTasks.push(activeTask);
 			} else if (res === EXIT) {
 				activeTask.waiters.forEach(function(cb) { cb(); });
+				activeTask.waiters = null;
 			}
 		} while (runnableTasks.length);
 		activeTask = null;
@@ -74,14 +76,21 @@ function create() {
 		spawn: function(env, fn, args) {
 			if (fn) {
 				if (fn.__jtype === 'function') {
-					if (args.length !== fn.args.length) {
+
+					//
+					// TODO: deal with args properly
+					
+					if (args.length !== fn.co.params.length) {
 						throw new Error("spawn: arity error");
 					}
+					
 					var newEnv = beget(env);
+
 					for (var i = 0; i < args.length; ++i) {
-						define(newEnv, fn.args[i], args[i]);
+						define(newEnv, fn.co.params[i].name, args[i]);
 					}
-					return spawnTask(fn.body, newEnv);
+
+					return spawnTask(fn.co.body, newEnv);
 				}
 			}
 			throw new Error("spawn: callee is not callable");
@@ -129,8 +138,14 @@ function create() {
 			if (state !== 'idle') {
 				throw new Error("state error: start() can only be called when machine is idle");
 			}
+			var moduleEnv = beget(rootEnv);
+
+			for (var k in mainModule.scope.symbols) {
+				define(moduleEnv, k, new FunctionInstance(mainModule.scope.symbols[k], moduleEnv));
+			}
+
 			state = 'starting';
-			spawnTask(mainModule.statements, rootEnv);
+			spawnTask(mainModule.statements, moduleEnv);
 			setTimeout(function() {
 				state = 'running';
 				go();

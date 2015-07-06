@@ -2,6 +2,7 @@ module.exports = Module;
 
 function Module(block) {
 	this.statements = block;
+	this.scope = null;
 }
 
 Module.prototype.type = require('./type')('MODULE');
