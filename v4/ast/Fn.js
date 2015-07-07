@@ -17,8 +17,5 @@ Fn.prototype.evaluate = function(ctx, env, cont, err) {
 }
 
 Fn.prototype.createCodeObject = function() {
-	return {
-		params: this.params,
-		body: this.body
-	};
+	return this;
 }

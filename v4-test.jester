@@ -12,11 +12,15 @@ print(10 + 4 - 4)
 -- 	x = x + 1
 -- }
 
-def test_closure {
-	print(a + b + a + b)
+def test_closure(x) {
+	y = 15
+	def foo {
+		print(x + y + a + b)
+	}
+	foo()
 }
 
-test_closure()
+test_closure(100)
 
 -- def count_to(x, d) {
 -- 	i = 0

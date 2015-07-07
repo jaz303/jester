@@ -2,6 +2,7 @@ module.exports = Call;
 
 var beget = require('../env').beget;
 var define = require('../env').define;
+var FunctionInstance = require('../runtime/FunctionInstance');
 
 function Call(callee, args) {
 	this.callee = callee;
@@ -28,6 +29,10 @@ Call.prototype.evaluate = function(ctx, env, cont, err) {
 				}
 				
 				var newEnv = beget(env);
+
+				for (var k in fn.co.scope.symbols) {
+					define(newEnv, k, new FunctionInstance(fn.co.scope.symbols[k], newEnv));
+				}
 
 				for (var i = 0; i < args.length; ++i) {
 					define(newEnv, fn.co.params[i].name, args[i]);
