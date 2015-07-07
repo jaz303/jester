@@ -24,20 +24,20 @@ my_fn = test_closure(100)
 my_fn()
 
 
--- def count_to(x, d) {
--- 	i = 0
--- 	while i < x {
--- 		print(i); sleep(d)
--- 		i = i + 1
--- 	}
--- }
--- 
--- t1 = spawn count_to(10, 0.1)
--- t2 = spawn count_to(100, 0.01)
--- t3 = spawn count_to(5, 0.2)
--- 
--- wait(t1)
--- wait(t2)
--- wait(t3)
--- 
--- print(303)
+def count_to(x, d) {
+	i = 0
+	while i < x {
+		print(i); sleep(d)
+		i = i + 1
+	}
+}
+
+t1 = spawn count_to(10, 0.1)
+t2 = spawn count_to(100, 0.01)
+t3 = spawn count_to(5, 0.2)
+
+wait(t1)
+wait(t2)
+wait(t3)
+
+print(303)

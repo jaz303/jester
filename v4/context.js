@@ -36,7 +36,11 @@ function create() {
 						return EXIT;
 					},
 					function(err) {
-						console.log("task ID " + task.id + " error:", err);
+						if (err instanceof Error) {
+							console.log("task ID " + task.id + " error:", err);
+						} else {
+							console.log("task ID " + task.id + " exited");
+						}
 						return EXIT;
 					}
 				)
