@@ -17,10 +17,12 @@ def test_closure(x) {
 	def foo {
 		print(x + y + a + b)
 	}
-	foo()
+	return foo
 }
 
-test_closure(100)
+my_fn = test_closure(100)
+my_fn()
+
 
 -- def count_to(x, d) {
 -- 	i = 0

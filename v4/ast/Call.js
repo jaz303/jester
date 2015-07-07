@@ -28,7 +28,7 @@ Call.prototype.evaluate = function(ctx, env, cont, err) {
 					return ctx.thunk(err, new Error("call: arity error"));
 				}
 				
-				var newEnv = beget(env);
+				var newEnv = beget(fn.env);
 
 				for (var k in fn.co.scope.symbols) {
 					define(newEnv, k, new FunctionInstance(fn.co.scope.symbols[k], newEnv));
@@ -38,7 +38,19 @@ Call.prototype.evaluate = function(ctx, env, cont, err) {
 					define(newEnv, fn.co.params[i].name, args[i]);
 				}
 
-				return fn.co.body.evaluate(ctx, newEnv, cont, err);
+				return fn.co.body.evaluate(
+					ctx,
+					newEnv,
+					function() {
+						console.error("!BUG! function call should never continue");
+					}, function(thing) {
+						if (thing instanceof Error) {
+							return ctx.thunk(err, thing);
+						} else {
+							return ctx.thunk(cont, thing);
+						}
+					}
+				);
 
 			} else {
 				return ctx.thunk(err, new Error("expression is not callable"));

@@ -23,16 +23,16 @@ function create() {
 	}
 
 	function addImplicitReturn(functionBody) {
-		// if (functionBody.length === 0) {
-		// 	// TODO: 
-		// 	throw new Error("need to decide wtf a void value is!");
-		// } else {
-		// 	var lastStatement = functionBody[functionBody.length-1];
-		// 	if (lastStatement.type !== A.RETURN) {
-		// 		lastStatement = new A.Return(lastStatement);
-		// 		functionBody[functionBody.length-1] = lastStatement;
-		// 	}
-		// }
+		if (functionBody.length === 0) {
+			// TODO: 
+			throw new Error("need to decide wtf a void value is!");
+		} else {
+			var lastStatement = functionBody[functionBody.length-1];
+			if (lastStatement.type !== A.RETURN) {
+				lastStatement = new A.Return(lastStatement);
+				functionBody[functionBody.length-1] = lastStatement;
+			}
+		}
 	}
 
 	//
