@@ -90,7 +90,7 @@ var env = require('./v4/env').create({
 	},
 	ops: 0,
 	print: function(ctx, args) {
-		console.log(args[0]);
+		console.log.apply(console, args);
 	}
 });
 

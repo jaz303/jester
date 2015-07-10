@@ -100,6 +100,19 @@ function create(source) {
 	}
 
 	//
+	// decoders
+
+	function decodeString(str) {
+	    return str.substr(1, str.length - 2)
+	              .replace(/\\r/g,  "\r")
+	              .replace(/\\n/g,  "\n")
+	              .replace(/\\t/g,  "\t")
+	              .replace(/\\\\/g, "\\")
+	              .replace(/\\'/g,  "'")
+	              .replace(/\\"/g,  "\"");
+	}
+
+	//
 	//
 
 	function parseModule() {
@@ -240,11 +253,11 @@ function create(source) {
 	// a || b
 	function parseLogicalOrExpression() {
 	    var exp = parseLogicalAndExpression();
-	    while (at('||')) {
-	    	throw new Error("impl");
-	        // var line = state.line;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: '||', line: line, left: exp, right: parseLogicalAndExpression() };
+	    while (at(T.OR)) {
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseLogicalAndExpression());
+	    	// TODO: line
 	    }
 	    return exp;
 	}
@@ -252,11 +265,11 @@ function create(source) {
 	// a && b
 	function parseLogicalAndExpression() {
 	    var exp = parseBitwiseOrExpression();
-	    while (at('&&')) {
-	    	throw new Error("impl");
-	        // var line = state.line;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: '&&', line: line, left: exp, right: parseBitwiseOrExpression() };
+	    while (at(T.AND)) {
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseBitwiseOrExpression());
+	    	// TODO: line
 	    }
 	    return exp;
 	}
@@ -264,11 +277,11 @@ function create(source) {
 	// a | b
 	function parseBitwiseOrExpression() {
 	    var exp = parseBitwiseXorExpression();
-	    while (at('|')) {
-	    	throw new Error("impl");
-	        // var line = state.line;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: '|', line: line, left: exp, right: parseBitwiseXorExpression() };
+	    while (at(T.PIPE)) {
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseBitwiseXorExpression());
+	    	// TODO: line
 	    }
 	    return exp;
 	}
@@ -276,11 +289,11 @@ function create(source) {
 	// a ^ b
 	function parseBitwiseXorExpression() {
 	    var exp = parseBitwiseAndExpression();
-	    while (at('^')) {
-	    	throw new Error("impl");
-	        // var line = state.line;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: '^', line: line, left: exp, right: parseBitwiseAndExpression() };
+	    while (at(T.HAT)) {
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseBitwiseAndExpression());
+	    	// TODO: line
 	    }
 	    return exp;
 	}
@@ -288,11 +301,11 @@ function create(source) {
 	// a & b
 	function parseBitwiseAndExpression() {
 	    var exp = parseEqualityExpression();
-	    while (at('&')) {
-	    	throw new Error("impl");
-	        // var line = state.line;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: '&', line: line, left: exp, right: parseEqualityExpression() };
+	    while (at(T.AMP)) {
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseEqualityExpression());
+	    	// TODO: line
 	    }
 	    return exp;
 	}
@@ -300,11 +313,11 @@ function create(source) {
 	// a == b, a != b
 	function parseEqualityExpression() {
 	    var exp = parseCmpExpression();
-	    while (at('==') || at('!=')) {
-	    	throw new Error("impl");
-	        // var line = state.line, op = curr;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseCmpExpression() };
+	    while (at(T.EQ) || at(T.NEQ)) {
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseCmpExpression());
+	    	// TODO: line
 	    }
 	    return exp;
 	}
@@ -324,11 +337,11 @@ function create(source) {
 	// a << b, a >> b
 	function parseShiftExpression() {
 	    var exp = parseAddSubExpression();
-	    while (at('<<') || at('>>')) {
-	    	throw new Error("impl");
-	        // var line = state.line, op = curr;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseAddSubExpression() };
+	    while (at(T.LSHIFT) || at(T.RSHIFT)) {
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseAddSubExpression());
+	    	// TODO: line
 	    }
 	    return exp;
 	}
@@ -349,10 +362,10 @@ function create(source) {
 	function parseMulDivPowModExpression() {
 	    var exp = parseUnary();
 	    while (at(T.STAR) || at(T.SLASH) || at(T.BACKSLASH) || at(T.POW) || at(T.PERCENT)) {
-	    	throw new Error("impl");
-	        // var line = state.line, op = curr;
-	        // next();
-	        // exp = { type: A.BIN_OP, op: op, line: line, left: exp, right: parseUnary() };
+	    	var op = curr.binOp;
+	    	next();
+	    	exp = new op(exp, parseUnary());
+	    	// TODO: line
 	    }
 	    return exp;
 	}
@@ -480,7 +493,8 @@ function create(source) {
 	    	exp = new A.Literal(parseFloat(text()), 10);
 	        next();
 	    } else if (at(T.STRING)) {
-	        exp = parseString();
+	    	exp = new A.Literal(decodeString(state.text));
+	        next();
 	    // } else if (at('TRACE')) {
 	    //     exp = { type: A.TRACE };
 	    //     next();
@@ -519,12 +533,6 @@ function create(source) {
 	        error("expected: expression");
 	    }
 
-	    return exp;
-	}
-
-	function parseString() {
-	    var exp = { type: A.STRING, value: decodeString(state.text) };
-	    accept('STRING');
 	    return exp;
 	}
 

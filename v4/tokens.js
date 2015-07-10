@@ -22,8 +22,8 @@ makeSymbols({
     EQ          : { text: '==', binOp: A.BinOpCmpEQ },
     NEQ         : { text: '!=', binOp: A.BinOpCmpNEQ },
     POW         : { text: '**', binOp: A.BinOpPow },
-    OR          : '||',
-    AND         : '&&',
+    OR          : { text: '||', binOp: A.BinOpLogicalOr },
+    AND         : { text: '&&', binOp: A.BinOpLogicalAnd },
     DOTBRACE    : '.{',
 
     QUESTION    : '?',

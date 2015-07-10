@@ -11,6 +11,8 @@ module.exports = {
 	BinOpCmpNEQ: require('./BinOpCmpNEQ.js'),
 	BinOpDiv: require('./BinOpDiv.js'),
 	BinOpIntDiv: require('./BinOpIntDiv.js'),
+	BinOpLogicalAnd: require('./BinOpLogicalAnd.js'),
+	BinOpLogicalOr: require('./BinOpLogicalOr.js'),
 	BinOpMod: require('./BinOpMod.js'),
 	BinOpMul: require('./BinOpMul.js'),
 	BinOpPow: require('./BinOpPow.js'),
