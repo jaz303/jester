@@ -1,7 +1,8 @@
-var A = module.exports = {
+exports = module.exports = {
 	Assign		: require('./Assign'),
 	Call		: require('./Call'),
 	Fn 			: require('./Fn'),
+	GlobalIdent	: require('./GlobalIdent'),
 	Ident 		: require('./Ident'),
 	If 			: require('./If'),
 	Literal		: require('./Literal'),

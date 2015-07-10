@@ -77,6 +77,8 @@ function create() {
 	}
 
 	var ctx = {
+		globals: {},
+
 		spawn: function(env, fn, args) {
 			if (fn) {
 				if (fn.__jtype === 'function') {

@@ -26,6 +26,7 @@ makeSymbols({
     AND         : { text: '&&', binOp: A.BinOpLogicalAnd },
     DOTBRACE    : '.{',
 
+    DOLLAR      : '$',
     QUESTION    : '?',
     DOT         : '.',
     SEMICOLON   : ';',

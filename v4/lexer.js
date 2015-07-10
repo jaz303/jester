@@ -35,12 +35,12 @@ module.exports = function() {
                 return match[1] ? T.FLOAT : T.INTEGER;
             }
         },
-        // // $, $foo
-        // {   pattern: /^\$([a-zA-Z_][a-zA-Z0-9_]*)?/,
-        //     cb: function(match) {
-        //         return (match[0].length === 1) ? '$' : 'GLOBAL_IDENT';
-        //     }
-        // },
+        // $, $foo
+        {   pattern: /^\$([a-zA-Z_][a-zA-Z0-9_]*)?/,
+            cb: function(match) {
+                return (match[0].length === 1) ? T.DOLLAR : T.GLOBAL_IDENT;
+            }
+        },
         // // #, #red, #ff0000
         // {   pattern: /^#([0-9a-fA-F]{8}|[0-9a-fA-F]{6}|[a-zA-Z_]+)?/,
         //     cb: function(match) {

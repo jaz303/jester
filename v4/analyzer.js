@@ -43,6 +43,7 @@ function create() {
 			case A.ASSIGN: return walkAssign(node);
 			case A.CALL: return walkCall(node);
 			case A.FN: return walkFn(node);
+			case A.GLOBAL_IDENT: return walkGlobalIdent(node);
 			case A.IDENT: return walkIdent(node);
 			case A.IF: return walkIf(node);
 			case A.LITERAL: return walkLiteral(node);
@@ -99,6 +100,10 @@ function create() {
 		node.scope = pushScope();
 		walk(node.body);
 		popScope();
+	}
+
+	function walkGlobalIdent(node) {
+		// no-op
 	}
 
 	function walkIdent(node) {

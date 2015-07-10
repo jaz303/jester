@@ -500,12 +500,9 @@ function create(source) {
 	    //     next();
 	    } else if (at(T.IDENT)) {
 	        exp = parseIdent();
-	    // } else if (at(T.GLOBAL_IDENT)) {
-	    //     exp = {
-	    //         type: A.GLOBAL_IDENT,
-	    //         name: text().substring(1)
-	    //     };
-	    //     next();
+	    } else if (at(T.GLOBAL_IDENT)) {
+	    	exp = new A.GlobalIdent(state.text.substring(1));
+	        next();
 	    // } else if (at('$')) {
 	    //     exp = { type: A.GLOBAL_OBJECT };
 	    //     next();
