@@ -2,24 +2,34 @@ module.exports = If;
 
 var VOID = require('../runtime/void');
 
-function If(condition, consequent, alternate) {
-	this.condition = condition;
-	this.consequent = consequent;
-	this.alternate = alternate;
+function If(conditions, bodies) {
+	this.conditions = conditions;
+	this.bodies = bodies;
 }
 
 If.prototype.type = require('./type')('IF');
 
 If.prototype.evaluate = function(ctx, env, cont, err) {
-	var consequent = this.consequent;
-	var alternate = this.alternate;
-	return this.condition.evaluate(ctx, env, function(res) {
-		if (ctx.isTruthy(res)) {
-			return consequent.evaluate(ctx, env, cont, err);
-		} else if (alternate) {
-			return alternate.evaluate(ctx, env, cont, err);
-		} else {
+	var conditions = this.conditions;
+	var bodies = this.bodies;
+	var len = conditions.length;
+	return (function _loop(ix) {
+		if (ix === len) {
 			return ctx.thunk(cont, VOID);
+		} else if (!conditions[ix]) {
+			return bodies[ix].evaluate(ctx, env, function(res) {
+				return ctx.thunk(cont, res);
+			}, err);
+		} else {
+			return conditions[ix].evaluate(ctx, env, function(res) {
+				if (ctx.isTruthy(res)) {
+					return bodies[ix].evaluate(ctx, env, function(res) {
+						return ctx.thunk(cont, res);
+					}, err);
+				} else {
+					return _loop(ix + 1);
+				}
+			}, err);
 		}
-	}, err);
+	})(0);
 }

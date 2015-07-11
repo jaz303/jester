@@ -111,10 +111,11 @@ function create() {
 	}
 
 	function walkIf(node) {
-		walk(node.condition);
-		walk(node.consequent);
-		if (node.alternate) {
-			walk(node.alternate);	
+		for (var i = 0; i < node.conditions.length; ++i) {
+			if (node.conditions[i]) {
+				walk(node.conditions[i]);	
+			}
+			walk(node.bodies[i]);
 		}
 	}
 

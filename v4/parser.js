@@ -69,7 +69,9 @@ function create(source) {
 
 	function atBlockStatementStart() {
 		return curr === T.WHILE
-				|| curr === T.DEF;
+				|| curr === T.LOOP
+				|| curr === T.DEF
+				|| curr === T.IF;
 		// return curr === T.IF
 	    //         || curr === T.WHILE
 	    //         || curr === T.LOOP
@@ -152,6 +154,10 @@ function create(source) {
 	function parseBlockStatement() {
 		if (curr === T.WHILE) {
 			return parseWhileStatement();
+		} else if (curr === T.LOOP) {
+			return parseLoopStatement();
+		} else if (curr === T.IF) {
+			return parseIfStatement();
 		} else if (curr === T.DEF) {
 			return parseFunctionDefinition();
 		} else {
@@ -166,6 +172,45 @@ function create(source) {
 	    skipNewlines();
 	    var body = parseBlock();
 	    return new A.While(condition, body);
+	}
+
+	function parseLoopStatement() {
+	    var line = state.line;
+	    accept(T.LOOP);
+	    skipNewlines();
+	    var body = parseBlock();
+	    return new A.Loop(body);
+	}
+
+	function parseIfStatement() {
+		var conditions = [];
+		var bodies = [];
+
+		accept(T.IF);
+
+		conditions.push(parseExpression());
+		skipNewlines();
+		bodies.push(parseBlock());
+		skipNewlines();
+
+		while (curr === T.ELSE) {
+			next();
+			if (curr === T.IF) {
+				next();
+				conditions.push(parseExpression());
+				skipNewlines();
+				bodies.push(parseBlock());
+				skipNewlines();
+			} else {
+				conditions.push(null);
+				skipNewlines();
+				bodies.push(parseBlock());
+				skipNewlines();
+				break;
+			}
+		}
+
+		return new A.If(conditions, bodies);
 	}
 
 	function parseFunctionDefinition() {
