@@ -58,6 +58,8 @@ function create() {
 			default:
 				if (node.type & A.BIN_OP) {
 					walkBinOp(node);
+				} else if (node.type & A.UN_OP) {
+					walkUnOp(node);
 				} else {
 					var err = new Error("unknown type: " + node.type);	
 					throw err;
@@ -142,6 +144,10 @@ function create() {
 
 	function walkStatements(node) {
 		walkAll(node.statements);
+	}
+
+	function walkUnOp(node) {
+		walk(node.exp);
 	}
 
 	function walkWhile(node) {

@@ -417,19 +417,21 @@ function create(source) {
 	
 	// !foo, ~foo, -foo, +foo
 	function parseUnary() {
-	    if (at('!') || at('~') || at('-') || at('+')) {
-	    	throw new Error("impl");
-	        // var line = state.line;
-	        // var root = { type: A.UN_OP, op: curr, line: line, exp: null }, curr = root;
-	        // next();
-	        // while (at('!') || at('~') || at('-') || at('+')) {
-	        //     line = state.line;
-	        //     curr.exp = { type: A.UN_OP, op: curr, line: line, exp: null };
-	        //     curr = curr.exp;
-	        //     next();
-	        // }
-	        // curr.exp = parseSpawn();
-	        // return root;
+	    if (at(T.BANG) || at(T.TILDE) || at(T.MINUS) || at(T.PLUS)) {
+	        var line = state.line;
+	        var op = curr.unOp;
+	        var rootOp = new op(null);
+	        var currentOp = rootOp;
+	        next();
+	        while (at(T.BANG) || at(T.TILDE) || at(T.MINUS) || at(T.PLUS)) {
+	        	line = state.line;
+	        	op = curr.unOp;
+	        	currentOp.exp = new op(null);
+	        	currentOp = currentOp.exp;
+	        	next();
+	        }
+	        currentOp.exp = parseSpawn();
+	        return rootOp;
 	    } else {
 	        return parseSpawn();
 	    }

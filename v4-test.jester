@@ -2,6 +2,12 @@ foo = 0
 foo = 100
 bar = "green"
 
+print(-+-+-5)
+print(++++-5)
+print(!5)
+print(!!5)
+print(~1)
+
 if foo < 10 {
 	print("foo is less than 10")
 } else if foo == 10 {

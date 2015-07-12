@@ -18,5 +18,9 @@ module.exports = {
 	BinOpPow: require('./BinOpPow.js'),
 	BinOpShiftLeft: require('./BinOpShiftLeft.js'),
 	BinOpShiftRight: require('./BinOpShiftRight.js'),
-	BinOpSub: require('./BinOpSub.js')
+	BinOpSub: require('./BinOpSub.js'),
+	UnOpBitwiseNot: require('./UnOpBitwiseNot'),
+	UnOpLogicalNot: require('./UnOpLogicalNot'),
+	UnOpNegative: require('./UnOpNegative'),
+	UnOpPositive: require('./UnOpPositive')
 }
