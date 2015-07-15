@@ -571,9 +571,9 @@ function create(source) {
 	    //     exp = parseArray();
 	    // } else if (at('{')) {
 	    //     exp = parseDictionary();
-	    // } else if (at('.{')) {
-	    //     exp = parseLambda();
-	    // } else {
+	    } else if (at(T.DOTBRACE)) {
+	        exp = parseLambda();
+	    } else {
 	        error("expected: expression");
 	    }
 
@@ -601,7 +601,52 @@ function create(source) {
 	    return args;
 	}
 
+	function parseLambda() {
+	    
+	    var line        = state.line,
+	        hasParams  	= false;
+	    
+	    accept(T.DOTBRACE);
 
+	    if (curr === T.IDENT) {
+	        var lookahead = lexer.clone(state);
+	        while (true) {
+	            var tok = lexer.lex(lookahead);
+	            if (tok === T.IDENT || tok === T.COMMA) {
+	                // do nothing
+	            } else if (tok === T.PIPE) {
+	                hasParams = true;
+	                break;
+	            } else {
+	                break;
+	            }
+	        }
+	    }
+
+	    var params = hasParams ? parseLambdaParameters() : [];
+	    var body = parseStatements();
+
+	    accept(T.RBRACE);
+
+	    return new A.Lambda(params, body);
+
+	}
+
+	function parseLambdaParameters() {
+	    var args = [{ name: state.text, optional: false, defaultValue: void 0 }];
+	    accept(T.IDENT);
+		while (true) {
+	        if (at(T.COMMA)) {
+	            next();
+	            args.push({ name: requireident(), optional: false, defaultValue: void 0 });
+	        } else if (at(T.PIPE)) {
+	            next();
+	            return args;
+	        } else {
+	            error("unexpected token in lambda argument list")
+	        }
+	    }
+	}
 
 	return {
 		parseModule: function(source) {

@@ -2,6 +2,16 @@ foo = 0
 foo = 100
 bar = "green"
 
+lambda1 = .{ x,y| x + y }
+print(lambda1(10, 11))
+
+def test_lambda(a, b) {
+	.{ x, y | a + b + x + y }
+}
+
+l = test_lambda(1, 2)
+print(l(3, 4))
+
 print(-+-+-5)
 print(++++-5)
 print(!5)

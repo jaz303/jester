@@ -46,6 +46,7 @@ function create() {
 			case A.GLOBAL_IDENT: return walkGlobalIdent(node);
 			case A.IDENT: return walkIdent(node);
 			case A.IF: return walkIf(node);
+			case A.LAMBDA: return walkLambda(node);
 			case A.LITERAL: return walkLiteral(node);
 			case A.LOOP: return walkLoop(node);
 			case A.MISSING_ARG: return walkMissingArg(node);
@@ -119,6 +120,13 @@ function create() {
 			}
 			walk(node.bodies[i]);
 		}
+	}
+
+	function walkLambda(node) {
+		addImplicitReturn(node.body.statements);
+		node.scope = pushScope();
+		walk(node.body);
+		popScope();
 	}
 
 	function walkLiteral(node) {

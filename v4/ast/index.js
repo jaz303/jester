@@ -5,6 +5,7 @@ exports = module.exports = {
 	GlobalIdent	: require('./GlobalIdent'),
 	Ident 		: require('./Ident'),
 	If 			: require('./If'),
+	Lambda 		: require('./Lambda'),
 	Literal		: require('./Literal'),
 	Loop		: require('./Loop'),
 	MissingArg	: require('./MissingArg'),
