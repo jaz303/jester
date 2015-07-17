@@ -1,22 +1,23 @@
 exports = module.exports = {
-	Assign		: require('./Assign'),
-	Call		: require('./Call'),
-	Fn 			: require('./Fn'),
-	GlobalIdent	: require('./GlobalIdent'),
-	Ident 		: require('./Ident'),
-	If 			: require('./If'),
-	Lambda 		: require('./Lambda'),
-	Literal		: require('./Literal'),
-	Loop		: require('./Loop'),
-	MissingArg	: require('./MissingArg'),
-	Module 		: require('./Module'),
-	Return 		: require('./Return'),
-	Spawn		: require('./Spawn'),
-	Statements	: require('./Statements'),
-	While 		: require('./While'),
-	Yield		: require('./Yield'),
+	ArrayLiteral	: require('./ArrayLiteral'),
+	Assign			: require('./Assign'),
+	Call			: require('./Call'),
+	Fn 				: require('./Fn'),
+	GlobalIdent		: require('./GlobalIdent'),
+	Ident 			: require('./Ident'),
+	If 				: require('./If'),
+	Lambda 			: require('./Lambda'),
+	Literal			: require('./Literal'),
+	Loop			: require('./Loop'),
+	MissingArg		: require('./MissingArg'),
+	Module 			: require('./Module'),
+	Return 			: require('./Return'),
+	Spawn			: require('./Spawn'),
+	Statements		: require('./Statements'),
+	While 			: require('./While'),
+	Yield			: require('./Yield'),
 
-	build 		: build
+	build 			: build
 };
 
 var ops = require('./ops');

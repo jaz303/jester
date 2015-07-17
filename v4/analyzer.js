@@ -40,6 +40,7 @@ function create() {
 
 	function walk(node) {
 		switch (node.type) {
+			case A.ARRAY_LITERAL: return walkArrayLiteral(node);
 			case A.ASSIGN: return walkAssign(node);
 			case A.CALL: return walkCall(node);
 			case A.FN: return walkFn(node);
@@ -70,6 +71,10 @@ function create() {
 
 	function walkAll(ary) {
 		ary.forEach(walk);
+	}
+
+	function walkArrayLiteral(node) {
+		walkAll(node.elements);
 	}
 
 	function walkAssign(node) {

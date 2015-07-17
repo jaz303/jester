@@ -2,6 +2,34 @@ foo = 0
 foo = 100
 bar = "green"
 
+ary = [
+	1, 2,
+	3 ]
+
+print(ary)
+
+ary2 = [
+
+
+]
+
+print(ary2)
+
+ary3 = [
+"foo"
+
+,
+
+"bar"
+
+,
+
+"baz"
+
+]
+
+print(ary3)
+
 lambda1 = .{ x,y| x + y }
 print(lambda1(10, 11))
 

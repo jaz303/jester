@@ -567,6 +567,8 @@ function create(source) {
 	        next();
 	        exp = parseExpression();
 	        accept(T.RPAREN);
+	    } else if (at(T.LBRACKET)) {
+	    	exp = parseArray();
 	    // } else if (at('[')) {
 	    //     exp = parseArray();
 	    // } else if (at('{')) {
@@ -599,6 +601,26 @@ function create(source) {
 	    }
 	    accept(T.RPAREN);
 	    return args;
+	}
+
+	function parseArray() {
+		var els = [], line = state.line;
+		accept(T.LBRACKET);
+		skipNewlines();
+		if (curr !== T.RBRACKET) {
+		    while (true) {
+		        els.push(parseExpression());
+		        skipNewlines();
+		        if (curr === T.COMMA) {
+		            next();
+		            skipNewlines();
+		        } else {
+		            break;
+		        }
+		    }    
+		}
+		accept(T.RBRACKET);
+		return new A.ArrayLiteral(els);
 	}
 
 	function parseLambda() {
