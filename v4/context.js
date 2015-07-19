@@ -77,6 +77,8 @@ function create() {
 	}
 
 	var ctx = {
+		'void': require('./runtime/void'),
+		VOID: require('./runtime/void'),
 		globals: {},
 
 		spawn: function(env, fn, args) {

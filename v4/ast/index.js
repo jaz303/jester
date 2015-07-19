@@ -2,6 +2,7 @@ exports = module.exports = {
 	ArrayLiteral	: require('./ArrayLiteral'),
 	Assign			: require('./Assign'),
 	Call			: require('./Call'),
+	ComputedMember	: require('./ComputedMember'),
 	Fn 				: require('./Fn'),
 	GlobalIdent		: require('./GlobalIdent'),
 	Ident 			: require('./Ident'),
@@ -14,6 +15,7 @@ exports = module.exports = {
 	Return 			: require('./Return'),
 	Spawn			: require('./Spawn'),
 	Statements		: require('./Statements'),
+	StaticMember	: require('./StaticMember'),
 	While 			: require('./While'),
 	Yield			: require('./Yield'),
 

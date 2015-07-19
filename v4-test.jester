@@ -2,6 +2,14 @@ foo = 0
 foo = 100
 bar = "green"
 
+my_array = [1, 4, 3]
+print("index 0 ", my_array[0])
+print("index 1 ", my_array[1])
+
+x = 3
+my_array[x-1] = 10
+print("index 2 ", my_array[2])
+
 ary = [
 	1, 2,
 	3 ]

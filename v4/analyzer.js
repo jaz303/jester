@@ -43,6 +43,7 @@ function create() {
 			case A.ARRAY_LITERAL: return walkArrayLiteral(node);
 			case A.ASSIGN: return walkAssign(node);
 			case A.CALL: return walkCall(node);
+			case A.COMPUTED_MEMBER: return walkComputedMember(node);
 			case A.FN: return walkFn(node);
 			case A.GLOBAL_IDENT: return walkGlobalIdent(node);
 			case A.IDENT: return walkIdent(node);
@@ -54,6 +55,7 @@ function create() {
 			case A.MODULE: return walkModule(node);
 			case A.RETURN: return walkReturn(node);
 			case A.SPAWN: return walkSpawn(node);
+			case A.STATIC_MEMBER: return walkStaticMember(node);
 			case A.STATEMENTS: return walkStatements(node);
 			case A.WHILE: return walkWhile(node);
 			case A.YIELD: return walkYield(node);
@@ -90,6 +92,11 @@ function create() {
 	function walkCall(node) {
 		walk(node.callee);
 		walkAll(node.args);
+	}
+
+	function walkComputedMember(node) {
+		walk(node.subject);
+		walk(node.memberExp);
 	}
 
 	function walkFn(node) {
@@ -157,6 +164,10 @@ function create() {
 
 	function walkStatements(node) {
 		walkAll(node.statements);
+	}
+
+	function walkStaticMember(node) {
+		walk(node.subject);
 	}
 
 	function walkUnOp(node) {

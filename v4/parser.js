@@ -494,25 +494,13 @@ function create(source) {
 	            } else {
 	            	lhs = new A.Call(lhs, parseParenArgs());
 	            }
-	        } else if (curr === '.') {
-	        	throw new Error("impl");
-	            // next();
-	            // var name = state.text;
-	            // accept('IDENT');
-	            // lhs = {
-	            //     type    : A.PROP_DEREF,
-	            //     subject : lhs,
-	            //     name    : name
-	            // };
+	        } else if (curr === T.DOT) {
+	        	next();
+	        	lhs = new A.StaticMember(lhs, requireident());
 	        } else {
-	        	throw new Error("impl");
-	            // next();
-	            // lhs = {
-	            //     type    : A.ARRAY_DEREF,
-	            //     subject : lhs,
-	            //     index   : parseExpression()
-	            // };
-	            // accept(']');
+	        	next();
+	        	lhs = new A.ComputedMember(lhs, parseExpression());
+	        	accept(T.RBRACKET);
 	        }
 	    }
 	    return lhs;
