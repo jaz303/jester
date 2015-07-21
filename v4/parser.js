@@ -557,10 +557,8 @@ function create(source) {
 	        accept(T.RPAREN);
 	    } else if (at(T.LBRACKET)) {
 	    	exp = parseArray();
-	    // } else if (at('[')) {
-	    //     exp = parseArray();
-	    // } else if (at('{')) {
-	    //     exp = parseDictionary();
+	    } else if (at(T.LBRACE)) {
+	    	exp = parseDictionary();
 	    } else if (at(T.DOTBRACE)) {
 	        exp = parseLambda();
 	    } else {
@@ -609,6 +607,35 @@ function create(source) {
 		}
 		accept(T.RBRACKET);
 		return new A.ArrayLiteral(els);
+	}
+
+	function parseDictionary() {
+		var keys = [], values = [], line = state.line;
+		accept(T.LBRACE);
+		skipNewlines();
+		if (curr !== T.RBRACE) {
+			while (true) {
+				if (curr === T.STRING) {
+					keys.push(decodeString(state.text));
+				} else if (curr === T.IDENT) {
+					keys.push(state.text);
+				} else {
+					error("dictionary key must be string or ident");
+				}
+				next();
+				accept(T.EQUALS);
+				values.push(parseExpression());
+				skipNewlines();
+				if (curr === T.COMMA) {
+					next();
+					skipNewlines();
+				} else {
+					break;
+				}
+			}
+		}
+		accept(T.RBRACE);
+		return new A.DictLiteral(keys, values);
 	}
 
 	function parseLambda() {

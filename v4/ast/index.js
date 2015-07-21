@@ -3,6 +3,7 @@ exports = module.exports = {
 	Assign			: require('./Assign'),
 	Call			: require('./Call'),
 	ComputedMember	: require('./ComputedMember'),
+	DictLiteral 	: require('./DictLiteral'),
 	Fn 				: require('./Fn'),
 	GlobalDict 		: require('./GlobalDict'),
 	GlobalIdent		: require('./GlobalIdent'),

@@ -44,6 +44,7 @@ function create() {
 			case A.ASSIGN: return walkAssign(node);
 			case A.CALL: return walkCall(node);
 			case A.COMPUTED_MEMBER: return walkComputedMember(node);
+			case A.DICT_LITERAL: return walkDictLiteral(node);
 			case A.FN: return walkFn(node);
 			case A.GLOBAL_DICT: return walkGlobalDict(node);
 			case A.GLOBAL_IDENT: return walkGlobalIdent(node);
@@ -98,6 +99,10 @@ function create() {
 	function walkComputedMember(node) {
 		walk(node.subject);
 		walk(node.memberExp);
+	}
+
+	function walkDictLiteral(node) {
+		walkAll(node.values);
 	}
 
 	function walkFn(node) {
