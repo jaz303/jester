@@ -27,7 +27,7 @@ Assign.prototype.evaluate = function(ctx, env, cont, err) {
 				return ctx.thunk(cont, value);
 			// }	
 		} else if (assignee.type === type.GLOBAL_IDENT) {
-			ctx.globals[assignee.name] = value;
+			ctx.globals.items[assignee.name] = value;
 			return ctx.thunk(cont, value);
 		} else if (assignee.type === type.COMPUTED_MEMBER) {
 			return assignee.subject.evaluate(ctx, env, function(subject) {
@@ -45,14 +45,29 @@ Assign.prototype.evaluate = function(ctx, env, cont, err) {
 							return ctx.thunk(cont, value);
 						}
 					} else if (subject.__jtype === 'dict') {
-						return ctx.thunk(err, new Error("dictionary assignment not implemented"));
+						if (typeof member !== 'string') {
+							return ctx.thunk(err, new Error("dictionary key must be a string"));
+						} else {
+							subject.items[member] = value;
+							return ctx.thunk(cont, value);
+						}
 					} else {
 						return ctx.thunk(err, new Error("lval of computed member assignment must be array or dictionary"));
 					}
 				}, err);
 			}, err);
 		} else if (assignee.type === type.STATIC_MEMBER) {
-			return ctx.thunk(err, new Error("static member assignment not implemented"));
+			return assignee.subject.evaluate(ctx, env, function(subject) {
+				if (!subject) {
+					return ctx.thunk(err, new Error("cannot dereference null value"));
+				}
+				if (subject.__jtype === 'dict') {
+					subject.items[assignee.member] = value;
+					return ctx.thunk(cont, value);
+				} else {
+					return ctx.thunk(err, new Error("subject of static member assignment must be dictionary"));
+				}
+			}, err);
 		} else {
 			return ctx.thunk(err, new Error("invalid lval in assignment"));
 		}

@@ -4,6 +4,7 @@ exports = module.exports = {
 	Call			: require('./Call'),
 	ComputedMember	: require('./ComputedMember'),
 	Fn 				: require('./Fn'),
+	GlobalDict 		: require('./GlobalDict'),
 	GlobalIdent		: require('./GlobalIdent'),
 	Ident 			: require('./Ident'),
 	If 				: require('./If'),

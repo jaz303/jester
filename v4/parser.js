@@ -538,9 +538,9 @@ function create(source) {
 	    } else if (at(T.GLOBAL_IDENT)) {
 	    	exp = new A.GlobalIdent(state.text.substring(1));
 	        next();
-	    // } else if (at('$')) {
-	    //     exp = { type: A.GLOBAL_OBJECT };
-	    //     next();
+	    } else if (at(T.DOLLAR)) {
+	    	exp = new A.GlobalDict();
+	    	next();
 	    // } else if (at('COLOR')) {
 	    //     exp = decodeColor(text());
 	    //     next();

@@ -3,6 +3,7 @@ module.exports = create;
 var beget = require('./env').beget;
 var define = require('./env').define;
 var FunctionInstance = require('./runtime/FunctionInstance');
+var Dict = require('./runtime/Dict');
 
 function create() {
 
@@ -79,7 +80,7 @@ function create() {
 	var ctx = {
 		'void': require('./runtime/void'),
 		VOID: require('./runtime/void'),
-		globals: {},
+		globals: new Dict(),
 
 		spawn: function(env, fn, args) {
 			if (fn) {

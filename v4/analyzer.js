@@ -45,6 +45,7 @@ function create() {
 			case A.CALL: return walkCall(node);
 			case A.COMPUTED_MEMBER: return walkComputedMember(node);
 			case A.FN: return walkFn(node);
+			case A.GLOBAL_DICT: return walkGlobalDict(node);
 			case A.GLOBAL_IDENT: return walkGlobalIdent(node);
 			case A.IDENT: return walkIdent(node);
 			case A.IF: return walkIf(node);
@@ -115,6 +116,10 @@ function create() {
 		node.scope = pushScope();
 		walk(node.body);
 		popScope();
+	}
+
+	function walkGlobalDict(node) {
+		// no-op
 	}
 
 	function walkGlobalIdent(node) {
