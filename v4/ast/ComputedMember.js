@@ -16,7 +16,7 @@ ComputedMember.prototype.evaluate = function(ctx, env, cont, err) {
 					if (typeof member === 'string') {
 						return ctx.thunk(cont, subject.items[member] || ctx.VOID);
 					} else {
-						return ctx.thunk(err, new Dictionary("dictionary key must be a string"));
+						return ctx.thunk(err, new Error("dictionary key must be a string"));
 					}
 				} else if (subject.__jtype === 'array') {
 					if (typeof member === 'number') {
